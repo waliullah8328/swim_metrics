@@ -9,6 +9,7 @@ import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/lan
 import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/plan_page_widget.dart';
 import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/tools_page_widget.dart';
 
+import '../../../../core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import '../../../../core/common/widgets/new_custon_widgets/custom_screen_back_ground.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
@@ -90,23 +91,17 @@ class _OnboardingScreenState
               /// Next Button
               Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 24.w),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  onPressed: () {
-                    if (state.currentPage < 3) {
-                      _controller.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeIn);
-                    } else {
-                      debugPrint("Complete Onboarding");
-                    }
-                  },
-                  child: const Text("Next"),
-                ),
+                child: CustomPrimaryButton(onPressed: (){
+                  if (state.currentPage < 3) {
+                    _controller.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeIn);
+                  } else {
+                    debugPrint("Complete Onboarding");
+                  }
+                },title: "Purchase Now",),
               ),
+
             
                SizedBox(height: 30.h),
             ],

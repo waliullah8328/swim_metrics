@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
+import '../../../core/utils/constants/app_colors.dart';
 
-import '../../constants/app_colors.dart';
+
 
 class BottomNavBarThemeData {
   BottomNavBarThemeData._();

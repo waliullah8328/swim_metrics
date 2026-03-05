@@ -7,8 +7,9 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 
 
+import '../../../../config/theme/theme_provider.dart';
 import '../../../utils/constants/app_colors.dart';
-import '../../../utils/theme/theme_provider.dart';
+
 
 class CustomTextField extends ConsumerWidget {
   const CustomTextField(  {

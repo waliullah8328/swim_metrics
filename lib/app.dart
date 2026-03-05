@@ -5,11 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'config/language/language.dart';
 import 'config/route/routes.dart';
+import 'config/theme/theme.dart';
+import 'config/theme/theme_provider.dart';
 import 'core/common/widgets/new_custon_widgets/no_internet_widget.dart';
 import 'core/utils/constants/app_sizer.dart';
 import 'core/utils/constants/app_sizes.dart';
-import 'core/utils/theme/theme.dart';
-import 'core/utils/theme/theme_provider.dart';
+
 import 'l10n/app_localizations.dart';
 
 
