@@ -23,7 +23,7 @@ class AppColors {
 
 
   // Text Colors
-  static const Color textPrimary = Color(0xFF000000);
+  static const Color textPrimary = Color(0xFF022740);
   static const Color textSecondary = Color(0xFF616161);
   static const Color textWhite = Color(0xFFFFFFFF);
   static const Color textGrey = Color(0xFFC8C8C8);
@@ -57,7 +57,7 @@ class AppColors {
 
   static const Color containerColor = Color(0xFF747474);
 
-// ScaFold BackGround Color
-  static const Color scaFoldBackGroudLightColor = Color(0xFFF5F5F5);
-  static const Color scaFoldBackGroudDarkColor = Color(0xFF212121);
+// Scaffold BackGround Color
+  static const Color scaFoldBackGroudLightColor = Color(0xFFFAFAFA);
+  static const Color scaFoldBackGroudDarkColor = Color(0xFF022740);
 }
