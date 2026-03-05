@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../constants/app_colors.dart';
+
+import '../../../core/utils/constants/app_colors.dart';
+
 
 class AppCardThemeData {
   AppCardThemeData._();

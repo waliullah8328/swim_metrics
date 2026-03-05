@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 
@@ -28,16 +29,16 @@ class AppElevatedButtonTheme {
           TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
         shape: WidgetStateProperty.all(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(99)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         ),
       ),
     );
   }
 
   static final ElevatedButtonThemeData lightElevatedButtonTheme = _baseTheme(
-    defaultTextColor: Colors.white,
+    defaultTextColor: AppColors.textPrimary,
     disabledTextColor: Colors.grey,
-    defaultBackgroundColor: Color(0xff000000),
+    defaultBackgroundColor: AppColors.primary,
     disabledBackgroundColor: Colors.grey.shade300,
     borderColor: Color(0xff000000),
   );
