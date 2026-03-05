@@ -12,11 +12,12 @@ class ToolsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:  EdgeInsets.only(left: 20.w,right: 20.w),
+      padding:  EdgeInsets.only(left: 20.w,right: 20.w,top: 50.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomText(text: "The Core Tools",fontSize: 22.sp,fontWeight: FontWeight.w600,color: AppColors.textWhite,),
+          SizedBox(height: 8.h,),
           CoreToolCard(
             title: "Split Calculator",
             description:
@@ -24,11 +25,24 @@ class ToolsPage extends StatelessWidget {
             icon: IconPath.calculatorIcon,
             onTap: () {},
           ),
-          Text(
-            "The Core Tools\n\nSplit Calculator\nCourse Conversion\nStopwatch",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white),
+          CoreToolCard(
+            isLeft: false,
+            title: "Course Conversion",
+            description:
+            "Seamlessly convert times between SCY, LCM, and SCM courses. Essential for college recruiting and international meets.",
+            icon: IconPath.conversionIcon,
+            onTap: () {},
           ),
+
+
+          CoreToolCard(
+            title: "Stopwatch",
+            description:
+            "Time swims with precision. Large, easy-to-hit buttons designed specifically for poolside use.",
+            icon: IconPath.stopWatchIcon,
+            onTap: () {},
+          ),
+
         ],
       ),
     );

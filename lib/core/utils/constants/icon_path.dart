@@ -9,6 +9,9 @@ class IconPath{
   static const  String courseIcon ='$_basePath/course_icon.svg';
   static const  String rankCourseIcon ='$_basePath/rank_course_icon.svg';
   static const  String calculatorIcon ='$_basePath/calculator_icon.svg';
+  static const  String stopWatchIcon ='$_basePath/stop_watch_icon.svg';
+  static const  String conversionIcon ='$_basePath/conversion_icon.svg';
+  static const  String ticMarkIcon ='$_basePath/tic_mark_icon.svg';
 
 
 

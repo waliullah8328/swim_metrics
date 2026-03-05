@@ -9,6 +9,7 @@ class CoreToolCard extends StatelessWidget {
   final String description;
   final String icon;
   final VoidCallback? onTap;
+  final bool? isLeft;
 
   const CoreToolCard({
     super.key,
@@ -16,6 +17,7 @@ class CoreToolCard extends StatelessWidget {
     required this.description,
     required this.icon,
     this.onTap,
+    this.isLeft = true,
   });
 
   @override
@@ -44,11 +46,18 @@ class CoreToolCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// LEFT ICON
-            Center(
-              child: SvgPicture.asset(icon),
-            ),
+            if(isLeft!)
+              Row(
+                children: [
+                  Center(
+                    child: SvgPicture.asset(icon),
+                  ),
+                  SizedBox(width: 16.h),
+                ],
+              ),
 
-            SizedBox(width: 16.h),
+
+
 
 
 
@@ -71,14 +80,25 @@ class CoreToolCard extends StatelessWidget {
                     text:
                     description,
 
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 10.sp,
+                      color: Color(0xffE3D99B),
+                      fontSize: 11.sp,
+
 
 
                   ),
                 ],
               ),
             ),
+            if(!isLeft!)
+              Row(
+                children: [
+                  SizedBox(width: 16.h),
+                  Center(
+                    child: SvgPicture.asset(icon),
+                  ),
+
+                ],
+              ),
           ],
         ),
       ),
