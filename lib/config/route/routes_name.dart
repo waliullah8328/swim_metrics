@@ -6,6 +6,8 @@ class RouteNames{
   static const String getStartedScreen= "/getStartedScreen";
   static const String loginScreen = "/loginScreen";
   static const String signUpScreen = "/signUpScreen";
+  static const String verifyEmailScreen = "/verifyEmailScreen";
+
   static const String otpScreen = "/otpScreen";
   static const String resetPasswordScreen = "/resetPasswordScreen";
   static const String navBarScreen = "/navBarScreen";

@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:swim_metrics/config/route/routes_name.dart';
 import 'package:swim_metrics/feature/auth/get_started/presentation/screens/get_started_screen.dart';
+import 'package:swim_metrics/feature/auth/sign_up_section/verify_email/presentation/screens/verify_email_screen.dart';
 
 
 import '../../feature/auth/login_section/login/presentation/screens/login_screen.dart';
@@ -42,6 +43,13 @@ class Routes {
       GoRoute(
         path: RouteNames.signUpScreen,
         builder: (context, state) => SignUpScreen(),
+      ),
+      GoRoute(
+        path: "${RouteNames.verifyEmailScreen}/:email",
+        builder: (context, state) {
+          String email = state.pathParameters['email']??'';
+          return VerifyEmailScreen(email: email,);
+  } ,
       ),
 
       // GoRoute(
