@@ -1,8 +1,11 @@
 import 'package:go_router/go_router.dart';
 
 import 'package:swim_metrics/config/route/routes_name.dart';
+import 'package:swim_metrics/feature/auth/get_started/presentation/screens/get_started_screen.dart';
 
 
+import '../../feature/auth/login_section/login/presentation/screens/login_screen.dart';
+import '../../feature/auth/sign_up_section/sign_up/presentation/screens/sign_up_screen.dart';
 import '../../feature/on_boarding/presentation/screens/on_boarding_screen.dart';
 import '../../feature/splash_section/splash/presentation/screens/splash_screen.dart';
 
@@ -26,6 +29,19 @@ class Routes {
       GoRoute(
         path: RouteNames.onboardingScreen,
         builder: (context, state) => OnboardingScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.getStartedScreen,
+        builder: (context, state) => GetStartedScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.loginScreen,
+        builder: (context, state) => LoginScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.signUpScreen,
+        builder: (context, state) => SignUpScreen(),
       ),
 
       // GoRoute(

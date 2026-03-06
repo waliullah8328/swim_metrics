@@ -12,6 +12,11 @@ class IconPath{
   static const  String stopWatchIcon ='$_basePath/stop_watch_icon.svg';
   static const  String conversionIcon ='$_basePath/conversion_icon.svg';
   static const  String ticMarkIcon ='$_basePath/tic_mark_icon.svg';
+  static const  String googleIcon ='$_basePath/google_icon.svg';
+  static const  String appleIcon ='$_basePath/apple_icon.svg';
+  static const  String emailIcon ='$_basePath/email_icon.svg';
+  static const  String passwordIcon ='$_basePath/password_icon.svg';
+  static const  String profileIcon ='$_basePath/profile_icon.svg';
 
 
 
