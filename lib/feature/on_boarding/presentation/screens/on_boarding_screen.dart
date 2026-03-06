@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:swim_metrics/config/route/routes_name.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/course_page_widget.dart';
@@ -92,13 +94,7 @@ class _OnboardingScreenState
               Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 24.w),
                 child: CustomPrimaryButton(onPressed: (){
-                  if (state.currentPage < 3) {
-                    _controller.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeIn);
-                  } else {
-                    debugPrint("Complete Onboarding");
-                  }
+                  context.go(RouteNames.getStartedScreen);
                 },title: "Purchase Now",),
               ),
 

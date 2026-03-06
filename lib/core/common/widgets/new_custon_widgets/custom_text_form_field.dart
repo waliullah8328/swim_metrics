@@ -30,7 +30,7 @@ class CustomTextField extends ConsumerWidget {
     this.focusNode,           // ✅ Added focusNode
     this.visibilityProvider,
     this.enable,
-    this.decoration,
+    this.decoration, this.suffixIcon,
   });
 
   final TextEditingController? controller;
@@ -45,6 +45,7 @@ class CustomTextField extends ConsumerWidget {
   final String? value;
   final void Function(String)? onFieldSubmitted;
   final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final Function(String)? onChanged;
   final FocusNode? focusNode; // ✅ FocusNode added
 
@@ -84,21 +85,9 @@ class CustomTextField extends ConsumerWidget {
       onTapOutside: (_) => FocusScope.of(context).unfocus(),
       decoration: decoration??InputDecoration(
         hintText: hintText,
-        suffixIcon: obscureText
-            ? IconButton(
-          icon: Icon(
-            isVisible ? Icons.visibility : Icons.visibility_off,
-            color: isDarkMode?AppColors.textWhite:AppColors.textGrey,
-          ),
-          onPressed: () {
-            if (visibilityProvider != null) {
-              ref.read(visibilityProvider!.notifier).state = !isVisible;
-            }
-          },
-        )
-            : null,
+        suffixIcon:suffixIcon,
         prefixIcon: prefixIcon,
-        hintStyle: GoogleFonts.urbanist(
+        hintStyle: GoogleFonts.lora(
 
           fontWeight: FontWeight.w400,
           fontSize: 14.sp,

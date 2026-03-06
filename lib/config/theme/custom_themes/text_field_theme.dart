@@ -33,23 +33,23 @@ class AppTextFormFieldTheme {
       errorStyle: TextStyle(fontSize: 12, color: errorColor),
       floatingLabelStyle: TextStyle(color: labelColor.withValues(alpha: 0.8)),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: borderColor),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: enabledBorderColor),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: focusedBorderColor),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: errorBorderColor),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: focusedErrorBorderColor),
       ),
     );
@@ -57,11 +57,10 @@ class AppTextFormFieldTheme {
 
   static final InputDecorationTheme lightInputDecorationTheme =
       _baseInputDecorationTheme(
-        fillColor:  Color(0xffFAFAFA),
+        fillColor:  AppColors.textFormFieldFillColorLightMode.withValues(alpha: 0.6),
     labelColor: Colors.black,
-    hintColor: Color(0xff9E9E9E),
+    hintColor: AppColors.textFormFieldHintColorLightMode,
     errorColor: Colors.red,
-    
     focusedErrorColor: Colors.orange,
     prefixIconColor: Colors.grey,
     suffixIconColor: Colors.grey,

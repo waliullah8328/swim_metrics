@@ -1,37 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
-
-import '../../../../core/common/widgets/custom_text.dart';
+import '../../../../feature/auth/get_started/presentation/screens/widgets/custom_card_widget.dart';
+import '../../../utils/constants/icon_path.dart';
 
 class CustomSocialLogin extends StatelessWidget {
   const CustomSocialLogin({
-    super.key, required this.iconPath, this.onTap, required this.title,
+    super.key,
   });
-  final String iconPath,title;
-  final void Function()? onTap;
-
-
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-            border: Border.all(width: 1.w,color: Color(0xffEEEEEE)),
-            borderRadius: BorderRadius.circular(99)
-        ),
-        child: Row(
-          children: [
-            SvgPicture.asset(iconPath,height: 24.h,width: 24.w,),
-            Expanded(child: Center(child: CustomText(text: title,fontSize: 16.sp,fontWeight: FontWeight.w600,)))
-
-          ],
-        ),
-      ),
+    return Column(
+      children: [
+        CustomCard(title: "Continue with Google",imagePath: IconPath.googleIcon,onTap: (){},),
+        CustomCard(title: "Continue with Apple",imagePath: IconPath.appleIcon,onTap: (){},),
+      ],
     );
   }
 }

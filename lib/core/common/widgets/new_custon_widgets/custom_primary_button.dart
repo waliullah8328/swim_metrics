@@ -4,10 +4,12 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 class CustomPrimaryButton extends StatelessWidget {
   const CustomPrimaryButton({
-    super.key, required this.title, this.onPressed,
+    super.key, required this.title, this.onPressed, this.isLoading = false,
   });
   final String title;
   final void Function()? onPressed;
+
+  final bool? isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,7 @@ class CustomPrimaryButton extends StatelessWidget {
         fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
       ),
       onPressed: onPressed,
-      child: Center(child:  Text(title,style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w500),)),
+      child: isLoading!? Center(child: CircularProgressIndicator()):Center(child:  Text(title,style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),)),
     );
   }
 }
