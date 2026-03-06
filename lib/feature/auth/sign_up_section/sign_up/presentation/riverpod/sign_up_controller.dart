@@ -1,5 +1,7 @@
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:swim_metrics/config/route/routes_name.dart';
 
 import 'package:swim_metrics/feature/auth/sign_up_section/sign_up/presentation/riverpod/sign_up_state.dart';
 
@@ -38,14 +40,14 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
 
   /// Toggle Remember Me
   Future<void> toggleTermAndPrivacy(bool value) async {
-    state = state.copyWith(isTermsAndPrivacy: value);
+    state = state.copyWith(isTermsAndPolicy: value);
 
   }
 
 
 
   /// Login logic
-  Future<bool> login() async {
+  Future<bool> signUp({required context}) async {
     try {
       state = state.copyWith(
         isLoading: true,
@@ -60,17 +62,25 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
       }
 
       /// Save credentials if Remember Me is checked
-      await saveCredentialsIfRemembered();
+
 
       state = state.copyWith(
         isLoading: false,
-        successMessage: "Login Successful",
+        successMessage: "Sign Up Successful",
       );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Sign Up Successful")),
+      );
+
       return true;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
       );
       return false;
     }
@@ -80,6 +90,6 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
 final signUpProvider =
 StateNotifierProvider<SignUpNotifier, SignUpState>((ref) {
   final notifier = SignUpNotifier();
-  notifier.loadSavedLogin();
+
   return notifier;
 });

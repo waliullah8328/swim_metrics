@@ -13,7 +13,7 @@ import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_account_widget.dart';
-import '../../../../../../core/common/widgets/new_custon_widgets/custom_check_box_widget.dart';
+import '../../../../../../core/common/widgets/new_custon_widgets/custom_switch_widget.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/social_login.dart';
 import '../../../../../../core/utils/constants/app_sizer.dart';
 import '../../../../../../core/utils/constants/image_path.dart';
@@ -44,7 +44,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     print("build");
 
-    ref.listen<SignUpState>(loginProvider, (previous, next) {
+    ref.listen<LoginState>(loginProvider, (previous, next) {
       if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(next.errorMessage!)),
@@ -72,138 +72,140 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: Center(
         child: Padding(
           padding:  EdgeInsets.only(left: 20.w,right: 20.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
-              SizedBox(height: 24.h,),
-              CustomText(text: "Welcome back",fontSize: 23.sp,fontWeight: FontWeight.w700),
-              SizedBox(height: 24.h,),
-              CustomTextField(
-                controller: emailController,
-                hintText: "Enter your email",
-
-                validator: AppValidator.validateEmail,
-
-                onChanged: (value) {
-                  ref.read(loginProvider.notifier).setEmail(value);
-                },
-                prefixIcon: Padding(
-                  padding: EdgeInsets.all(13.w),
-                  child: SvgPicture.asset(
-                    IconPath.emailIcon,
-                    width: 18.w,
-                    height: 18.h,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-
-              ),
-              SizedBox(height: 24.h,),
-             Consumer(builder:  (context,ref,child){
-               final isRemember = ref.watch(loginProvider.select((s)=>s.isPasswordVisible));
-               return  CustomTextField(
-                 controller: passwordController,
-                 hintText: "Enter your password",
-                 obscureText: !isRemember ,
-                 validator: AppValidator.validatePassword,
-                 onChanged: (password) {
-                   ref.read(loginProvider.notifier).
-                   setPassword(password);
-
-                   /// 🔥 If checkbox is unchecked remove saved password
-
-                 },
-                 prefixIcon: Padding(
-                   padding: EdgeInsets.all(13.w),
-                   child: SvgPicture.asset(
-                     IconPath.passwordIcon,
-                     width: 18.w,
-                     height: 18.h,
-                     fit: BoxFit.contain,
-                   ),
-                 ),
-                 suffixIcon: IconButton(
-                   icon: Icon(
-                     isRemember
-                         ? Icons.visibility
-                         : Icons.visibility_off,
-                   ),
-                   onPressed: () {
-                     ref.read(loginProvider.notifier)
-                         .togglePasswordVisibility();
-                   },
-                 ),
-               );
-             }),
-              SizedBox(height: 24.h,),
-              Consumer(builder: (context,ref,child){
-                final isLoading = ref.watch(loginProvider.select((s)=>s.isLoading));
-
-                return CustomPrimaryButton(title: "Sign In",
-                  isLoading: isLoading,
-                  onPressed: () async {
-                   ref.read(loginProvider.notifier).login();
-
-
-
-
-                },);
-
-              }),
-              SizedBox(height: 24.h,),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Consumer(builder: (context, ref, child) {
-                        final isRemember = ref.watch(loginProvider.select((s)=>s.isRemember));
-                        return CustomSwitchWidget(
-                          value: isRemember,
-                          onChanged: (value) {
-                            ref.read(loginProvider.notifier)
-                                .toggleRemember(value );
-
-
-                          },
-                        );
-                      },),
-                      SizedBox(width: 10.w,),
-                      CustomText(text: "Remember Me",color: AppColors.textGrey,fontSize: 16.sp,fontWeight: FontWeight.w400,),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                     // Navigator.pushNamed(context, RouteNames.forgetPasswordScreen);
-                    },
-                    child: CustomText(
-                      text: "Forget Password",
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.primary,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
+                SizedBox(height: 24.h,),
+                CustomText(text: "Welcome back",fontSize: 23.sp,fontWeight: FontWeight.w700),
+                SizedBox(height: 24.h,),
+                CustomTextField(
+                  controller: emailController,
+                  hintText: "Enter your email",
+            
+                  validator: AppValidator.validateEmail,
+            
+                  onChanged: (value) {
+                    ref.read(loginProvider.notifier).setEmail(value);
+                  },
+                  prefixIcon: Padding(
+                    padding: EdgeInsets.all(13.w),
+                    child: SvgPicture.asset(
+                      IconPath.emailIcon,
+                      width: 18.w,
+                      height: 18.h,
+                      fit: BoxFit.contain,
                     ),
                   ),
-                ],
-              ),
-
-              SizedBox(height: 24.h,),
-              SvgPicture.asset(ImagePath.orImage),
-              SizedBox(height: 32.h,),
-              CustomSocialLogin(),
-
-
-              SizedBox(height: 60.h,),
-
-              CustomAccountWidget(firstTitle: "Don’t have an account?",buttonTitle: " Sign Up",onTap: (){
-                context.go(RouteNames.signUpScreen);
-              },),
-
-
-
-            ],
+            
+                ),
+                SizedBox(height: 24.h,),
+               Consumer(builder:  (context,ref,child){
+                 final isRemember = ref.watch(loginProvider.select((s)=>s.isPasswordVisible));
+                 return  CustomTextField(
+                   controller: passwordController,
+                   hintText: "Enter your password",
+                   obscureText: !isRemember ,
+                   validator: AppValidator.validatePassword,
+                   onChanged: (password) {
+                     ref.read(loginProvider.notifier).
+                     setPassword(password);
+            
+                     /// 🔥 If checkbox is unchecked remove saved password
+            
+                   },
+                   prefixIcon: Padding(
+                     padding: EdgeInsets.all(13.w),
+                     child: SvgPicture.asset(
+                       IconPath.passwordIcon,
+                       width: 18.w,
+                       height: 18.h,
+                       fit: BoxFit.contain,
+                     ),
+                   ),
+                   suffixIcon: IconButton(
+                     icon: Icon(
+                       isRemember
+                           ? Icons.visibility
+                           : Icons.visibility_off,
+                     ),
+                     onPressed: () {
+                       ref.read(loginProvider.notifier)
+                           .togglePasswordVisibility();
+                     },
+                   ),
+                 );
+               }),
+                SizedBox(height: 24.h,),
+                Consumer(builder: (context,ref,child){
+                  final isLoading = ref.watch(loginProvider.select((s)=>s.isLoading));
+            
+                  return CustomPrimaryButton(title: "Sign In",
+                    isLoading: isLoading,
+                    onPressed: () async {
+                     ref.read(loginProvider.notifier).login();
+            
+            
+            
+            
+                  },);
+            
+                }),
+                SizedBox(height: 24.h,),
+            
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Consumer(builder: (context, ref, child) {
+                          final isRemember = ref.watch(loginProvider.select((s)=>s.isRemember));
+                          return CustomSwitchWidget(
+                            value: isRemember,
+                            onChanged: (value) {
+                              ref.read(loginProvider.notifier)
+                                  .toggleRemember(value );
+            
+            
+                            },
+                          );
+                        },),
+                        SizedBox(width: 10.w,),
+                        CustomText(text: "Remember Me",color: AppColors.textGrey,fontSize: 16.sp,fontWeight: FontWeight.w400,),
+                      ],
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                       // Navigator.pushNamed(context, RouteNames.forgetPasswordScreen);
+                      },
+                      child: CustomText(
+                        text: "Forget Password",
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+            
+                SizedBox(height: 24.h,),
+                SvgPicture.asset(ImagePath.orImage),
+                SizedBox(height: 32.h,),
+                CustomSocialLogin(),
+            
+            
+                SizedBox(height: 60.h,),
+            
+                CustomAccountWidget(firstTitle: "Don’t have an account?",buttonTitle: " Sign Up",onTap: (){
+                  context.go(RouteNames.signUpScreen);
+                },),
+            
+            
+            
+              ],
+            ),
           ),
         ),
       ),

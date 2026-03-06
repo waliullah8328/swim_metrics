@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_state.dart';
 
-class LoginNotifier extends StateNotifier<SignUpState> {
-  LoginNotifier() : super(const SignUpState()) {
+class LoginNotifier extends StateNotifier<LoginState> {
+  LoginNotifier() : super(const LoginState()) {
     loadSavedLogin();
   }
 
@@ -104,7 +104,7 @@ class LoginNotifier extends StateNotifier<SignUpState> {
 }
 
 final loginProvider =
-StateNotifierProvider<LoginNotifier, SignUpState>((ref) {
+StateNotifierProvider<LoginNotifier, LoginState>((ref) {
   final notifier = LoginNotifier();
   notifier.loadSavedLogin();
   return notifier;

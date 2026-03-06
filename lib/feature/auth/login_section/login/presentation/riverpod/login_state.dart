@@ -1,4 +1,4 @@
-class SignUpState {
+class LoginState {
   final String email;
   final String password;
   final bool isRemember;
@@ -7,7 +7,7 @@ class SignUpState {
   final String? errorMessage;
   final String? successMessage;
 
-  const SignUpState({
+  const LoginState({
     this.email = '',
     this.password = '',
     this.isRemember = false,
@@ -17,7 +17,7 @@ class SignUpState {
     this.successMessage,
   });
 
-  SignUpState copyWith({
+  LoginState copyWith({
     String? email,
     String? password,
     bool? isRemember,
@@ -26,7 +26,7 @@ class SignUpState {
     String? errorMessage,
     String? successMessage,
   }) {
-    return SignUpState(
+    return LoginState(
       email: email ?? this.email,
       password: password ?? this.password,
       isRemember: isRemember ?? this.isRemember,
