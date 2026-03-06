@@ -3,7 +3,7 @@ class SignUpState {
   final String confirmPassword;
   final String email;
   final String password;
-  final bool isRemember;
+  final bool isTermsAndPolicy;
   final bool isPasswordVisible;
   final bool isConfirmPasswordVisible;
   final bool isLoading;
@@ -13,7 +13,7 @@ class SignUpState {
   const SignUpState({
     this.email = '',
     this.password = '',
-    this.isRemember = false,
+    this.isTermsAndPolicy = false,
     this.isPasswordVisible = false,
     this.isConfirmPasswordVisible = false,
     this.isLoading = false,
@@ -26,7 +26,7 @@ class SignUpState {
   SignUpState copyWith({
     String? email,
     String? password,
-    bool? isTermsAndPrivacy,
+    bool? isTermsAndPolicy,
     bool? isPasswordVisible,
     bool? isLoading,
     String? errorMessage,
@@ -38,7 +38,8 @@ class SignUpState {
     return SignUpState(
       email: email ?? this.email,
       password: password ?? this.password,
-      isRemember: isTermsAndPrivacy ?? this.isRemember,
+      isTermsAndPolicy:
+        isTermsAndPolicy?? this.isTermsAndPolicy,
       isPasswordVisible: isPasswordVisible ?? this.isPasswordVisible,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,

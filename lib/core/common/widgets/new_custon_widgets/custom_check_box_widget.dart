@@ -1,45 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 
-class CustomSwitchWidget extends StatelessWidget {
-  const CustomSwitchWidget({
+class CustomCheckBoxWidget extends StatelessWidget {
+  const CustomCheckBoxWidget({
     super.key,
-    required this.value,
-    required this.onChanged,
+    this.value, this.onChanged,
   });
 
-  final bool value;
-  final ValueChanged<bool> onChanged;
+
+
+  final bool? value;
+  final void Function(bool?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onChanged(!value),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOut,
-        width: 46,
-        height: 26,
-        padding: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: value ? const Color(0xFFC69C3F) : Colors.transparent,
-          border: Border.all(
-            color: value ? const Color(0xFFC69C3F) : Colors.grey,
-            width: 2,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        checkboxTheme: CheckboxThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4), // ✅ Rounded corners
           ),
-        ),
-        child: AnimatedAlign(
-          duration: const Duration(milliseconds: 250),
-          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            width: 18,
-            height: 18,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: value ? Colors.white : Colors.grey,
-            ),
+          side: BorderSide(
+            color: AppColors.primary, // Border color
+            width: 2, // Border thickness
           ),
+          fillColor: WidgetStateProperty.resolveWith<Color>(
+                (states) {
+              if (states.contains(WidgetState.selected)) {
+                return  AppColors.primary; // Checked color
+              }
+              return Colors.transparent; // Unchecked background
+            },
+          ),
+          checkColor: WidgetStateProperty.all<Color>(Colors.white),
         ),
+      ),
+      child: Checkbox(
+        value: value,
+        onChanged: onChanged,
       ),
     );
   }
