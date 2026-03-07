@@ -11,6 +11,8 @@ class RouteNames{
   static const String forgetPasswordScreen = "/forgetPasswordScreen";
   static const String createNewPasswordScreen  = "/createNewPasswordScreen";
   static const String homeNavBarScreen  = "/homeNavBarScreen";
+  static const String settingsScreen  = "/settingsScreen";
+  static const String editProfileScreen = "/editProfileScreen";
 
 
 

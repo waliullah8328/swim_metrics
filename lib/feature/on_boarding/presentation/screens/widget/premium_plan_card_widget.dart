@@ -8,7 +8,6 @@ import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 
-import '../../../../../core/utils/constants/app_colors.dart';
 
 final promoCodeProvider = StateProvider<String>((ref) => '');
 
