@@ -21,15 +21,15 @@ class BottomNavBarThemeData {
       elevation: elevation,
       type: BottomNavigationBarType.fixed,
       selectedLabelStyle: TextStyle(
-        fontSize: 12.0.sp,
+        fontSize: 15.0.sp,
         fontWeight: FontWeight.w600,
       ),
       unselectedLabelStyle: TextStyle(
-        fontSize: 11.0.sp,
+        fontSize: 14.0.sp,
         fontWeight: FontWeight.w400,
       ),
       selectedIconTheme: IconThemeData(
-        size: 24.0.sp,
+        size: 23.0.sp,
       ),
       unselectedIconTheme: IconThemeData(
         size: 22.0.sp,

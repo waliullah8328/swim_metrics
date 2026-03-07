@@ -18,6 +18,15 @@ class IconPath{
   static const  String passwordIcon ='$_basePath/password_icon.svg';
   static const  String profileIcon ='$_basePath/profile_icon.svg';
 
+  static const  String calculatorInActiveIcon ='$_basePath/calculator_in_active_icon.svg';
+  static const  String calculatorActiveIcon ='$_basePath/calculator_active_icon.svg';
+  static const  String stopSwitchInActiveIcon ='$_basePath/stop_switch_in_active_icon.svg';
+  static const  String stopSwitchActiveIcon ='$_basePath/stop_switch_active_icon.svg';
+  static const  String converterActiveIcon ='$_basePath/converter_active_icon.svg';
+  static const  String converterInActiveIcon ='$_basePath/converter_in_active_icon.svg';
+
+  static const  String lightModeDrawerIcon ='$_basePath/light_mode_drawer_icon.svg';
+
 
 
 

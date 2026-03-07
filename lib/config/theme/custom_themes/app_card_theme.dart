@@ -24,7 +24,7 @@ class AppCardThemeData {
 
   /// 🌞 Light Theme Card
   static final CardThemeData lightCardTheme = _baseCardTheme(
-    color: AppColors.textWhite,
+    color: Color(0xffEAEDF1),
     shadowColor: AppColors.textWhite.withValues(alpha: 0.08),
     elevation: 1,
     borderRadius: BorderRadius.circular(8),

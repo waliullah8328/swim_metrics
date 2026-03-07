@@ -10,6 +10,7 @@ class RouteNames{
   static const String verifyEmailSuccessScreen = "/verifyEmailSuccessScreen";
   static const String forgetPasswordScreen = "/forgetPasswordScreen";
   static const String createNewPasswordScreen  = "/createNewPasswordScreen";
+  static const String homeNavBarScreen  = "/homeNavBarScreen";
 
 
 
