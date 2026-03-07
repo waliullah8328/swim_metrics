@@ -32,6 +32,11 @@ class IconPath{
   static const  String helpAndSupportIcon ='$_basePath/help_and_support_icon.svg';
   static const  String settingIcon ='$_basePath/settings_icon.svg';
   static const  String backIcon ='$_basePath/back_icon.svg';
+  static const  String darkModeLightIcon ='$_basePath/dark_mode_light.svg';
+  static const  String textSizeIcon ='$_basePath/text_size_icon.svg';
+  static const  String stopSoundIcon ='$_basePath/stop_sound_icon.svg';
+  static const  String voiceInputIcon ='$_basePath/voice_input_icon.svg';
+  static const  String hapticIcon ='$_basePath/haptic_icon.svg';
 
 
 
