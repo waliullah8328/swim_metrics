@@ -7,11 +7,11 @@ class RouteNames{
   static const String loginScreen = "/loginScreen";
   static const String signUpScreen = "/signUpScreen";
   static const String verifyEmailScreen = "/verifyEmailScreen";
+  static const String verifyEmailSuccessScreen = "/verifyEmailSuccessScreen";
+  static const String forgetPasswordScreen = "/forgetPasswordScreen";
+  static const String createNewPasswordScreen  = "/createNewPasswordScreen";
 
-  static const String otpScreen = "/otpScreen";
-  static const String resetPasswordScreen = "/resetPasswordScreen";
-  static const String navBarScreen = "/navBarScreen";
-  static const String welcomeScreen = "/welcomeScreen";
+
 
 
 

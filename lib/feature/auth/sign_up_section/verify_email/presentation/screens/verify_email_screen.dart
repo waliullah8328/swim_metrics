@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:swim_metrics/config/route/routes_name.dart';
 
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 
@@ -19,9 +21,10 @@ import '../../../../../../core/utils/constants/image_path.dart';
 
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
-  const VerifyEmailScreen({super.key, required this.email});
+  const VerifyEmailScreen({super.key, required this.email, this.isSignUp = "true"});
 
   final String email;
+  final String? isSignUp;
 
   @override
   ConsumerState<VerifyEmailScreen> createState() => _LoginScreenState();
@@ -82,13 +85,37 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                 CustomText(text: "Tips: Make sure check your inbox and spam folders",fontSize: 14.sp,color: AppColors.primary,fontWeight: FontWeight.w400,),
 
                 SizedBox(height: 230.h,),
+                widget.isSignUp== 'true'?Consumer(builder: (context,ref,child){
+                  final isLoading = ref.watch(verifyEmailProvider.select((s)=>s.isLoading));
+
+                  return CustomPrimaryButton(title: "Verify",
+                    isLoading: isLoading,
+                    onPressed: () async {
+
+                    final String title = "Verified Email !";
+                    final String subTitle = "Your Account has been created successfully.";
+                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp();
+                      if(result){
+                        context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle");
+                      }
+
+
+
+
+                    },);
+
+                }):
                 Consumer(builder: (context,ref,child){
                   final isLoading = ref.watch(verifyEmailProvider.select((s)=>s.isLoading));
 
                   return CustomPrimaryButton(title: "Verify",
                     isLoading: isLoading,
                     onPressed: () async {
-                      ref.read(verifyEmailProvider.notifier).login();
+
+                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp();
+                      if(result){
+                       context.go("${RouteNames.createNewPasswordScreen}/${widget.email}/${ref.read(verifyEmailProvider.select((s)=>s.code))}/${widget.isSignUp}");
+                      }
 
 
 

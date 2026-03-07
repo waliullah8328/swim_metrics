@@ -35,7 +35,7 @@ class LanguagePage extends ConsumerWidget {
         SizedBox(height: 24.h),
 
         LanguageWheelSelector(
-          items: const ["English", "Spanish", "Arabic"],
+          items: const ["English", "Spanish", "Italian","French"],
           onChanged: (value) {
             ref.read(onboardingProvider.notifier)
                 .selectLanguage(value);

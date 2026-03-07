@@ -16,7 +16,7 @@ class VerifyEmailNotifier extends StateNotifier<VerifyEmailState> {
 
 
   /// Login logic
-  Future<bool> login() async {
+  Future<bool> verifyOtp() async {
     try {
       state = state.copyWith(
         isLoading: true,
@@ -34,7 +34,7 @@ class VerifyEmailNotifier extends StateNotifier<VerifyEmailState> {
 
       state = state.copyWith(
         isLoading: false,
-        successMessage: "Login Successful",
+        successMessage: "Verification Successful",
       );
       return true;
     } catch (e) {
