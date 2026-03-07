@@ -145,7 +145,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   return CustomPrimaryButton(title: "Sign In",
                     isLoading: isLoading,
                     onPressed: () async {
-                     ref.read(loginProvider.notifier).login();
+                     final result = await ref.read(loginProvider.notifier).login();
+                     if(result){
+                       context.go(RouteNames.homeNavBarScreen);
+                     }
             
             
             
