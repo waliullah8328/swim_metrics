@@ -7,6 +7,7 @@ import 'package:swim_metrics/feature/auth/sign_up_section/verify_email/presentat
 
 import '../../feature/auth/login_section/login/presentation/screens/login_screen.dart';
 import '../../feature/auth/sign_up_section/sign_up/presentation/screens/sign_up_screen.dart';
+import '../../feature/auth/sign_up_section/verify_email_success/presentation/screens/verify_email_success.dart';
 import '../../feature/on_boarding/presentation/screens/on_boarding_screen.dart';
 import '../../feature/splash_section/splash/presentation/screens/splash_screen.dart';
 
@@ -50,6 +51,16 @@ class Routes {
           String email = state.pathParameters['email']??'';
           return VerifyEmailScreen(email: email,);
   } ,
+      ),
+
+      GoRoute(
+        path: "${RouteNames.verifyEmailSuccessScreen}/:title/:subTitle/:isSignUp",
+        builder: (context, state) {
+          String title = state.pathParameters['title']??'';
+          String subTitle = state.pathParameters['subTitle']??'';
+          String isSignUp = state.pathParameters['isSignUp']??'';
+          return VerifyEmailSuccess (title: title, subTitle: subTitle,isSignUp: isSignUp,);
+        } ,
       ),
 
       // GoRoute(

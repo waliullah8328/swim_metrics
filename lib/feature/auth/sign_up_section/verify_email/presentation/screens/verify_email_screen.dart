@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:swim_metrics/config/route/routes_name.dart';
 
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 
@@ -88,7 +90,13 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                   return CustomPrimaryButton(title: "Verify",
                     isLoading: isLoading,
                     onPressed: () async {
-                      ref.read(verifyEmailProvider.notifier).login();
+
+                    final String title = "Verified Email !";
+                    final String subTitle = "Your Account has been created successfully.";
+                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp();
+                      if(result){
+                        context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle");
+                      }
 
 
 
