@@ -178,7 +178,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                       // Navigator.pushNamed(context, RouteNames.forgetPasswordScreen);
+                       context.go( RouteNames.forgetPasswordScreen);
                       },
                       child: CustomText(
                         text: "Forget Password",
