@@ -10,6 +10,8 @@ import '../../feature/auth/login_section/create_new_password/presentation/screen
 import '../../feature/auth/login_section/login/presentation/screens/login_screen.dart';
 import '../../feature/auth/sign_up_section/sign_up/presentation/screens/sign_up_screen.dart';
 import '../../feature/auth/sign_up_section/verify_email_success/presentation/screens/verify_email_success.dart';
+import '../../feature/home_section/calculator_section/setting_section/edit_profile/screen/edit_profile_screen.dart';
+import '../../feature/home_section/calculator_section/setting_section/settings/screen/setting_screen.dart';
 import '../../feature/home_section/home_app_bar/presentation/screens/home_app_bar.dart';
 import '../../feature/on_boarding/presentation/screens/on_boarding_screen.dart';
 import '../../feature/splash_section/splash/presentation/screens/splash_screen.dart';
@@ -47,6 +49,14 @@ class Routes {
       GoRoute(
         path: RouteNames.signUpScreen,
         builder: (context, state) => SignUpScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.settingsScreen,
+        builder: (context, state) => SettingsScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.editProfileScreen,
+        builder: (context, state) => EditProfileScreen(),
       ),
       GoRoute(
         path: RouteNames.homeNavBarScreen,

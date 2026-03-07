@@ -78,7 +78,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             SizedBox(height: 3.h,),
             CustomText(text: "Welcome to",fontSize: 21.sp,fontWeight: FontWeight.w300,color: AppColors.textGrey,),
             SizedBox(height: 4.h,),
-            CustomText(text: "SwimMetrics",fontSize: 23.sp,fontWeight: FontWeight.w400,color: AppColors.textCreamyYellow,),
+            CustomText(text: "SwimMetrics",fontSize: 23.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
 
           ],
         ),),

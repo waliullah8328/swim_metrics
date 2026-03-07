@@ -26,6 +26,12 @@ class IconPath{
   static const  String converterInActiveIcon ='$_basePath/converter_in_active_icon.svg';
 
   static const  String lightModeDrawerIcon ='$_basePath/light_mode_drawer_icon.svg';
+  static const  String toolsExplainIcon ='$_basePath/tools_explain_icon.svg';
+  static const  String learningIcon ='$_basePath/learning_icon.svg';
+  static const  String legalIcon ='$_basePath/legal_icon.svg';
+  static const  String helpAndSupportIcon ='$_basePath/help_and_support_icon.svg';
+  static const  String settingIcon ='$_basePath/settings_icon.svg';
+  static const  String backIcon ='$_basePath/back_icon.svg';
 
 
 
