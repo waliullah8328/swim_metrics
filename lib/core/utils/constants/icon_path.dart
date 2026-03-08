@@ -43,6 +43,7 @@ class IconPath{
   static const  String calculatorSplitIcon ='$_basePath/calculator_split_icon.svg';
   static const  String clearIcon ='$_basePath/clear_icon.svg';
   static const  String exportIcon ='$_basePath/export_icon.svg';
+  static const  String rightArrowIcon ='$_basePath/right_arrow_icon.svg';
 
 
 

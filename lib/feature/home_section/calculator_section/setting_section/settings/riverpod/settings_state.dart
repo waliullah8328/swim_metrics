@@ -8,7 +8,7 @@ class SettingsState {
   final FontSizeOption fontSize;
   final AppLanguage language;
 
-  SettingsState({
+  SettingsState( {
     this.darkMode = false,
     this.stopwatchSound = true,
     this.voiceInput = true,

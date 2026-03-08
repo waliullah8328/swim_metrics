@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:swim_metrics/config/route/routes_name.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
@@ -68,8 +70,18 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: "Terms and Conditions",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
-                    Divider(),
+                    GestureDetector(
+                      onTap: (){
+                        context.push(RouteNames.termsConditionsScreen);
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText(text: "Terms and Conditions",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                          Divider(),
+                        ],
+                      ),
+                    ),
                     CustomText(text: "Privacy Policy",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
                     CustomText(text: "Copyright",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),

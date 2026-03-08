@@ -106,7 +106,7 @@ class SettingsScreen extends ConsumerWidget {
                       color: AppColors.textGrey,
                       child: Padding(
                       padding: const EdgeInsets.all(14.0),
-                      child: Center(child: CustomText(text: "Edit Profile",fontSize: getAdjustedFontSize(12, fontOption).sp,fontWeight: FontWeight.w400,)),
+                      child: Center(child: CustomText(text: AppLocalizations.of(context)!.editProfile,fontSize: getAdjustedFontSize(12, fontOption).sp,fontWeight: FontWeight.w400,)),
                     ),),
                   ),
                 ],
@@ -122,7 +122,7 @@ class SettingsScreen extends ConsumerWidget {
                  SizedBox(height: 20.h),
 
                 /// APPEARANCE
-                CustomText(text: "APPEARANCE",fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
+                CustomText(text: AppLocalizations.of(context)!.appearance,fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
                 SizedBox(height: 10.h,),
 
                 Container(
@@ -150,7 +150,7 @@ class SettingsScreen extends ConsumerWidget {
                               children: [
                                 SvgPicture.asset(IconPath.darkModeLightIcon ),
                                 SizedBox(width: 10.w,),
-                                CustomText(text: "Dark Mode",fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
+                                CustomText(text: AppLocalizations.of(context)!.darkMode,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
                               ],
                             ),
                             Consumer(builder: (context, ref, child) {
@@ -175,7 +175,7 @@ class SettingsScreen extends ConsumerWidget {
                               children: [
                                 SvgPicture.asset(IconPath.textSizeIcon),
                                 SizedBox(width: 10.w,),
-                                CustomText(text: "Text Size",fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
+                                CustomText(text: AppLocalizations.of(context)!.textSize,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
                               ],
                             ),
                             Consumer(
@@ -206,15 +206,15 @@ class SettingsScreen extends ConsumerWidget {
                                               items:  [
                                                 DropdownMenuItem(
                                                   value: FontSizeOption.small,
-                                                  child: CustomText(text: "SMALL",fontSize: 10.sp,),
+                                                  child: CustomText(text: AppLocalizations.of(context)!.small,fontSize: 10.sp,),
                                                 ),
                                                 DropdownMenuItem(
                                                   value: FontSizeOption.medium,
-                                                  child: CustomText(text: "MEDIUM",fontSize: 10.sp,),
+                                                  child: CustomText(text: AppLocalizations.of(context)!.medium,fontSize: 10.sp,),
                                                 ),
                                                 DropdownMenuItem(
                                                   value: FontSizeOption.big,
-                                                  child: CustomText(text: "BIG",fontSize: 10.sp,),
+                                                  child: CustomText(text: AppLocalizations.of(context)!.big,fontSize: 10.sp,),
                                                 ),
                                               ],
                                               onChanged: (value) {
@@ -248,7 +248,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
 
                 SizedBox(height: 20.h),
-                CustomText(text: "ACCESSIBILITY",fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
+                CustomText(text: AppLocalizations.of(context)!.accessibility,fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
                 SizedBox(height: 10.h,),
 
 
@@ -276,7 +276,7 @@ class SettingsScreen extends ConsumerWidget {
                               children: [
                                 SvgPicture.asset(IconPath.languageSettingsIcon),
                                 SizedBox(width: 10.w,),
-                                CustomText(text: "Language",fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
+                                CustomText(text: AppLocalizations.of(context)!.language,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
                               ],
                             ),
 
@@ -345,7 +345,7 @@ class SettingsScreen extends ConsumerWidget {
                               children: [
                                 SvgPicture.asset(IconPath.stopSoundIcon),
                                 SizedBox(width: 10.w,),
-                                CustomText(text: "Stopwatch Sound",fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
+                                CustomText(text: AppLocalizations.of(context)!.stopWatchSound,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
                               ],
                             ),
                             Consumer(builder: (context, ref, child) {
@@ -370,7 +370,7 @@ class SettingsScreen extends ConsumerWidget {
                               children: [
                                 SvgPicture.asset(IconPath.voiceInputIcon),
                                 SizedBox(width: 10.w,),
-                                CustomText(text: "Voice Input",fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
+                                CustomText(text: AppLocalizations.of(context)!.voiceInput,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
                               ],
                             ),
                             Consumer(builder: (context, ref, child) {
@@ -395,7 +395,7 @@ class SettingsScreen extends ConsumerWidget {
                               children: [
                                 SvgPicture.asset(IconPath.hapticIcon),
                                 SizedBox(width: 10.w,),
-                                CustomText(text: "Haptic Feedback",fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
+                                CustomText(text: AppLocalizations.of(context)!.hapticFeedBack,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
                               ],
                             ),
                             Consumer(builder: (context, ref, child) {
@@ -432,7 +432,7 @@ class SettingsScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SvgPicture.asset(IconPath.logOutIcon ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-                      Text("Log Out",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
+                      Text(AppLocalizations.of(context)!.logout,style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
                     ],
                   )),
                 )

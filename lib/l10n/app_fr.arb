@@ -1,4 +1,35 @@
 {
 
-"settings":"Paramètres"
+"settings":"Paramètres",
+"editProfile": "Modifier le profil",
+"appearance": "APPARENCE",
+
+"darkMode": "Mode sombre",
+"textSize": "Taille du texte",
+"small": "PETITE",
+"medium": "MOYENNE",
+"big": "GRANDE",
+"accessibility": "ACCESSIBILITÉ",
+"language": "Langue",
+"stopWatchSound": "Son du chronomètre",
+"voiceInput": "Entrée vocale",
+"hapticFeedBack": "Retour haptique",
+"logout": "Déconnexion",
+
+"personalDetails": "RENSEIGNEMENTS PERSONNELS",
+"enterYourName": "Entrez votre nom",
+"name": "Nom",
+"enterYourEmail": "Saisissez votre adresse e-mail",
+"email": "E-mail",
+"enterYourPhoneNumber": "Saisissez votre numéro de téléphone",
+"phone": "Téléphone",
+"saveChanges": "Enregistrer les modifications",
+"securityDetails": "DÉTAILS DE SÉCURITÉ",
+"enterYourCurrentPassword": "Saisissez votre mot de passe actuel",
+"currentPassword": "Mot de passe actuel",
+"enterYourNewPassword": "Saisissez votre nouveau mot de passe",
+"newPassword": "Nouveau mot de passe",
+"enterYourConfirmPassword": "Saisissez votre mot de passe de confirmation",
+"confirmPassword": "Confirmez le mot de passe",
+"savePassword": "Enregistrer le mot de passe"
 }
