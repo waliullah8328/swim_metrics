@@ -65,4 +65,10 @@ class AppColors {
   static const Color textFormFieldFillColorLightMode = Color(0xFFEAEDF1);
   static const Color textFormFieldHintColorLightMode = Color(0xFF82888E);
 
+
+  static const Color darkThemeContainerColor= Color(0xFF0F3253);
+
+
+
+
 }

@@ -21,6 +21,7 @@ class ConverterScreen extends ConsumerWidget {
     final state = ref.watch(converterProvider);
     final controller = ref.read(converterProvider.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       key: scaffoldKey,
@@ -64,11 +65,11 @@ class ConverterScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
 
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                color: isDark?Color(0xff0C3156):Colors.white,
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
-                    blurRadius: 12,
+                    blurRadius: 6,
                     color: Colors.black12,
                   )
                 ],
@@ -256,7 +257,7 @@ class ConverterScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
 
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark?Color(0xff0C3156):Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(width: 1,color:Color (0xff2DA8F0)),
                 boxShadow: const [
@@ -323,7 +324,7 @@ class ConverterScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SvgPicture.asset(IconPath.exportIcon),
+                        SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
                         SizedBox(width: 6.w,),
                         CustomText(text: "Export",fontSize: 16.sp,fontWeight: FontWeight.w700,),
                       ],

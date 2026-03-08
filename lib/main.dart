@@ -4,11 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'core/services/local_storage_service.dart';
+import 'core/services/token_storage.dart';
 
 
 
 Future<void> main() async {
-  //await LocalStorage.init();
+  WidgetsFlutterBinding.ensureInitialized();
+
+
+  await TokenStorage.init();
   await dotenv.load(fileName: ".env");
   runApp(ProviderScope(child: const MyApp()));
 }

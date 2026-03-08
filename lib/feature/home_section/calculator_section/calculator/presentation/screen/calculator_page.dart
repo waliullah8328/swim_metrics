@@ -24,6 +24,7 @@ class SplitCalculatorPage extends ConsumerWidget {
     final state = ref.watch(splitProvider);
     final notifier = ref.read(splitProvider.notifier);
     final selected = ref.watch(currencyProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -57,9 +58,9 @@ class SplitCalculatorPage extends ConsumerWidget {
         ),
       ),
 
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -67,7 +68,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                 /// COURSE CARD
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xffFFFFFF),
+                    color: isDark?AppColors.darkThemeContainerColor: Color(0xffFFFFFF),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -95,7 +96,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD9D9D9),
+                                color: isDark?Color(0xff033A5E):Color(0xFFD9D9D9),
                                 borderRadius: BorderRadius.circular(40),
                               ),
                               child: DropdownButtonHideUnderline(
@@ -265,7 +266,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                 Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Color(0xffEAEDF1),
+                    color: isDark?Color(0xff234B6E):Color(0xffEAEDF1),
                     borderRadius:BorderRadius.only(
                       topRight: Radius.circular(10),
                       topLeft: Radius.circular(10)
@@ -285,7 +286,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                   height: 300.h, // fixed height for scrollable area
                   child: Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xffFFFFFF),
+                      color: isDark?Color(0xff1B3A5C):Color(0xffFFFFFF),
 
 
                     ),
@@ -354,7 +355,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SvgPicture.asset(IconPath.clearIcon),
+                              SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
                               SizedBox(width: 6.w,),
                               CustomText(text: "Clear",fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
                             ],
@@ -372,7 +373,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SvgPicture.asset(IconPath.exportIcon),
+                            SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
                             SizedBox(width: 6.w,),
                             CustomText(text: "Export",fontSize: 16.sp,fontWeight: FontWeight.w700,),
                           ],

@@ -7,6 +7,7 @@ import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
+import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../../core/utils/constants/image_path.dart';
 import '../riverpod/edit_profile_controller.dart';
@@ -42,6 +43,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
 
     return Scaffold(
@@ -82,7 +84,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
+                color: isDark?AppColors.darkThemeContainerColor: Color(0xffFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
@@ -147,7 +149,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
+                color: isDark?AppColors.darkThemeContainerColor: Color(0xffFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(

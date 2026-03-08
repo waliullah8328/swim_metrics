@@ -15,6 +15,7 @@ import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_account_widget.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_switch_widget.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/social_login.dart';
+import '../../../../../../core/services/token_storage.dart';
 import '../../../../../../core/utils/constants/app_sizer.dart';
 import '../../../../../../core/utils/constants/image_path.dart';
 import '../../../../../../core/utils/validators/app_validator.dart';
@@ -147,6 +148,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: () async {
                      final result = await ref.read(loginProvider.notifier).login();
                      if(result){
+                       await TokenStorage.setLogin(true);
                        context.go(RouteNames.homeNavBarScreen);
                      }
             

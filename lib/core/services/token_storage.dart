@@ -10,6 +10,7 @@ class TokenStorage {
   static const String _userRoleKey = 'user_first_name';
   static const String _userGoalKey = 'user_goal';
   static const String _isSeeOnboardingKey = 'isSeeOnboarding';
+  static const String _isLoginKey = 'isLogin';
 
   // Remember email and Password
   static const String _savedEmailKey = 'saved_email';
@@ -134,8 +135,22 @@ class TokenStorage {
     }
   }
 
+  static Future<void> setLogin(bool seen) async {
+    try {
+      if (_preferences == null) await init();
+      await _preferences!.setBool(_isLoginKey, seen);
+      log('Login flag saved: $seen');
+    } catch (e) {
+      log('Error saving Login flag: $e');
+    }
+  }
+
   static bool hasSeenOnboarding() {
     return _preferences?.getBool(_isSeeOnboardingKey) ?? false;
+  }
+
+  static bool hasSeenLogin() {
+    return _preferences?.getBool(_isLoginKey) ?? false;
   }
 
   // Check if user is logged in

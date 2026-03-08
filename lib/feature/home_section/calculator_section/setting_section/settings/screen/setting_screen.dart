@@ -32,6 +32,7 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     final fontOption = ref.watch(settingsProvider).fontSize;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
 
 
@@ -60,7 +61,7 @@ class SettingsScreen extends ConsumerWidget {
           child: Divider(
             height: 1,
             thickness: 1,
-            color: Colors.grey.shade300,
+            color: isDark?Color(0xffDADADA):Colors.grey.shade300,
           ),
         ),
       ),
@@ -103,10 +104,10 @@ class SettingsScreen extends ConsumerWidget {
                       context.push(RouteNames.editProfileScreen);
                     },
                     child: Card(
-                      color: AppColors.textGrey,
+                      color: isDark?Color(0xff00253F):AppColors.textGrey,
                       child: Padding(
                       padding: const EdgeInsets.all(14.0),
-                      child: Center(child: CustomText(text: AppLocalizations.of(context)!.editProfile,fontSize: getAdjustedFontSize(12, fontOption).sp,fontWeight: FontWeight.w400,)),
+                      child: Center(child: CustomText(text: AppLocalizations.of(context)!.editProfile,fontSize: getAdjustedFontSize(12, fontOption).sp,fontWeight: FontWeight.w400,color:isDark? AppColors.primary:null,)),
                     ),),
                   ),
                 ],
@@ -127,7 +128,7 @@ class SettingsScreen extends ConsumerWidget {
 
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xffFFFFFF),
+                    color: isDark?AppColors.darkThemeContainerColor: Color(0xffFFFFFF),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -189,7 +190,7 @@ class SettingsScreen extends ConsumerWidget {
                                   child: Container(
                                     padding: EdgeInsets.symmetric(horizontal: 4.w),
                                     decoration: BoxDecoration(
-                                      color: Color(0xffEAEDF1),
+                                      color: isDark?AppColors.darkThemeContainerColor: Color(0xffEAEDF1),
                                       borderRadius: BorderRadius.circular(45),
                                       border: Border.all(color: Color(0xffEAEDF1),),
                                     ),
@@ -254,7 +255,7 @@ class SettingsScreen extends ConsumerWidget {
 
 
                 Container( decoration: BoxDecoration(
-                  color: const Color(0xffFFFFFF),
+                  color: isDark?AppColors.darkThemeContainerColor: Color(0xffFFFFFF),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -291,7 +292,7 @@ class SettingsScreen extends ConsumerWidget {
                                   child: Container(
                                     padding: EdgeInsets.symmetric(horizontal: 4.w),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xffEAEDF1),
+                                      color: isDark?AppColors.darkThemeContainerColor: Color(0xffEAEDF1),
                                       borderRadius: BorderRadius.circular(45),
                                       border: Border.all(color: const Color(0xffEAEDF1)),
                                     ),
@@ -431,7 +432,7 @@ class SettingsScreen extends ConsumerWidget {
                   child: Center(child:  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset(IconPath.logOutIcon ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                      SvgPicture.asset(IconPath.logOutIcon ,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
                       Text(AppLocalizations.of(context)!.logout,style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
                     ],
                   )),

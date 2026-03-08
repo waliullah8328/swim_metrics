@@ -10,6 +10,7 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 import '../../../../../config/route/routes_name.dart';
 import '../../../../../core/common/widgets/new_custon_widgets/custom_screen_back_ground.dart';
+import '../../../../../core/services/token_storage.dart';
 import '../../../../../core/utils/constants/image_path.dart';
 
 
@@ -35,8 +36,31 @@ class _SplashScreenState extends ConsumerState<SplashScreenTwo> {
 
   Future<void> _navigateUser() async {
     await Future.delayed(const Duration(seconds: 2));
+
+    final isOnBoarding = TokenStorage.hasSeenOnboarding();
+    debugPrint("Is Onboarding value : $isOnBoarding");
+
+    final isLogin= TokenStorage.hasSeenLogin();
+    debugPrint("Is Login value : $isLogin");
     if (!mounted) return;
-    context.go(RouteNames.onboardingScreen);
+
+
+    if(TokenStorage.hasSeenOnboarding()){
+
+      if(TokenStorage.hasSeenLogin()){
+        context.go(RouteNames.homeNavBarScreen);
+
+      }else{
+        context.go(RouteNames.getStartedScreen);
+
+      }
+
+
+
+    }else{
+      context.go(RouteNames.onboardingScreen);
+
+    }
 
     // final loggedIn = await _authService.isLoggedIn();
     //  final isOnBoarding = await TokenStorage.hasSeenOnboarding();
