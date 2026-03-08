@@ -11,6 +11,7 @@ import 'core/common/widgets/new_custon_widgets/no_internet_widget.dart';
 import 'core/utils/constants/app_sizer.dart';
 import 'core/utils/constants/app_sizes.dart';
 
+import 'feature/home_section/calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import 'l10n/app_localizations.dart';
 
 
@@ -56,7 +57,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     AppSizes().init(context);
 
     final themeMode = ref.watch(themeModeProvider);
-    final language = ref.watch(languageProvider);
+    final settings = ref.watch(settingsProvider);
 
     return Sizer(
       builder: (context, orientation, deviceType) {
@@ -71,7 +72,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           //home: BottomNavScreen (),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: Locale(language.code),
+          locale: Locale(settings.language.code),
           builder: (context, child) {
             // Set global context for auth error handler
             //AuthErrorHandler.setGlobalContext(context);

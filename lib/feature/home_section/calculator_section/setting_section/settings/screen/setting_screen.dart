@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swim_metrics/config/route/routes_name.dart';
+
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/image_path.dart';
@@ -10,6 +11,7 @@ import 'package:swim_metrics/core/utils/constants/image_path.dart';
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_switch_widget.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../riverpod/setting_controller.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -28,14 +30,14 @@ class SettingsScreen extends ConsumerWidget {
           return baseSize + 2;
       }
     }
-    final settings = ref.watch(settingsProvider);
+
     final fontOption = ref.watch(settingsProvider).fontSize;
 
 
 
     return Scaffold(
       appBar: AppBar(
-        title: CustomText(text: "Settings",fontSize: getAdjustedFontSize(24, fontOption).sp,fontWeight: FontWeight.w600,),
+        title: CustomText(text: AppLocalizations.of(context)!.settings,fontSize: getAdjustedFontSize(24, fontOption).sp,fontWeight: FontWeight.w600,),
         centerTitle: true,
         leading: GestureDetector(
           onTap: (){
@@ -123,8 +125,20 @@ class SettingsScreen extends ConsumerWidget {
                 CustomText(text: "APPEARANCE",fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
                 SizedBox(height: 10.h,),
 
-                Card(
-                  color: Color(0xffFFFFFF),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xffFFFFFF),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 4), // shadow position
+                      ),
+                    ],
+                  ),
+
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -170,10 +184,10 @@ class SettingsScreen extends ConsumerWidget {
                                 ref.watch(settingsProvider.select((s) => s.fontSize));
 
                                 return SizedBox(
-                                  width: 100.w,
-                                  height: 40.h,
+                                  width: 80.w,
+                                  height:32.h,
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 10),
+                                    padding: EdgeInsets.symmetric(horizontal: 4.w),
                                     decoration: BoxDecoration(
                                       color: Color(0xffEAEDF1),
                                       borderRadius: BorderRadius.circular(45),
@@ -215,9 +229,9 @@ class SettingsScreen extends ConsumerWidget {
                                         ),
 
                                         /// Your custom icon
-                                        const Icon(
+                                        Icon(
                                           Icons.keyboard_arrow_down,
-                                          size: 20,
+                                          size: 18,
                                         ),
                                       ],
                                     ),
@@ -239,15 +253,90 @@ class SettingsScreen extends ConsumerWidget {
 
 
 
-                Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xffFFFFFF),
-                    borderRadius: BorderRadius.circular(12)
-                  ),
+                Container( decoration: BoxDecoration(
+                  color: const Color(0xffFFFFFF),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 4), // shadow position
+                    ),
+                  ],
+                ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                SvgPicture.asset(IconPath.languageSettingsIcon),
+                                SizedBox(width: 10.w,),
+                                CustomText(text: "Language",fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
+                              ],
+                            ),
+
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final language =
+                                ref.watch(settingsProvider.select((s) => s.language));
+
+                                return SizedBox(
+                                  width: 80.w,
+                                  height: 32.h,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xffEAEDF1),
+                                      borderRadius: BorderRadius.circular(45),
+                                      border: Border.all(color: const Color(0xffEAEDF1)),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton<AppLanguage>(
+                                              value: language,
+                                              isExpanded: true,
+                                              icon: const SizedBox(), // remove default arrow
+                                              items: AppLanguage.values.map((lang) {
+                                                return DropdownMenuItem(
+                                                  value: lang,
+                                                  child: CustomText(
+                                                    text: lang.name,
+                                                    fontSize: 10.sp,
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              onChanged: (value) {
+                                                if (value != null) {
+                                                  ref
+                                                      .read(settingsProvider.notifier)
+                                                      .changeLanguage(value);
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ),
+
+                                        /// Custom icon
+                                        const Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 20,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 10.h,),
 
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -331,15 +420,22 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 30),
-
+                 SizedBox(height: 30.h),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
                   ),
-                  onPressed: () {},
-                  child: const Text("Log Out"),
-                ),
+                  onPressed: (){
+                    context.go(RouteNames.loginScreen);
+                  },
+                  child: Center(child:  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(IconPath.logOutIcon ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                      Text("Log Out",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
+                    ],
+                  )),
+                )
               ],
             ),
           )

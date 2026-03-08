@@ -11,10 +11,29 @@ enum FontSizeOption {
   medium,
   big,
 }
+
+
+enum AppLanguage {
+  english('en', 'ENGLISH'),
+  french('fr', 'FRENCH'),
+  spanish('es', 'SPANISH'),
+  italian('it', 'ITALIAN');
+
+  final String code;
+  final String name;
+
+  const AppLanguage(this.code, this.name);
+}
+
+
 class SettingsNotifier extends StateNotifier<SettingsState> {
   SettingsNotifier() : super(SettingsState());
 
-  Future<void> toggleDarkMode(bool value,ref) async {
+  static const String key = "font_size";
+  static const String darkModeKey = "dark_mode";
+  static const String languageKey = "app_language";
+
+  Future<void> toggleDarkMode(bool value, ref) async {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setBool(darkModeKey, value);
@@ -23,7 +42,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       darkMode: value,
     );
 
-    /// Update theme
     ref.read(themeModeProvider.notifier).state =
     value ? ThemeMode.dark : ThemeMode.light;
   }
@@ -40,25 +58,40 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     state = state.copyWith(haptic: value);
   }
 
-  static const String key = "font_size";
-  static const String darkModeKey = "dark_mode";
-
-  Future<void> loadFontSize() async {
+  Future<void> loadSettings(ref) async {
     final prefs = await SharedPreferences.getInstance();
-    final value = prefs.getString(key);
-    final darkMode = prefs.getBool(darkModeKey) ?? false;
 
-    if (value != null) {
+    final fontSizeValue = prefs.getString(key);
+    final darkMode = prefs.getBool(darkModeKey) ?? false;
+    final languageCode = prefs.getString(languageKey);
+
+    /// font size
+    if (fontSizeValue != null) {
       state = state.copyWith(
         fontSize: FontSizeOption.values.firstWhere(
-              (e) => e.name == value,
+              (e) => e.name == fontSizeValue,
           orElse: () => FontSizeOption.medium,
         ),
       );
     }
+
+    /// language
+    if (languageCode != null) {
+      state = state.copyWith(
+        language: AppLanguage.values.firstWhere(
+              (e) => e.code == languageCode,
+          orElse: () => AppLanguage.english,
+        ),
+      );
+    }
+
+    /// dark mode
     state = state.copyWith(
       darkMode: darkMode,
     );
+
+    ref.read(themeModeProvider.notifier).state =
+    darkMode ? ThemeMode.dark : ThemeMode.light;
   }
 
   Future<void> changeFontSize(FontSizeOption size) async {
@@ -67,8 +100,14 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
 
     state = state.copyWith(fontSize: size);
   }
+
+  /// LANGUAGE CHANGE
+  Future<void> changeLanguage(AppLanguage language) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(languageKey, language.code);
+
+    state = state.copyWith(language: language);
+  }
 }
 
-final settingsProvider =
-StateNotifierProvider<SettingsNotifier, SettingsState>(
-        (ref) => SettingsNotifier()..loadFontSize());
+final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>( (ref) => SettingsNotifier()..loadSettings(ref));
