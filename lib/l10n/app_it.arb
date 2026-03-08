@@ -1,3 +1,34 @@
 {
-"settings":"Impostazioni"
+"settings":"Impostazioni",
+"editProfile": "Modifica profilo",
+"appearance": "ASPETTO",
+
+"darkMode": "Modalità scura",
+"textSize": "Dimensione del testo",
+"small": "PICCOLA",
+"medium": "MEDIA",
+"big": "GRANDE",
+"accessibility": "ACCESSIBILITÀ",
+"language": "Lingua",
+"stopWatchSound": "Suono del cronometro",
+"voiceInput": "Input vocale",
+"hapticFeedBack": "Feedback tattile",
+"logout": "Disconnetti",
+
+"personalDetails": "DATI PERSONALI",
+"enterYourName": "Inserisci il tuo nome",
+"name": "Name",
+"enterYourEmail": "Enter your email",
+"email": "Email",
+"enterYourPhoneNumber": "Enter your phone number",
+"phone": "Phone",
+"saveChanges": "Save Changes",
+"securityDetails": "SECURITY DETAILS",
+"enterYourCurrentPassword": "Enter your current password",
+"currentPassword": "Current Password",
+"enterYourNewPassword": "Enter your new password",
+"newPassword": "New Password",
+"enterYourConfirmPassword": "Enter your confirm password",
+"confirmPassword": "Confirm Password",
+"savePassword": "Save Password"
 }

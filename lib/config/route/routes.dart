@@ -11,7 +11,10 @@ import '../../feature/auth/login_section/login/presentation/screens/login_screen
 import '../../feature/auth/sign_up_section/sign_up/presentation/screens/sign_up_screen.dart';
 import '../../feature/auth/sign_up_section/verify_email_success/presentation/screens/verify_email_success.dart';
 import '../../feature/home_section/calculator_section/setting_section/edit_profile/screen/edit_profile_screen.dart';
+import '../../feature/home_section/calculator_section/setting_section/faq/presentation/screen/faq_screen.dart';
+import '../../feature/home_section/calculator_section/setting_section/help_and_support/presentation/screen/help_and_support_screen.dart';
 import '../../feature/home_section/calculator_section/setting_section/settings/screen/setting_screen.dart';
+import '../../feature/home_section/calculator_section/setting_section/terms_and_condition/presentation/screen/terms_and_condition.dart';
 import '../../feature/home_section/home_app_bar/presentation/screens/home_app_bar.dart';
 import '../../feature/on_boarding/presentation/screens/on_boarding_screen.dart';
 import '../../feature/splash_section/splash/presentation/screens/splash_screen.dart';
@@ -36,6 +39,18 @@ class Routes {
       GoRoute(
         path: RouteNames.onboardingScreen,
         builder: (context, state) => OnboardingScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.helpSupportScreen,
+        builder: (context, state) => HelpSupportScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.fAQScreen,
+        builder: (context, state) => FAQScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.termsConditionsScreen,
+        builder: (context, state) => TermsConditionsScreen (),
       ),
 
       GoRoute(

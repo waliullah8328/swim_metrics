@@ -4,7 +4,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
-import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
@@ -43,7 +42,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final profile = ref.watch(profileProvider);
+
 
     return Scaffold(
       appBar: AppBar(

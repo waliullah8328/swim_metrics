@@ -41,7 +41,7 @@ class AppBarThemeData {
   );
 
   static final AppBarTheme darkAppBarTheme = _baseAppBarTheme(
-    backgroundColor: Color(0xff212121),
+    backgroundColor: Color(0xff022740),
     iconColor: AppColors.textWhite,
     titleColor: AppColors.textWhite,
     surfaceTintColor: AppColors.textPrimary,

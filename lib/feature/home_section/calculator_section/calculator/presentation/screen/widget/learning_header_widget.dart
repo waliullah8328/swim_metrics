@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:swim_metrics/config/route/routes_name.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
@@ -72,7 +74,11 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                     Divider(),
                     CustomText(text: "Ideas for use",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "FAQs",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    GestureDetector(
+                      onTap: (){
+                        context.push(RouteNames.fAQScreen);
+                      },
+                        child: CustomText(text: "FAQs",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,)),
                     SizedBox(height: 16.h,),
                   ],
                 ),

@@ -13,6 +13,9 @@ class RouteNames{
   static const String homeNavBarScreen  = "/homeNavBarScreen";
   static const String settingsScreen  = "/settingsScreen";
   static const String editProfileScreen = "/editProfileScreen";
+  static const String helpSupportScreen = "/helpSupportScreen";
+  static const String termsConditionsScreen  = "/termsConditionsScreen";
+  static const String fAQScreen  = "/fAQScreen";
 
 
 

@@ -40,16 +40,16 @@ class BottomNavBarThemeData {
   static final BottomNavigationBarThemeData lightBottomNavBarTheme =
   _baseBottomNavBarTheme(
     backgroundColor: AppColors.textWhite,
-    selectedItemColor: Color(0xff7F27FF),
-    unselectedItemColor: Colors.grey,
+    selectedItemColor: Color(0xff2DA8F0),
+    unselectedItemColor: Color(0xffC7C7C7),
     elevation: 8,
   );
 
   static final BottomNavigationBarThemeData darkBottomNavBarTheme =
   _baseBottomNavBarTheme(
-    backgroundColor: Color(0xff353434),
-    selectedItemColor: Color(0xff7F27FF),
-    unselectedItemColor: Colors.grey,
+    backgroundColor: Color(0xff0F2A44),
+    selectedItemColor: Color(0xff2DA8F0),
+    unselectedItemColor: Color(0xffC7C7C7),
     elevation: 0,
   );
 }

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/riverpod/settings_state.dart';
 
 import '../../../../../../config/theme/theme_provider.dart';
+import '../../../../../../core/services/theme_service.dart';
 
 
 enum FontSizeOption {

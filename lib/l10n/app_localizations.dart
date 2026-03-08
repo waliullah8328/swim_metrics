@@ -107,6 +107,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get settings;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'APPEARANCE'**
+  String get appearance;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @textSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Size'**
+  String get textSize;
+
+  /// No description provided for @small.
+  ///
+  /// In en, this message translates to:
+  /// **'SMALL'**
+  String get small;
+
+  /// No description provided for @medium.
+  ///
+  /// In en, this message translates to:
+  /// **'MEDIUM'**
+  String get medium;
+
+  /// No description provided for @big.
+  ///
+  /// In en, this message translates to:
+  /// **'BIG'**
+  String get big;
+
+  /// No description provided for @accessibility.
+  ///
+  /// In en, this message translates to:
+  /// **'ACCESSIBILITY'**
+  String get accessibility;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @stopWatchSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopwatch Sound'**
+  String get stopWatchSound;
+
+  /// No description provided for @voiceInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Input'**
+  String get voiceInput;
+
+  /// No description provided for @hapticFeedBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptic Feedback'**
+  String get hapticFeedBack;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Out'**
+  String get logout;
+
+  /// No description provided for @personalDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'PERSONAL DETAILS'**
+  String get personalDetails;
+
+  /// No description provided for @enterYourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name'**
+  String get enterYourName;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @enterYourEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email'**
+  String get enterYourEmail;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @enterYourPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your phone number'**
+  String get enterYourPhoneNumber;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @securityDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'SECURITY DETAILS'**
+  String get securityDetails;
+
+  /// No description provided for @enterYourCurrentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current password'**
+  String get enterYourCurrentPassword;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get currentPassword;
+
+  /// No description provided for @enterYourNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your new password'**
+  String get enterYourNewPassword;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// No description provided for @enterYourConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your confirm password'**
+  String get enterYourConfirmPassword;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// No description provided for @savePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Password'**
+  String get savePassword;
 }
 
 class _AppLocalizationsDelegate
