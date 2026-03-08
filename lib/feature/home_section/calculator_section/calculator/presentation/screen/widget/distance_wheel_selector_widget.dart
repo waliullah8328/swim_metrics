@@ -1,27 +1,28 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
-import '../../../../../../core/utils/constants/app_colors.dart';
+import '../../../../../../../core/utils/constants/app_colors.dart';
 
-class SplitCalculatorSelector extends StatefulWidget {
-  final List<String> items;
-  final ValueChanged<String> onChanged;
+import 'package:flutter/material.dart';
+import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
+import '../../../../../../../core/utils/constants/app_colors.dart';
 
-  const SplitCalculatorSelector({
+class DistanceWheelSelector extends StatefulWidget {
+  final List<int> items;
+  final ValueChanged<int> onChanged;
+
+  const DistanceWheelSelector({
     super.key,
     required this.items,
     required this.onChanged,
   });
 
   @override
-  State<SplitCalculatorSelector> createState() =>
-      _SplitCalculatorSelectorState();
+  State<DistanceWheelSelector> createState() =>
+      _DistanceWheelSelectorState();
 }
 
-class _SplitCalculatorSelectorState
-    extends State<SplitCalculatorSelector> {
+class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
   final FixedExtentScrollController _controller =
   FixedExtentScrollController();
 
@@ -32,19 +33,17 @@ class _SplitCalculatorSelectorState
     const double itemHeight = 70;
 
     return Card(
-      // Remove horizontal margin to allow full width
-      // margin: const EdgeInsets.symmetric(horizontal: 40),
-
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: SizedBox(
-        // Take full width
-        width: double.infinity,
+        width: double.infinity, // take full width
         height: (itemHeight * 3).h,
+
         child: Stack(
           alignment: Alignment.center,
           children: [
+
             /// Scroll List
             ListWheelScrollView.useDelegate(
               controller: _controller,
@@ -68,10 +67,10 @@ class _SplitCalculatorSelectorState
 
                   return Center(
                     child: Text(
-                      widget.items[index],
+                      widget.items[index].toString(),
                       style: TextStyle(
                         fontSize: 19.sp,
-                        color: isSelected ? Colors.amber : null,
+                        color: isSelected ? Colors.amber : Colors.black,
                         fontWeight: isSelected
                             ? FontWeight.w500
                             : FontWeight.normal,

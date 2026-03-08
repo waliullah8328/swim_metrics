@@ -6,6 +6,7 @@ class SettingsState {
   final bool voiceInput;
   final bool haptic;
   final FontSizeOption fontSize;
+  final AppLanguage language;
 
   SettingsState({
     this.darkMode = false,
@@ -13,6 +14,7 @@ class SettingsState {
     this.voiceInput = true,
     this.haptic = true,
     this.fontSize = FontSizeOption.medium,
+    this.language = AppLanguage.english
   });
 
   SettingsState copyWith({
@@ -21,13 +23,15 @@ class SettingsState {
     bool? voiceInput,
     bool? haptic,
     FontSizeOption? fontSize,
+    AppLanguage? language,
   }) {
     return SettingsState(
       darkMode: darkMode ?? this.darkMode,
       stopwatchSound: stopwatchSound ?? this.stopwatchSound,
       voiceInput: voiceInput ?? this.voiceInput,
       haptic: haptic ?? this.haptic,
-      fontSize: fontSize?? this.fontSize
+      fontSize: fontSize?? this.fontSize,
+      language: language??this.language
     );
   }
 }

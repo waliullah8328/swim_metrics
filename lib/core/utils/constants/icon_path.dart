@@ -37,6 +37,12 @@ class IconPath{
   static const  String stopSoundIcon ='$_basePath/stop_sound_icon.svg';
   static const  String voiceInputIcon ='$_basePath/voice_input_icon.svg';
   static const  String hapticIcon ='$_basePath/haptic_icon.svg';
+  static const  String languageSettingsIcon ='$_basePath/language_settings_icon.svg';
+  static const  String logOutIcon ='$_basePath/log_out_icon.svg';
+  static const  String voiceIcon ='$_basePath/voice_icon.svg';
+  static const  String calculatorSplitIcon ='$_basePath/calculator_split_icon.svg';
+  static const  String clearIcon ='$_basePath/clear_icon.svg';
+  static const  String exportIcon ='$_basePath/export_icon.svg';
 
 
 
