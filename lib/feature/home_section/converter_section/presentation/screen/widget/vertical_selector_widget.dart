@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 
 class VerticalSelector extends StatelessWidget {
   final List<String> items;
@@ -14,6 +15,7 @@ class VerticalSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     // Height of each item
     const double itemHeight = 55;
     // Max number of visible items
@@ -22,7 +24,7 @@ class VerticalSelector extends StatelessWidget {
     return Container(
       height: itemHeight * visibleItems, // fix container height
       decoration: BoxDecoration(
-        color: const Color(0xffd9dbe1),
+        color: isDark ?Color(0xff092541):Color(0xffEAEDF1),
         borderRadius: BorderRadius.circular(18),
       ),
       child: ClipRRect(
@@ -41,7 +43,7 @@ class VerticalSelector extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: index != items.length - 1
                         ? Border(
-                      bottom: BorderSide(color: Colors.grey.shade300),
+                      bottom: BorderSide(color: Color(0xffC7C7C7)),
                     )
                         : null, // no border for last item
                   ),
@@ -50,7 +52,7 @@ class VerticalSelector extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
-                      color: isSelected ? const Color(0xff1c1f3a) : Colors.grey,
+                      color: isSelected ? isDark?AppColors.textWhite:Color(0xff1c1f3a) : Colors.grey,
                     ),
                   ),
                 ),

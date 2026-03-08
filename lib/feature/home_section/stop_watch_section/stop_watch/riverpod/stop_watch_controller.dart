@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../../calculator_section/calculator/data/model/split_model.dart';
+
 final stopwatchProvider =
 StateNotifierProvider<StopwatchController, StopwatchState>((ref) {
   return StopwatchController();
@@ -12,21 +14,43 @@ class StopwatchState {
   final bool isRunning;
   final List<Duration> laps;
 
+  final List<String> from;
+  final List<String> to;
+  final String stroke;
+  final String distance;
+  final List<SplitModel> splits;
+
   const StopwatchState({
     required this.time,
     required this.isRunning,
     required this.laps,
+    this.from = const ["SCY"],
+    this.to = const ["LCM"],
+    this.stroke = "FREE",
+    this.distance = "100",
+    this.splits = const [],
   });
 
   StopwatchState copyWith({
     Duration? time,
     bool? isRunning,
     List<Duration>? laps,
+    List<String>? from,
+    List<String>? to,
+    String? stroke,
+    String? distance,
+    List<SplitModel>? splits,
+
   }) {
     return StopwatchState(
       time: time ?? this.time,
       isRunning: isRunning ?? this.isRunning,
       laps: laps ?? this.laps,
+      from: from ?? this.from,
+      to: to ?? this.to,
+      stroke: stroke ?? this.stroke,
+      distance: distance ?? this.distance,
+      splits: splits ?? this.splits,
     );
   }
 }
@@ -77,6 +101,26 @@ class StopwatchController extends StateNotifier<StopwatchState> {
       laps: [],
       isRunning: false,
     );
+  }
+
+  void selectFrom(String value) {
+
+      state = state.copyWith(from: [value]);
+
+  }
+
+  void selectTo(String value) {
+
+      state = state.copyWith(to: [value]);
+
+  }
+
+  void selectStroke(String value) {
+    state = state.copyWith(stroke: value);
+  }
+
+  void selectDistance(String value) {
+    state = state.copyWith(distance: value);
   }
 
   /// LAP

@@ -4,8 +4,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
+import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
+import '../../../../converter_section/presentation/screen/widget/vertical_selector_widget.dart';
+import '../../../../converter_section/riverpod/converter_controller.dart';
 import '../../riverpod/stop_watch_controller.dart';
 import '../widget/controll_button_widget.dart';
 import '../widget/lap_table_widget.dart';
@@ -30,6 +34,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     final state = ref.watch(stopwatchProvider);
     final controller = ref.read(stopwatchProvider.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
 
     return Scaffold(
       key: scaffoldKey,
@@ -62,108 +67,501 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         ),
       ),
       drawer: CustomDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            /// Top Buttons
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              /// Top Buttons
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                          offset: Offset(0,4),
+                          color: Colors.black12
+                      )
+                    ]
+                ),
+                child: Row(
+                  children: List.generate(items.length * 2 - 1, (index) {
+        
+                    if(index.isOdd){
+                      return const SizedBox(width:6);
+                    }
+        
+                    final itemIndex = index ~/ 2;
+                    final isActive = selectedIndex == itemIndex;
+        
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            selectedIndex = itemIndex;
+                          });
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? const Color(0xFFC9A84C)
+                                : const Color(0xFFEAEDF1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            items[itemIndex],
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: isActive
+                                  ? Colors.black
+                                  : const Color(0xFF82888E),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+        
+        
+              SizedBox(height: 20.h),
+        
+              /// Main Content
+              selectedIndex == 0
+                  ? Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffFFFFFF),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+        
+                      child: Column(
+                        children: [
+                          TimerDisplay(duration: state.time),
+        
+                          const SizedBox(height: 20),
+        
+                          ControlButtons(
+                            running: state.isRunning,
+                            onStart: controller.start,
+                            onPause: controller.pause,
+                            onReset: controller.reset,
+                            onLap: controller.lap,
+                          ),
+        
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    )
+                  : selectedIndex == 1?Container(
+                padding: const EdgeInsets.all(16),
+
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
                     BoxShadow(
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                        offset: Offset(0,4),
-                        color: Colors.black12
+                      blurRadius: 6,
+                      color: Colors.black12,
                     )
-                  ]
-              ),
-              child: Row(
-                children: List.generate(items.length * 2 - 1, (index) {
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
 
-                  if(index.isOdd){
-                    return const SizedBox(width:6);
-                  }
+                        Expanded(
+                          child: Column(
+                            children: [
 
-                  final itemIndex = index ~/ 2;
-                  final isActive = selectedIndex == itemIndex;
+                              CustomText(text:
+                              "FROM",
 
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: (){
-                        setState(() {
-                          selectedIndex = itemIndex;
-                        });
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color: isActive
-                              ? const Color(0xFFC9A84C)
-                              : const Color(0xFFEAEDF1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          items[itemIndex],
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: isActive
-                                ? Colors.black
-                                : const Color(0xFF82888E),
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
+
+                              ),
+
+                              SizedBox(height: 10.h),
+
+                              VerticalSelector(
+                                items: const ["SCM", "SCY", "LCM"],
+                                selected: state.from,
+                                onTap: controller.selectFrom,
+                              )
+                            ],
                           ),
                         ),
+
+                        SizedBox(width: 12.w),
+
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(text:
+                              "TO",
+
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
+
+                              ),
+
+                              SizedBox(height: 10.h),
+
+
+
+                              VerticalSelector(
+                                items: const ["SCY", "LCM", "SCM"],
+                                selected: state.to,
+                                onTap: controller.selectTo,
+                              )
+                            ],
+                          ),
+                        ),
+
+                      ],
+                    ),
+
+
+                    SizedBox(height: 20.h),
+                    Card(
+
+                      child: Center(child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: CustomText(text: "00.00",fontSize: 35.sp,fontWeight: FontWeight.w700,),
+                      )),
+                    ),
+                    SizedBox(height: 20.h),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
                       ),
+                      onPressed: (){
+                        // context.go(RouteNames.loginScreen);
+                      },
+                      child: Center(child:  Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                          Text("START",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
+                        ],
+                      )),
                     ),
-                  );
-                }),
-              ),
-            ),
-
-
-            SizedBox(height: 20.h),
-
-            /// Main Content
-            selectedIndex == 0
-                ? Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffFFFFFF),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-
-                    child: Column(
+                  ],
+                ),
+              ):Container(
+                padding: const EdgeInsets.all(16),
+        
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      blurRadius: 6,
+                      color: Colors.black12,
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Row(
                       children: [
-                        TimerDisplay(duration: state.time),
+        
+                        Expanded(
+                          child: Column(
+                            children: [
+        
+                              CustomText(text:
+                              "FROM",
+        
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
+        
+                              ),
+        
+                              SizedBox(height: 10.h),
+        
+                              VerticalSelector(
+                                items: const ["SCM", "SCY", "LCM"],
+                                selected: state.from,
+                                onTap: controller.selectFrom,
+                              )
+                            ],
+                          ),
+                        ),
+        
+                        SizedBox(width: 12.w),
+        
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(text:
+                              "TO",
+        
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
+        
+                              ),
+        
+                              SizedBox(height: 10.h),
+        
+        
+        
+                              VerticalSelector(
+                                items: const ["SCY", "LCM", "SCM"],
+                                selected: state.to,
+                                onTap: controller.selectTo,
+                              )
+                            ],
+                          ),
+                        ),
+        
+                      ],
+                    ),
+        
+                    SizedBox(height: 20.h),
+                    Row(
+                      children: [
 
-                        const SizedBox(height: 20),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(text:
+                              "STROKE",
 
-                        ControlButtons(
-                          running: state.isRunning,
-                          onStart: controller.start,
-                          onPause: controller.pause,
-                          onReset: controller.reset,
-                          onLap: controller.lap,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
+
+                              ),
+
+                              SizedBox(height: 10.h),
+
+
+
+
+                              VerticalSelector(
+                                items: const ["FLY","BACK", "FREE", "IM","BREAST"],
+                                selected: [state.stroke],
+                                onTap: controller.selectStroke,
+                              )
+                            ],
+                          ),
                         ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(width: 12.w),
+
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(text:
+                              "DISTANCE",
+
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
+
+                              ),
+
+                              SizedBox(height: 10.h),
+
+
+
+                              VerticalSelector(
+                                items: const ["50", "100", "150","200","250"],
+                                selected: [state.distance],
+                                onTap: controller.selectDistance,
+                              )
+                            ],
+                          ),
+                        ),
+
                       ],
+                    ),
+
+                    SizedBox(height: 20.h),
+                    Row(
+                      children: [
+
+
+
+
+
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(text:
+                              "SPLIT SIZE",
+
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
+
+                              ),
+
+                              SizedBox(height: 10.h),
+
+
+
+                              VerticalSelector(
+                                items: const ["50", "100", "150","200","250"],
+                                selected: [state.distance],
+                                onTap: controller.selectDistance,
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(text:
+                              "START TYPE",
+
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
+
+                              ),
+
+                              SizedBox(height: 10.h),
+
+
+
+
+                              VerticalSelector(
+                                items: const ["FROM START","FROM MIDDLE","FROM LAST" ],
+                                selected: [state.stroke],
+                                onTap: controller.selectStroke,
+                              )
+                            ],
+                          ),
+                        ),
+
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
+                    Card(
+
+                      child: Center(child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: CustomText(text: "00.00",fontSize: 35.sp,fontWeight: FontWeight.w700,),
+                      )),
+                    ),
+                    SizedBox(height: 20.h),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
+                      ),
+                      onPressed: (){
+                       // context.go(RouteNames.loginScreen);
+                      },
+                      child: Center(child:  Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                          Text("START",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
+                        ],
+                      )),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.h,),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                    color: Color(0xffEAEDF1),
+                    borderRadius:BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        topLeft: Radius.circular(10)
+                    )
+                ),
+                child:Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomText(text: "SPLIT",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                    CustomText(text: "SPLIT TIME",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                    CustomText(text: "TOTAL",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 300.h, // fixed height for scrollable area
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xffFFFFFF),
+
+
+                  ),
+                  child: state.splits.isEmpty
+                      ? const Center(
+                    child: Text(
+                      "No splits yet",
+                      style: TextStyle(color: Colors.grey),
                     ),
                   )
-                : const Center(child: Text("Nothing")),
-            Expanded(child: LapTable(laps: state.laps)),
-          ],
+                      : ListView.builder(
+                    itemCount: state.splits.length,
+                    itemBuilder: (context, index) {
+                      final split = state.splits[index];
+
+                      // alternate colors: even -> E3F0FF, odd -> FFFFFF
+                      final bgColor = index % 2 == 0 ? Color(0xFFE3F0FF) : Color(0xFFFFFFFF);
+
+                      return Container(
+                        color: bgColor,
+                        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText(
+                              text: split.distance.toString(),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                            CustomText(
+                              text: split.splitTime.toStringAsFixed(2),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                            CustomText(
+                              text: split.total.toStringAsFixed(2),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

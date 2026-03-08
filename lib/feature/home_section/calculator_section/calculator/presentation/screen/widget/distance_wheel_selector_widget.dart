@@ -28,9 +28,11 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
 
   int selectedIndex = 0;
 
+
   @override
   Widget build(BuildContext context) {
     const double itemHeight = 70;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -70,7 +72,7 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
                       widget.items[index].toString(),
                       style: TextStyle(
                         fontSize: 19.sp,
-                        color: isSelected ? Colors.amber : Colors.black,
+                        color: isSelected ? Colors.amber : isDark?AppColors.textWhite:Colors.black,
                         fontWeight: isSelected
                             ? FontWeight.w500
                             : FontWeight.normal,

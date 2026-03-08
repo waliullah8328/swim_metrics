@@ -46,8 +46,8 @@ class AppElevatedButtonTheme {
   static final ElevatedButtonThemeData darkElevatedButtonTheme = _baseTheme(
     defaultTextColor: Color(0xffFFFFFF),
     disabledTextColor: Colors.grey.shade600,
-    defaultBackgroundColor: Color(0xff16A8AD),
+    defaultBackgroundColor: Color(0xffFE484C),
     disabledBackgroundColor: Colors.grey.shade800,
-    borderColor: AppColors.primary,
+    borderColor: Color(0xffFE484C),
   );
 }

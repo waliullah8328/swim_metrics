@@ -32,7 +32,7 @@ class AppCardThemeData {
 
   /// 🌙 Dark Theme Card
   static final CardThemeData darkCardTheme = _baseCardTheme(
-    color: const Color(0xff353434),
+    color: const Color(0xff092541),
     shadowColor: Color(0xff353434).withValues(alpha: 0.08),
     elevation: 1,
     borderRadius: BorderRadius.circular(8),

@@ -73,7 +73,7 @@ class AppTextFormFieldTheme {
 
   static final InputDecorationTheme darkInputDecorationTheme =
       _baseInputDecorationTheme(
-        fillColor: Color(0xff353434),
+        fillColor: Color(0xff153250),
     labelColor: Colors.white,
     hintColor: AppColors.textWhite,
     errorColor: Colors.redAccent,

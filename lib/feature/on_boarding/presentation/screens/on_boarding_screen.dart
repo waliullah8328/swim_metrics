@@ -13,6 +13,7 @@ import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/too
 
 import '../../../../core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import '../../../../core/common/widgets/new_custon_widgets/custom_screen_back_ground.dart';
+import '../../../../core/services/token_storage.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../riverpod/on_boarding_view_model.dart';
@@ -94,6 +95,7 @@ class _OnboardingScreenState
               Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 24.w),
                 child: CustomPrimaryButton(onPressed: (){
+                  TokenStorage.setOnboardingSeen(true);
                   context.go(RouteNames.getStartedScreen);
                 },title: "Purchase Now",),
               ),

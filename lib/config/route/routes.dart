@@ -26,7 +26,7 @@ import '../../feature/splash_section/splash2/presentation/screens/splash_screen_
 class Routes {
   static final GoRouter goRouter = GoRouter(
     debugLogDiagnostics: true,
-    initialLocation: RouteNames.homeNavBarScreen,
+    initialLocation: RouteNames.splashScreen,
     routes: [
       GoRoute(
         path: RouteNames.splashScreen,
