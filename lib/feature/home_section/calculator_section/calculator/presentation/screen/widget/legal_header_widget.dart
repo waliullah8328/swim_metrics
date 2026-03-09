@@ -10,7 +10,8 @@ import '../../../../../../../core/common/widgets/custom_text.dart';
 
 
 class LegalHeaderWidget extends StatefulWidget {
-  const LegalHeaderWidget({super.key});
+  const LegalHeaderWidget({super.key, required this.isDarkMode});
+  final bool isDarkMode;
 
   @override
   State<LegalHeaderWidget> createState() => _LegalHeaderWidgetState();
@@ -22,6 +23,7 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: widget.isDarkMode?Color(0xff153250):Color(0xffEAEDF1),
       child: Padding(
         padding:  EdgeInsets.only(left: 10.w,),
         child: Column(
@@ -77,14 +79,14 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CustomText(text: "Terms and Conditions",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                          CustomText(text: "Terms and Conditions",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                           Divider(),
                         ],
                       ),
                     ),
-                    CustomText(text: "Privacy Policy",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: "Privacy Policy",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "Copyright",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: "Copyright",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     SizedBox(height: 16.h,),
                   ],
                 ),

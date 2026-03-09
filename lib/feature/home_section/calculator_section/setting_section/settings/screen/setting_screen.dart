@@ -4,12 +4,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swim_metrics/config/route/routes_name.dart';
 
+
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/image_path.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_switch_widget.dart';
+import '../../../../../../core/services/token_storage.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../../l10n/app_localizations.dart';
 import '../riverpod/setting_controller.dart';
@@ -71,6 +73,7 @@ class SettingsScreen extends ConsumerWidget {
           /// PROFILE
           Card(
             margin: EdgeInsets.zero,
+            color: isDark?Color(0xff0F3253):Color(0xffEAEDF1),
 
 
             child: Padding(
@@ -426,7 +429,9 @@ class SettingsScreen extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                     fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
                   ),
-                  onPressed: (){
+                  onPressed: () async {
+
+                    await TokenStorage.deleteLoginFlag();
                     context.go(RouteNames.loginScreen);
                   },
                   child: Center(child:  Row(

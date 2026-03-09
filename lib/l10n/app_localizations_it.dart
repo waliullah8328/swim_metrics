@@ -97,4 +97,21 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get savePassword => 'Save Password';
+
+  @override
+  String get swimMetrics => 'SwimMetrics';
+
+  @override
+  String get helpAndSupport => 'Aiuto e supporto';
+
+  @override
+  String get version => 'Versione 2.5';
+
+  @override
+  String get manyThanksToMyFamilyAndFriends =>
+      'Grazie di cuore alla mia famiglia e ai miei amici';
+
+  @override
+  String get specialThanksToMyFriends =>
+      'Un ringraziamento speciale ai miei amici e mentori\n DCS, JCU ed ECR';
 }

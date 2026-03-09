@@ -49,6 +49,7 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     debugPrint("build");
     debugPrint(widget.email);
     debugPrint(widget.code);
@@ -97,6 +98,7 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                           width: 18.w,
                           height: 18.h,
                           fit: BoxFit.contain,
+                          colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                         ),
                       ),
                       suffixIcon: IconButton(
@@ -138,6 +140,7 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                           width: 18.w,
                           height: 18.h,
                           fit: BoxFit.contain,
+                          colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                         ),
                       ),
                       suffixIcon: IconButton(

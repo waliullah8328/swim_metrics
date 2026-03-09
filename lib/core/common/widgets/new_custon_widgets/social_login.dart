@@ -8,12 +8,14 @@ class CustomSocialLogin extends StatelessWidget {
     super.key,
   });
 
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       children: [
-        CustomCard(title: "Continue with Google",imagePath: IconPath.googleIcon,onTap: (){},),
-        CustomCard(title: "Continue with Apple",imagePath: IconPath.appleIcon,onTap: (){},),
+        CustomCard(title: "Continue with Google",imagePath: IconPath.googleIcon,onTap: (){},isDark: isDark,isApple: false,),
+        CustomCard(title: "Continue with Apple",imagePath: IconPath.appleIcon,onTap: (){},isDark: isDark,isApple: true,),
       ],
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
+import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
@@ -12,8 +13,9 @@ class FAQScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xffF3F3F3),
+
       appBar: AppBar(
         title: CustomText(
           text: "FAQ",
@@ -39,7 +41,7 @@ class FAQScreen extends StatelessWidget {
         /// Divider below AppBar
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
+          child: Divider(height: 0.5.h, thickness: 1, color: isDark?Color(0xffDADADA):Colors.grey.shade300),
         ),
       ),
       body: SingleChildScrollView(
@@ -47,8 +49,8 @@ class FAQScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            color: isDark?Color(0xff1B3A5C):Colors.white,
+            borderRadius: BorderRadius.circular(8),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
@@ -60,48 +62,54 @@ class FAQScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 30.h,),
 
               /// Title
-              const Text(
+               CustomText(
+                 text:
                 "FAQs",
-                style: TextStyle(
-                  fontSize: 28,
+
+                  fontSize: 28.sp,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff1D2130),
-                ),
+                  color: isDark?AppColors.textWhite:Color(0xff1D2130),
+
               ),
 
-              const SizedBox(height: 12),
+             SizedBox(height: 12.h),
 
-              const Text(
+              CustomText(text:
                 "Everything you need to know about the product and billing. "
                     "Can’t find the answer you’re looking for? Please send your query in Support.",
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.black54,
-                  height: 1.6,
-                ),
+
+                  fontSize: 15.sp,
+                  color: isDark?Color(0xffC7C7C7):Colors.black54,
+
+
               ),
 
-              const SizedBox(height: 24),
+             SizedBox(height: 24.h),
 
               faqItem(
                 "Is there a free trial available?",
                 "Yes, you can try us for free for 30 days. If you want, we’ll provide "
                     "you with a free, personalized 30-minute onboarding call to get "
                     "you up and running as soon as possible.",
+                isDark
               ),
 
               faqItem(
                 "Can I change my plan later?",
                 "Of course. Our pricing scales with your company. Chat to our "
                     "friendly team to find a solution that works for you.",
+                  isDark
               ),
 
               faqItem(
                 "What is your cancellation policy?",
                 "We understand that things change. You can cancel your plan at "
                     "any time and we’ll refund you the difference already paid.",
+                  isDark
+
               ),
 
               faqItem(
@@ -109,54 +117,57 @@ class FAQScreen extends StatelessWidget {
                 "Yes, you can try us for free for 30 days. If you want, we’ll provide "
                     "you with a free, personalized 30-minute onboarding call to get "
                     "you up and running as soon as possible.",
+                  isDark
               ),
 
               faqItem(
                 "How does billing work?",
                 "Plans are per workspace, not per account. You can upgrade one "
                     "workspace, and still have any number of free workspaces.",
+                  isDark
               ),
 
               faqItem(
                 "How do I change my account email?",
                 "You can change the email address associated with your account "
                     "by going to untitled.com/account from a laptop or desktop.",
+                  isDark
               ),
 
-              const SizedBox(height: 24),
+             SizedBox(height: 24.h),
 
               /// Support Card
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xffF1F1F1),
+                  color: isDark?Color(0xff032B46):Color(0xffF1F1F1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    const Text(
+                   CustomText(
+                     text:
                       "Still have questions?",
-                      style: TextStyle(
-                        fontSize: 20,
+
+                        fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xff1D2130),
-                      ),
+                        color:isDark?AppColors.textWhite: Color(0xff1D2130),
+
                     ),
 
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10.h),
 
-                    const Text(
+                    CustomText(text:
                       "Can’t find the answer you’re looking for? "
                           "Please send your query in support.",
-                      style: TextStyle(
-                        color: Colors.black54,
-                        height: 1.6,
-                      ),
+
+                        color:isDark? Color(0xffC7C7C7):Colors.black54,
+
                     ),
 
-                   SizedBox(height: 16.h),
+                   SizedBox(height:24.h),
                     SizedBox(
                       width: 120.w,
                       child: CustomPrimaryButton(title: "Get in touch",onPressed: (){
@@ -175,31 +186,31 @@ class FAQScreen extends StatelessWidget {
     );
   }
 
-  Widget faqItem(String question, String answer) {
+  Widget faqItem(String question, String answer,isDark) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 22),
+      padding:  EdgeInsets.only(bottom: 22.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          Text(
+         CustomText(text:
             question,
-            style: const TextStyle(
-              fontSize: 18,
+
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: Color(0xff1D2130),
-            ),
+              color: isDark?AppColors.textWhite:Color(0xff1D2130),
+
           ),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
 
-          Text(
+         CustomText(
+           text:
             answer,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black54,
-              height: 1.6,
-            ),
+
+              fontSize: 14.sp,
+              color: isDark?Color(0xffC7C7C7):Colors.black54,
+
           ),
         ],
       ),

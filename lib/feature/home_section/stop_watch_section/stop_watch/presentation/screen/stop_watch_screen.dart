@@ -6,13 +6,13 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
-import '../../../../../../l10n/app_localizations.dart';
+
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import '../../../../converter_section/presentation/screen/widget/vertical_selector_widget.dart';
-import '../../../../converter_section/riverpod/converter_controller.dart';
+
 import '../../riverpod/stop_watch_controller.dart';
 import '../widget/controll_button_widget.dart';
-import '../widget/lap_table_widget.dart';
+
 import '../widget/time_display_widget.dart';
 
 class StopwatchScreen extends ConsumerStatefulWidget {
@@ -27,13 +27,15 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
   int selectedIndex = 0;
 
-  final List<String> items = ["Normal", "Converter", "Predictor"];
+  final List<String> items = ["NORMAL", "CONVERTER", "PREDICTOR"];
+
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(stopwatchProvider);
     final controller = ref.read(stopwatchProvider.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
 
     return Scaffold(
@@ -63,7 +65,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         /// Divider below AppBar
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
+          child: Divider(height: 1, thickness: 1, color: isDark?Color(0xffDADADA):Colors.grey.shade300),
         ),
       ),
       drawer: CustomDrawer(),
@@ -73,10 +75,12 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           child: Column(
             children: [
               /// Top Buttons
+              CustomText(text: "MODE",fontSize: 18.sp,fontWeight: FontWeight.w600,color: Color(0xffE3D99B),),
+              SizedBox(height: 10.h,),
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark?Color(0xff1B3A5C):Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: const [
                       BoxShadow(
@@ -110,7 +114,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           decoration: BoxDecoration(
                             color: isActive
                                 ? const Color(0xFFC9A84C)
-                                : const Color(0xFFEAEDF1),
+                                :isDark?Color(0xff033151).withValues(alpha: 0.6):Color(0xFFEAEDF1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
@@ -119,7 +123,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               fontWeight: FontWeight.w600,
                               color: isActive
                                   ? Colors.black
-                                  : const Color(0xFF82888E),
+                                  : isDark?Color(0xffE3D99B): Color(0xFF82888E),
                             ),
                           ),
                         ),
@@ -137,7 +141,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                   ? Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xffFFFFFF),
+                        color: isDark?Color(0xff0C3156): Color(0xffFFFFFF),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -171,7 +175,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 padding: const EdgeInsets.all(16),
 
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark?Color(0xff0C3156):Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
                     BoxShadow(
@@ -244,14 +248,15 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                     Card(
 
                       child: Center(child: Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(24.0),
                         child: CustomText(text: "00.00",fontSize: 35.sp,fontWeight: FontWeight.w700,),
                       )),
                     ),
                     SizedBox(height: 20.h),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
+                        fixedSize:  Size(double.infinity, 52.h),
+                        backgroundColor: isDark?Color(0xffC69C3F):null,// width = full, height = 50
                       ),
                       onPressed: (){
                         // context.go(RouteNames.loginScreen);
@@ -259,8 +264,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       child: Center(child:  Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-                          Text("START",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
+                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
+                          Text("START",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600,),),
                         ],
                       )),
                     ),
@@ -270,7 +275,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 padding: const EdgeInsets.all(16),
         
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark?Color(0xff0C3156):Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
                     BoxShadow(
@@ -289,7 +294,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                             children: [
         
                               CustomText(text:
-                              "FROM",
+                              "GENDER",
         
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -300,7 +305,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               SizedBox(height: 10.h),
         
                               VerticalSelector(
-                                items: const ["SCM", "SCY", "LCM"],
+                                items: const ["","WOMEN", "MEN", ],
                                 selected: state.from,
                                 onTap: controller.selectFrom,
                               )
@@ -314,7 +319,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           child: Column(
                             children: [
                               CustomText(text:
-                              "TO",
+                              "COURSE",
         
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -463,7 +468,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                     Card(
 
                       child: Center(child: Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(24.0),
                         child: CustomText(text: "00.00",fontSize: 35.sp,fontWeight: FontWeight.w700,),
                       )),
                     ),
@@ -478,7 +483,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       child: Center(child:  Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
                           Text("START",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
                         ],
                       )),
@@ -490,7 +495,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                    color: Color(0xffEAEDF1),
+                    color: isDark?Color(0xff234B6E):Color(0xffEAEDF1),
                     borderRadius:BorderRadius.only(
                         topRight: Radius.circular(10),
                         topLeft: Radius.circular(10)
@@ -510,7 +515,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 height: 300.h, // fixed height for scrollable area
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xffFFFFFF),
+                    color: isDark?Color(0xff1B3A5C):Color(0xffFFFFFF),
 
 
                   ),
@@ -559,6 +564,52 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                     },
                   ),
                 ),
+              ),
+
+              SizedBox(height: 16.h),
+
+              /// ACTION BUTTONS
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor:Color(0xff234B6E),
+                          side: BorderSide(color: Color(0xff234B6E))
+                      ),
+                      onPressed: () {
+                        //notifier.clear();
+                      },
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
+                            SizedBox(width: 6.w,),
+                            CustomText(text: "Clear",fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:AppColors.primary,
+                      ),
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
+                          SizedBox(width: 6.w,),
+                          CustomText(text: "Export",fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

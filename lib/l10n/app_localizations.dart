@@ -281,6 +281,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Password'**
   String get savePassword;
+
+  /// No description provided for @swimMetrics.
+  ///
+  /// In en, this message translates to:
+  /// **'SwimMetrics'**
+  String get swimMetrics;
+
+  /// No description provided for @helpAndSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Support'**
+  String get helpAndSupport;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version 2.5'**
+  String get version;
+
+  /// No description provided for @manyThanksToMyFamilyAndFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Many thanks to my family and friends.'**
+  String get manyThanksToMyFamilyAndFriends;
+
+  /// No description provided for @specialThanksToMyFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Special thanks to my friends and mentors\n DCS, JCU, and ECR'**
+  String get specialThanksToMyFriends;
 }
 
 class _AppLocalizationsDelegate

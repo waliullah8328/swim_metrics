@@ -75,7 +75,7 @@ class AppTextFormFieldTheme {
       _baseInputDecorationTheme(
         fillColor: Color(0xff153250),
     labelColor: Colors.white,
-    hintColor: AppColors.textWhite,
+    hintColor: Color(0xffDADADA),
     errorColor: Colors.redAccent,
     focusedErrorColor: Colors.orangeAccent,
     prefixIconColor: Colors.grey,

@@ -29,5 +29,11 @@
 "newPassword": "New Password",
 "enterYourConfirmPassword": "Enter your confirm password",
 "confirmPassword": "Confirm Password",
-"savePassword": "Save Password"
+"savePassword": "Save Password",
+
+"swimMetrics": "SwimMetrics",
+"helpAndSupport": "Help & Support",
+"version": "Version 2.5",
+"manyThanksToMyFamilyAndFriends": "Many thanks to my family and friends.",
+"specialThanksToMyFriends": "Special thanks to my friends and mentors\n DCS, JCU, and ECR"
 }

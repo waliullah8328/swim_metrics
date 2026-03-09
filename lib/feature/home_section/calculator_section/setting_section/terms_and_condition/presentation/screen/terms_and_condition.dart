@@ -11,6 +11,7 @@ class TermsConditionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
 
       appBar: AppBar(
@@ -38,7 +39,7 @@ class TermsConditionsScreen extends StatelessWidget {
         /// Divider below AppBar
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
+          child: Divider(height: 0.5.h, thickness: 1, color: isDark?Color(0xffDADADA):Colors.grey.shade300),
         ),
       ),
 
@@ -47,7 +48,7 @@ class TermsConditionsScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark?Color(0xff1B3A5C):Colors.white,
             borderRadius: BorderRadius.circular(14),
             boxShadow: const [
               BoxShadow(
@@ -66,62 +67,63 @@ class TermsConditionsScreen extends StatelessWidget {
                 child: CustomText(text:
                   "Current as of 20 Mar 2026",
 
-                    color: Color(0xff5BA9C7),
+                    color: isDark?Color(0xff2DA8F0):Color(0xff5BA9C7),
                     fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
 
                 ),
               ),
 
-              const SizedBox(height: 10),
+               SizedBox(height: 10.h),
 
               /// Title
-              const Center(
-                child: Text(
+             Center(
+                child: CustomText(text:
                   "Privacy Policy",
-                  style: TextStyle(
-                    fontSize: 28,
+
+                    fontSize: 28.sp,
                     fontWeight: FontWeight.bold,
-                  ),
+
                 ),
               ),
 
-              const SizedBox(height: 16),
+               SizedBox(height: 16.h),
 
-              const Text(
+              CustomText(
+                text:
                 "Your privacy is important to us at Untitled. "
                     "We respect your privacy regarding any information "
                     "we may collect from you across our website.",
-                style: TextStyle(fontSize: 15, color: Colors.black87),
+               fontSize: 15.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
               ),
 
-              const SizedBox(height: 16),
+             SizedBox(height: 16.h),
 
-              const Text(
+              CustomText(
+                text:
                 "Mi tincidunt elit, id quisque ligula ac diam, amet. "
                     "Vel etiam suspendisse morbi eleifend faucibus eget vestibulum felis. "
                     "Dictum quis montes, sit sit. Tellus aliquam enim urna, etiam. "
                     "Mauris posuere vulputate arcu amet, vitae nisi, tellus tincidunt.",
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+               fontSize: 14.sp, color:isDark?Color(0xffC7C7C7): Colors.black54
               ),
 
-              const SizedBox(height: 20),
+             SizedBox(height: 20.h),
 
               sectionTitle("What information do we collect?"),
-              sectionText(),
-
+              sectionText(isDark: isDark),
               sectionTitle(
                   "Do we use cookies and other Letter spacing technologies?"),
-              sectionText(),
+              sectionText(isDark: isDark),
 
               sectionTitle("How long do we keep your information?"),
-              sectionText(),
+              sectionText(isDark: isDark),
 
               sectionTitle("How do we keep your information safe?"),
-              sectionText(),
+              sectionText(isDark: isDark),
 
               sectionTitle("What are your privacy rights?"),
-              sectionText(),
+              sectionText(isDark: isDark),
             ],
           ),
         ),
@@ -132,27 +134,26 @@ class TermsConditionsScreen extends StatelessWidget {
   Widget sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 20, bottom: 8),
-      child: Text(
+      child: CustomText(text:
         title,
-        style: const TextStyle(
-          fontSize: 20,
+
+          fontSize: 18.sp,
           fontWeight: FontWeight.bold,
-        ),
+
       ),
     );
   }
 
-  Widget sectionText() {
-    return const Text(
+  Widget sectionText({required bool isDark}) {
+    return CustomText(text:
       "Pharetra morbi libero id aliquam elit massa integer tellus. "
           "Quis felis aliquam ullamcorper porttitor. Pulvinar ullamcorper "
           "sit dictumst ut eget a, elementum eu. Maecenas est morbi "
           "mattis id in ac pellentesque ac.",
-      style: TextStyle(
-        fontSize: 14,
-        color: Colors.black54,
-        height: 1.6,
-      ),
+
+        fontSize: 14.sp,
+        color: isDark?Color(0xffC7C7C7):Colors.black54,
+
     );
   }
 }

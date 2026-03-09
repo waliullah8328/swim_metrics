@@ -31,6 +31,13 @@
 "newPassword": "Nueva contraseña",
 "enterYourConfirmPassword": "Ingrese su contraseña de confirmación",
 "confirmPassword": "confirmar Contraseña",
-"savePassword": "Guardar contraseña"
+"savePassword": "Guardar contraseña",
+
+
+"swimMetrics": "Métricas de natación",
+"helpAndSupport": "Ayuda y soporte",
+"version": "Versión 2.5",
+"manyThanksToMyFamilyAndFriends": "Muchas gracias a mi familia y amigos.",
+"specialThanksToMyFriends": "Un agradecimiento especial a mis amigas \ny mentoras DCS, JCU y ECR."
 
 }

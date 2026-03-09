@@ -4,16 +4,18 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 class CustomDrawerButtonWidget extends StatelessWidget {
   const CustomDrawerButtonWidget({
-    super.key, required this.icon, required this.buttonTitle, this.onTap,
+    super.key, required this.icon, required this.buttonTitle, this.onTap, required this.isDarkMode,
   });
   final String icon,buttonTitle;
   final void Function()? onTap;
+  final bool isDarkMode;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
+        color: isDarkMode?Color(0xff153250):Color(0xffEAEDF1),
         child: Padding(
           padding:  EdgeInsets.only(left: 10.w,top: 12.h,bottom: 12.h,right: 10),
           child: Column(
