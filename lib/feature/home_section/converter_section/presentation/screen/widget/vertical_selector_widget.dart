@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
+import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 class VerticalSelector extends StatelessWidget {
   final List<String> items;
@@ -26,6 +27,7 @@ class VerticalSelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ?Color(0xff092541):Color(0xffEAEDF1),
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(width: 0.5.w,color: isDark?Color(0xff368ABB):Color(0xffEAEDF1))
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
@@ -43,7 +45,10 @@ class VerticalSelector extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: index != items.length - 1
                         ? Border(
-                      bottom: BorderSide(color: Color(0xffC7C7C7)),
+
+                      bottom: BorderSide(
+                        width: 0.5.w,
+                          color: isDark?Color(0xffC7C7C7):Color(0xffC7C7C7)),
                     )
                         : null, // no border for last item
                   ),

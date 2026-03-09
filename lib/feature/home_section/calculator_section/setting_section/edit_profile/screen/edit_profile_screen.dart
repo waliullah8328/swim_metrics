@@ -10,6 +10,7 @@ import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../../core/utils/constants/image_path.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../riverpod/edit_profile_controller.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -49,7 +50,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: CustomText(
-          text: "Edit Profile",
+          text: AppLocalizations.of(context)!.editProfile,
           fontSize: 24.sp,
           fontWeight: FontWeight.w600,
         ),
@@ -79,7 +80,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         padding: const EdgeInsets.all(16),
         child: ListView(
           children: [
-            CustomText(text: "PERSONAL DETAILS",fontSize: 18.sp,fontWeight: FontWeight.w600,),
+            CustomText(text: AppLocalizations.of(context)!.personalDetails,fontSize: 18.sp,fontWeight: FontWeight.w600,),
             SizedBox(height: 18.h),
             Container(
               padding: EdgeInsets.all(16),
@@ -106,16 +107,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   CustomEditProfileTextFieldWidget(
 
                     controller:_nameController ,
-                    hintText: "Enter your name",
-                    titleName: "Name",
+                    hintText: AppLocalizations.of(context)!.enterYourName,
+                    titleName: AppLocalizations.of(context)!.name,
                     onChanged: (value) {
                     ref.read(profileProvider.notifier).updateName(value);
                   },),
                   CustomEditProfileTextFieldWidget(
 
                     controller:_emailController ,
-                    hintText: "Enter your email",
-                    titleName: "Email",
+                    hintText: AppLocalizations.of(context)!.enterYourEmail,
+                    titleName: AppLocalizations.of(context)!.email,
                     onChanged: (value) {
                       ref.read(profileProvider.notifier).updateEmail(value);
                     },),
@@ -123,8 +124,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   CustomEditProfileTextFieldWidget(
 
                     controller:_emailController ,
-                    hintText: "Enter your phone number",
-                    titleName: "Phone",
+                    hintText: AppLocalizations.of(context)!.enterYourPhoneNumber,
+                    titleName: AppLocalizations.of(context)!.phone,
                     onChanged: (value) {
                       ref.read(profileProvider.notifier).updatePhone(value);
                     },),
@@ -134,7 +135,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
 
                   SizedBox(height: 20.h),
-                  CustomPrimaryButton(title: "Save Changes",onPressed: (){},)
+                  CustomPrimaryButton(title: AppLocalizations.of(context)!.saveChanges,onPressed: (){},)
 
 
                 ],
@@ -143,7 +144,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
             SizedBox(height: 30.h),
 
-            CustomText(text: "SECURITY DETAILS",fontSize: 18.sp,fontWeight: FontWeight.w600,),
+            CustomText(text: AppLocalizations.of(context)!.securityDetails,fontSize: 18.sp,fontWeight: FontWeight.w600,),
             SizedBox(height: 18.h,),
 
             Container(
@@ -165,8 +166,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   CustomEditProfileTextFieldWidget(
 
                     controller:_phoneController ,
-                    hintText: "Enter your current password",
-                    titleName: "Current Password",
+                    hintText: AppLocalizations.of(context)!.enterYourCurrentPassword,
+                    titleName: AppLocalizations.of(context)!.currentPassword,
                     onChanged: (value) {
                       ref.read(profileProvider.notifier).updateEmail(value);
                     },),
@@ -174,16 +175,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   CustomEditProfileTextFieldWidget(
 
                     controller:_phoneController ,
-                    hintText: "Enter your new password",
-                    titleName: "New Password",
+                    hintText: AppLocalizations.of(context)!.enterYourNewPassword,
+                    titleName: AppLocalizations.of(context)!.newPassword,
                     onChanged: (value) {
                       ref.read(profileProvider.notifier).updateEmail(value);
                     },),
                   CustomEditProfileTextFieldWidget(
 
                     controller:_phoneController ,
-                    hintText: "Enter your confirm password",
-                    titleName: "Confirm Password",
+                    hintText: AppLocalizations.of(context)!.enterYourConfirmPassword,
+                    titleName: AppLocalizations.of(context)!.confirmPassword,
                     onChanged: (value) {
                       ref.read(profileProvider.notifier).updateEmail(value);
                     },),
@@ -191,7 +192,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
                    SizedBox(height: 20.h),
 
-                  CustomPrimaryButton(title: "Save Password",onPressed: (){},)
+                  CustomPrimaryButton(title: AppLocalizations.of(context)!.savePassword,onPressed: (){},)
                 ],
               ),
             ),

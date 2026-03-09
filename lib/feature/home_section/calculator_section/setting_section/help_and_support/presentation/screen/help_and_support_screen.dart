@@ -30,9 +30,10 @@ class HelpSupportScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(helpSupportProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF5F5F5),
+
       appBar: AppBar(
         title: CustomText(
           text: "Help & Support",
@@ -76,7 +77,7 @@ class HelpSupportScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark?Color(0xff1B3A5C):Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: const [
                   BoxShadow(color: Colors.black12, blurRadius: 8)
@@ -91,37 +92,37 @@ class HelpSupportScreen extends ConsumerWidget {
                   SizedBox(height: 20.h),
 
                   /// Email
-                  CustomText(text:"Email",color: Color(0xff82888E),),
+                  CustomText(text:"Email",color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
                   SizedBox(height: 6.h),
-                  TextField(
+                  TextFormField(
                     controller: emailController,
-                    decoration: inputDecoration(),
+                    decoration: inputDecoration(isDarkMode: isDark),
                   ),
 
                    SizedBox(height: 16.h),
 
                   /// Subject
-                   CustomText(text:"Subject of Problem or Suggestion",color: Color(0xff82888E),),
+                   CustomText(text:"Subject of Problem or Suggestion",color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
 
                   SizedBox(height: 6.h),
-                  TextField(
+                  TextFormField(
                     controller: subjectController,
-                    decoration: inputDecoration(),
+                    decoration: inputDecoration(isDarkMode: isDark),
                   ),
 
                  SizedBox(height: 16.h),
-                  CustomText(text:"Problem or Suggestion",color: Color(0xff82888E),),
+                  CustomText(text:"Problem or Suggestion",color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
 
 
                  SizedBox(height: 6.h),
-                  TextField(
+                  TextFormField(
                     controller: problemController,
                     maxLines: 5,
-                    decoration: inputDecoration(),
+                    decoration: inputDecoration(isDarkMode: isDark),
                   ),
 
                   SizedBox(height: 16.h),
-                  CustomText(text:"Screenshot (Optional)",color: Color(0xff82888E),),
+                  CustomText(text:"Screenshot (Optional)",color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
 
                  SizedBox(height: 8.h),
 
@@ -131,7 +132,7 @@ class HelpSupportScreen extends ConsumerWidget {
                       height: 140,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: const Color(0xffF1F3F6),
+                        color: isDark?Color(0xff153250):Color(0xffF1F3F6),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: state.screenshot == null
@@ -161,23 +162,26 @@ class HelpSupportScreen extends ConsumerWidget {
                   ),
 
                   SizedBox(height: 24.h),
-                  CustomPrimaryButton(title: "Save Changes",onPressed: (){},)
+                  CustomPrimaryButton(title: "Save Changes",onPressed: (){},),
+
 
 
                 ],
               ),
             ),
+            SizedBox(height:
+            24.h),
           ],
         ),
       ),
     );
   }
 
-  InputDecoration inputDecoration() {
+  InputDecoration inputDecoration({required bool isDarkMode}) {
     return InputDecoration(
       hintText: "Type here",
       filled: true,
-      fillColor: const Color(0xffF1F3F6),
+      fillColor: isDarkMode?Color(0xff153250): Color(0xffF1F3F6),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,

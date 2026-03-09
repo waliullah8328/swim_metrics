@@ -52,6 +52,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     print("build");
 
 
@@ -89,11 +90,12 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                         width: 18.w,
                         height: 18.h,
                         fit: BoxFit.contain,
+                        colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                       ),
                     ),
 
                   ),
-                  SizedBox(height: 8.h,),
+                  SizedBox(height: 16.h,),
                   CustomTextField(
                     focusNode: _emailFocusNode,
 
@@ -111,11 +113,12 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                         width: 18.w,
                         height: 18.h,
                         fit: BoxFit.contain,
+                        colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                       ),
                     ),
 
                   ),
-                  SizedBox(height: 8.h,),
+                  SizedBox(height: 16.h,),
                   Consumer(builder:  (context,ref,child){
                     final isRemember = ref.watch(signUpProvider.select((s)=>s.isPasswordVisible));
                     return  CustomTextField(
@@ -137,6 +140,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                           width: 18.w,
                           height: 18.h,
                           fit: BoxFit.contain,
+                          colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                         ),
                       ),
                       suffixIcon: IconButton(
@@ -152,7 +156,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                       ),
                     );
                   }),
-                  SizedBox(height: 8.h,),
+                  SizedBox(height: 16.h,),
                   Consumer(builder:  (context,ref,child){
                     final isPasswordVisible = ref.watch(signUpProvider.select((s)=>s.isConfirmPasswordVisible));
                     return  CustomTextField(
@@ -178,6 +182,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                           width: 18.w,
                           height: 18.h,
                           fit: BoxFit.contain,
+                          colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                         ),
                       ),
                       suffixIcon: IconButton(
@@ -193,7 +198,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                       ),
                     );
                   }),
-                  SizedBox(height:6.h,),
+                  SizedBox(height: 6.h,),
 
 
                   Row(
@@ -238,7 +243,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                         // }
                         final result = await ref.read(signUpProvider.notifier).signUp(context: context);
                         if(result){
-                          context.go("${RouteNames.verifyEmailScreen}/$email");
+                          context.go("${RouteNames.verifyEmailScreen}/$email/true");
                         }
 
 

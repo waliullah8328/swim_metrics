@@ -24,9 +24,9 @@ class AppElevatedButtonTheme {
           (states) => states.contains(WidgetState.disabled) ? disabledBackgroundColor : defaultBackgroundColor,
         ),
         side: WidgetStateProperty.all(BorderSide(color: borderColor)),
-        padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 18)),
+        padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 10)),
         textStyle: WidgetStatePropertyAll(
-          TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
         ),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -44,9 +44,9 @@ class AppElevatedButtonTheme {
   );
 
   static final ElevatedButtonThemeData darkElevatedButtonTheme = _baseTheme(
-    defaultTextColor: Color(0xffFFFFFF),
+    defaultTextColor: Color(0xff122338),
     disabledTextColor: Colors.grey.shade600,
-    defaultBackgroundColor: Color(0xffFE484C),
+    defaultBackgroundColor: Color(0xffC69C3F),
     disabledBackgroundColor: Colors.grey.shade800,
     borderColor: Color(0xffFE484C),
   );

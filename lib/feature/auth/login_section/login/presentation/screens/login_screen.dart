@@ -43,6 +43,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     print("build");
 
     ref.listen<LoginState>(loginProvider, (previous, next) {
@@ -98,11 +100,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       width: 18.w,
                       height: 18.h,
                       fit: BoxFit.contain,
+                      colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                     ),
                   ),
             
                 ),
-                SizedBox(height: 24.h,),
+                SizedBox(height: 16.h,),
                Consumer(builder:  (context,ref,child){
                  final isRemember = ref.watch(loginProvider.select((s)=>s.isPasswordVisible));
                  return  CustomTextField(
@@ -124,6 +127,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                        width: 18.w,
                        height: 18.h,
                        fit: BoxFit.contain,
+                       colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                      ),
                    ),
                    suffixIcon: IconButton(
@@ -186,7 +190,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                        context.go( RouteNames.forgetPasswordScreen);
                       },
                       child: CustomText(
-                        text: "Forget Password",
+                        text: "Forget Password?",
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         color: AppColors.primary,

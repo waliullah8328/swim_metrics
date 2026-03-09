@@ -35,6 +35,7 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     debugPrint("build");
     debugPrint(widget.email);
 
@@ -59,22 +60,28 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                   length: 6,
                   cursorColor: const Color(0xFF007AFF),
                   keyboardType: TextInputType.number,
-                  enableActiveFill: true, // allows background color to be shown
-                  backgroundColor: Colors.transparent, // keep overall background clear
+                  enableActiveFill: true,
+                  backgroundColor: Colors.transparent,
 
                   pinTheme: PinTheme(
                     shape: PinCodeFieldShape.box,
                     borderRadius: BorderRadius.circular(8),
                     fieldHeight: 60.h,
                     fieldWidth: 55.w,
-                    borderWidth: 1.5.w,
+                    borderWidth: 1.5,
 
-                    inactiveColor: AppColors.textFormFieldFillColorLightMode, // border when inactive
-                    selectedColor: AppColors.textFormFieldFillColorLightMode, // border when focused
-                    activeColor: AppColors.textFormFieldFillColorLightMode, // border when active
-                    inactiveFillColor: AppColors.textFormFieldFillColorLightMode, // background color
-                    selectedFillColor: AppColors.textFormFieldFillColorLightMode,
-                    activeFillColor: AppColors.textFormFieldFillColorLightMode,
+                    // Border Colors
+                    inactiveColor: isDark ? Colors.grey : Colors.grey.shade400,
+                    selectedColor: AppColors.primary,
+                    activeColor: AppColors.primary,
+
+                    // Fill Colors
+                    inactiveFillColor:
+                    isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
+                    selectedFillColor:
+                    isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
+                    activeFillColor:
+                    isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
                   ),
 
                   onChanged: (value) {
@@ -96,7 +103,7 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                     final String subTitle = "Your Account has been created successfully.";
                       final result = await ref.read(verifyEmailProvider.notifier).verifyOtp();
                       if(result){
-                        context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle");
+                        context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/${widget.isSignUp}");
                       }
 
 

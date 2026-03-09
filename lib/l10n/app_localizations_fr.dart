@@ -98,4 +98,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get savePassword => 'Enregistrer le mot de passe';
+
+  @override
+  String get swimMetrics => 'SwimMetrics';
+
+  @override
+  String get helpAndSupport => 'Aide et assistance';
+
+  @override
+  String get version => 'Version 2.5';
+
+  @override
+  String get manyThanksToMyFamilyAndFriends =>
+      'Un grand merci à ma famille et à mes amis.';
+
+  @override
+  String get specialThanksToMyFriends =>
+      'Un merci tout particulier à mes amis \net mentors de DCS, JCU et ECR.';
 }

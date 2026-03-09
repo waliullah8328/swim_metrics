@@ -2,17 +2,20 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/utils/constants/app_sizer.dart';
 
 class CustomCard extends StatelessWidget {
   const CustomCard({
-    super.key, required this.imagePath, required this.title, this.onTap,
+    super.key, required this.imagePath, required this.title, this.onTap, required this.isDark,  this.isApple = false,
   });
 
   final String imagePath, title;
   final void Function()? onTap;
+  final bool isDark;
+  final bool isApple;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +42,7 @@ class CustomCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SvgPicture.asset(imagePath),
+                  isApple?SvgPicture.asset(imagePath,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black,BlendMode.srcIn),):SvgPicture.asset(imagePath,),
                   SizedBox(width: 16.w),
                   CustomText(
                     text: title,

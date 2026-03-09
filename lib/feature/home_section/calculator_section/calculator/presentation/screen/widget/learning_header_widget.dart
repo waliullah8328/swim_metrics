@@ -10,7 +10,8 @@ import '../../../../../../../core/common/widgets/custom_text.dart';
 
 
 class LearningHeaderWidget extends StatefulWidget {
-  const LearningHeaderWidget({super.key});
+  const LearningHeaderWidget({super.key, required this.isDarkMode});
+  final bool isDarkMode;
 
   @override
   State<LearningHeaderWidget> createState() => _LearningHeaderWidgetState();
@@ -22,6 +23,7 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: widget.isDarkMode?Color(0xff153250):Color(0xffEAEDF1),
       child: Padding(
         padding:  EdgeInsets.only(left: 10.w,),
         child: Column(
@@ -70,15 +72,15 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: "Summary",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: "Summary",color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "Ideas for use",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: "Ideas for use",color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
                     GestureDetector(
                       onTap: (){
                         context.push(RouteNames.fAQScreen);
                       },
-                        child: CustomText(text: "FAQs",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,)),
+                        child: CustomText(text: "FAQs",color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,)),
                     SizedBox(height: 16.h,),
                   ],
                 ),

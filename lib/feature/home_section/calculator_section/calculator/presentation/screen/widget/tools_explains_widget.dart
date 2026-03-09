@@ -8,7 +8,8 @@ import '../../../../../../../core/common/widgets/custom_text.dart';
 
 
 class ToolsHeader extends StatefulWidget {
-  const ToolsHeader({super.key});
+  const ToolsHeader({super.key, required this.isDarkMode});
+  final bool isDarkMode;
 
   @override
   State<ToolsHeader> createState() => _ToolsHeaderState();
@@ -20,6 +21,7 @@ class _ToolsHeaderState extends State<ToolsHeader> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: widget.isDarkMode?Color(0xff153250):Color(0xffEAEDF1),
       child: Padding(
         padding:  EdgeInsets.only(left: 10.w,),
         child: Column(
@@ -68,11 +70,11 @@ class _ToolsHeaderState extends State<ToolsHeader> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: "Split calculation",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: "Split calculation",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "Course conversion",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: "Course conversion",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "Stopwatch",color: AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: "Stopwatch",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     SizedBox(height: 16.h,),
                   ],
                 ),

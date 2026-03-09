@@ -24,7 +24,7 @@ class StopwatchState {
     required this.time,
     required this.isRunning,
     required this.laps,
-    this.from = const ["SCY"],
+    this.from = const ["WOMEN"],
     this.to = const ["LCM"],
     this.stroke = "FREE",
     this.distance = "100",

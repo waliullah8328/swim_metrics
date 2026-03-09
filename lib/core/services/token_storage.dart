@@ -145,6 +145,16 @@ class TokenStorage {
     }
   }
 
+  static Future<void> deleteLoginFlag() async {
+    try {
+      if (_preferences == null) await init();
+      await _preferences!.remove(_isLoginKey);
+      log('Login flag deleted');
+    } catch (e) {
+      log('Error deleting Login flag: $e');
+    }
+  }
+
   static bool hasSeenOnboarding() {
     return _preferences?.getBool(_isSeeOnboardingKey) ?? false;
   }

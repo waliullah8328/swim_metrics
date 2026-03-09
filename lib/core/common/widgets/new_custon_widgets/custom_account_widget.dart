@@ -12,12 +12,14 @@ class CustomAccountWidget extends StatelessWidget {
   final void Function()? onTap;
 
 
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CustomText(text: firstTitle,fontWeight: FontWeight.w500,fontSize: 15.sp,color: AppColors.textSecondary,),
+        CustomText(text: firstTitle,fontWeight: FontWeight.w500,fontSize: 15.sp,color: isDark?AppColors.textWhite:AppColors.textSecondary,),
         GestureDetector(
             onTap: onTap,
             child: CustomText(text: buttonTitle,fontWeight: FontWeight.w600,fontSize: 15.sp,color: AppColors.primary,)),

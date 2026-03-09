@@ -38,6 +38,7 @@ class _LoginScreenState extends ConsumerState<ForgetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     print("build");
 
 
@@ -73,6 +74,7 @@ class _LoginScreenState extends ConsumerState<ForgetPasswordScreen> {
                       width: 18.w,
                       height: 18.h,
                       fit: BoxFit.contain,
+                      colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                     ),
                   ),
             
