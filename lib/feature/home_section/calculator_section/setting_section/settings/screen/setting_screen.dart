@@ -35,6 +35,8 @@ class SettingsScreen extends ConsumerWidget {
 
     final fontOption = ref.watch(settingsProvider).fontSize;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
 
 
 
@@ -110,7 +112,7 @@ class SettingsScreen extends ConsumerWidget {
                       color: isDark?Color(0xff00253F):AppColors.textGrey,
                       child: Padding(
                       padding: const EdgeInsets.all(14.0),
-                      child: Center(child: CustomText(text: AppLocalizations.of(context)!.editProfile,fontSize: getAdjustedFontSize(12, fontOption).sp,fontWeight: FontWeight.w400,color:isDark? AppColors.primary:null,)),
+                      child: Center(child: CustomText(text: AppLocalizations.of(context)!.editProfile,fontSize: getAdjustedFontSize(currentLanguageCode.toString()!= "en"?10:12, fontOption).sp,fontWeight: FontWeight.w400,color:isDark? AppColors.primary:null,)),
                     ),),
                   ),
                 ],

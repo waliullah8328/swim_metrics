@@ -405,4 +405,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get alreadyHaveAnAccount => 'Vous avez déjà un compte ?';
+
+  @override
+  String get converterBig => 'CONVERTISSEUR';
 }

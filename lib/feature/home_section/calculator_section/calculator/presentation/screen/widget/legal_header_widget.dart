@@ -8,17 +8,30 @@ import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../../l10n/app_localizations.dart';
+import '../../../../setting_section/settings/riverpod/setting_controller.dart';
 
 
 class LegalHeaderWidget extends StatefulWidget {
-  const LegalHeaderWidget({super.key, required this.isDarkMode});
+  const LegalHeaderWidget({super.key, required this.isDarkMode, required this.fontSizeOption});
   final bool isDarkMode;
+  final FontSizeOption fontSizeOption;
 
   @override
   State<LegalHeaderWidget> createState() => _LegalHeaderWidgetState();
 }
 
 class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
+
+  double getAdjustedFontSize(double baseSize, FontSizeOption option) {
+    switch (option) {
+      case FontSizeOption.small:
+        return baseSize - 2;
+      case FontSizeOption.medium:
+        return baseSize;
+      case FontSizeOption.big:
+        return baseSize + 2;
+    }
+  }
   bool isExpanded = false;
 
   @override
@@ -42,7 +55,7 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                     SizedBox(width: 6.w,),
                     CustomText(text:
                       AppLocalizations.of(context)!.legal,
-                     fontSize: 16.sp, fontWeight: FontWeight.bold
+                     fontSize: getAdjustedFontSize(16, widget.fontSizeOption).sp, fontWeight: FontWeight.bold
                     ),
                   ],
                 ),
@@ -80,14 +93,14 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CustomText(text: AppLocalizations.of(context)!.termsAndConditions,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                          CustomText(text: AppLocalizations.of(context)!.termsAndConditions,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
                           Divider(),
                         ],
                       ),
                     ),
-                    CustomText(text: AppLocalizations.of(context)!.privacyPolicy,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.privacyPolicy,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
                     Divider(),
-                    CustomText(text: AppLocalizations.of(context)!.copyRight,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.copyRight,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize:getAdjustedFontSize(14, widget.fontSizeOption).sp,),
                     SizedBox(height: 16.h,),
                   ],
                 ),

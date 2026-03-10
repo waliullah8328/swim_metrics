@@ -141,6 +141,7 @@
   "iAgreeTo": "J'accepte",
   "termsAndPrivacyPolicy": "Conditions et Politique de confidentialité.",
   "createAccount": "Créer un compte",
-  "alreadyHaveAnAccount": "Vous avez déjà un compte ?"
+  "alreadyHaveAnAccount": "Vous avez déjà un compte ?",
+  "converterBig": "CONVERTISSEUR"
 
 }

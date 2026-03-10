@@ -10,6 +10,7 @@ import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
 
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
+import '../../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import '../../../../converter_section/presentation/screen/widget/vertical_selector_widget.dart';
 
 import '../../riverpod/stop_watch_controller.dart';
@@ -45,6 +46,9 @@ final stopwatchProvider1 =
 StateNotifierProvider<StopwatchController1, StopwatchStatus>(
         (ref) => StopwatchController1());
 
+final showCourseSectionStopWatchProvider = StateProvider<bool>((ref) => true);
+final showCourseSectionStopWatchProvider2 = StateProvider<bool>((ref) => true);
+
 
 class StopwatchScreen extends ConsumerStatefulWidget {
   const StopwatchScreen({super.key});
@@ -68,7 +72,11 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final status = ref.watch(stopwatchProvider1);
-    final List<String> items = [AppLocalizations.of(context)!.normal, AppLocalizations.of(context)!.converter, AppLocalizations.of(context)!.predictor];
+    final List<String> items = [AppLocalizations.of(context)!.normal, AppLocalizations.of(context)!.converterBig, AppLocalizations.of(context)!.predictor];
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
+    final showCourse = ref.watch(showCourseSectionStopWatchProvider);
+    final showCourse2 = ref.watch(showCourseSectionStopWatchProvider2);
 
 
     return Scaffold(
@@ -168,6 +176,63 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         
         
               SizedBox(height: 20.h),
+              if(!showCourse && selectedIndex == 1)
+                Center(
+                  child: GestureDetector(
+                    onTap: (){
+                      ref.read(showCourseSectionStopWatchProvider.notifier).state = true;
+
+                    },
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10.h,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(IconPath.pullIcon),
+                            CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: 14.sp,color: Color(0xffC7C7C7),)
+                          ],
+                        ),
+                        SizedBox(height: 20.h,)
+                      ],
+                    ),
+                  ),
+                  // child: IconButton(
+                  //   icon: const Icon(Icons.keyboard_arrow_down, size: 32),
+                  //   onPressed: () {
+                  //     ref.read(showCourseSectionProvider.notifier).state = true;
+                  //   },
+                  // ),
+                ),
+
+              if(!showCourse2 && selectedIndex == 2)
+                Center(
+                  child: GestureDetector(
+                    onTap: (){
+                      ref.read(showCourseSectionStopWatchProvider2.notifier).state = true;
+
+                    },
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10.h,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(IconPath.pullIcon),
+                            CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: 14.sp,color: Color(0xffC7C7C7),)
+                          ],
+                        ),
+                        SizedBox(height: 20.h,)
+                      ],
+                    ),
+                  ),
+                  // child: IconButton(
+                  //   icon: const Icon(Icons.keyboard_arrow_down, size: 32),
+                  //   onPressed: () {
+                  //     ref.read(showCourseSectionProvider.notifier).state = true;
+                  //   },
+                  // ),
+                ),
         
               /// Main Content
               selectedIndex == 0
@@ -342,7 +407,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               BlendMode.srcIn),
                                         ),
                                         SizedBox(width: 6.w,),
-                                        CustomText(text: AppLocalizations.of(context)!.resume,color: Colors.black,fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                                        CustomText(text: AppLocalizations.of(context)!.resume,color: Colors.black,fontSize: currentLanguageCode.toString() != "en"?12:16.sp,fontWeight: FontWeight.w700,),
                                       ],
                                     ),
                                   ),
@@ -370,7 +435,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               BlendMode.srcIn),
                                         ),
                                         SizedBox(width: 6.w,),
-                                        CustomText(text: AppLocalizations.of(context)!.clearTime,color: AppColors.textWhite,fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                                        CustomText(text: AppLocalizations.of(context)!.clearTime,color: AppColors.textWhite,fontSize: currentLanguageCode.toString() != "en"?12:16.sp,fontWeight: FontWeight.w700,),
                                       ],
                                     ),
                                   ),
@@ -397,62 +462,68 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-
-                        Expanded(
-                          child: Column(
+                    if(showCourse)
+                      Column(
+                        children: [
+                          Row(
                             children: [
 
-                              CustomText(text:
-                              AppLocalizations.of(context)!.from,
+                              Expanded(
+                                child: Column(
+                                  children: [
 
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
+                                    CustomText(text:
+                                    AppLocalizations.of(context)!.from,
 
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14.sp,
+
+                                    ),
+
+                                    SizedBox(height: 10.h),
+
+                                    VerticalSelector(
+                                      items:  [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
+                                      selected: state.from,
+                                      onTap: controller.selectFrom,
+                                    )
+                                  ],
+                                ),
                               ),
 
-                              SizedBox(height: 10.h),
+                              SizedBox(width: 12.w),
 
-                              VerticalSelector(
-                                items:  [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
-                                selected: state.from,
-                                onTap: controller.selectFrom,
-                              )
-                            ],
-                          ),
-                        ),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    CustomText(text:
+                                    AppLocalizations.of(context)!.to,
 
-                        SizedBox(width: 12.w),
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14.sp,
 
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CustomText(text:
-                              AppLocalizations.of(context)!.to,
+                                    ),
 
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
+                                    SizedBox(height: 10.h),
 
+
+
+                                    VerticalSelector(
+                                      items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
+                                      selected: state.to,
+                                      onTap: controller.selectTo,
+                                    )
+                                  ],
+                                ),
                               ),
 
-                              SizedBox(height: 10.h),
-
-
-
-                              VerticalSelector(
-                                items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
-                                selected: state.to,
-                                onTap: controller.selectTo,
-                              )
                             ],
                           ),
-                        ),
+                        ],
+                      ),
 
-                      ],
-                    ),
 
 
                     SizedBox(height: 20.h),
@@ -471,6 +542,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       ),
                       onPressed: (){
                         // context.go(RouteNames.loginScreen);
+                        ref.read(showCourseSectionStopWatchProvider.notifier).state = false;
                       },
                       child: Center(child:  Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -497,185 +569,191 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-        
-                        Expanded(
-                          child: Column(
+                    if(showCourse2)
+                      Column(
+                        children: [
+                          Row(
                             children: [
-        
-                              CustomText(text:
-                              AppLocalizations.of(context)!.gender,
-        
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
-        
-                              ),
-        
-                              SizedBox(height: 10.h),
-        
-                              VerticalSelector(
-                                items:  ["",AppLocalizations.of(context)!.women, AppLocalizations.of(context)!.men, ],
-                                selected: state.from,
-                                onTap: controller.selectFrom,
-                              )
-                            ],
-                          ),
-                        ),
-        
-                        SizedBox(width: 12.w),
-        
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CustomText(text:
-                              AppLocalizations.of(context)!.course,
-        
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
-        
-                              ),
-        
-                              SizedBox(height: 10.h),
-        
-        
-        
-                              VerticalSelector(
-                                items:  [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
-                                selected: state.to,
-                                onTap: controller.selectTo,
-                              )
-                            ],
-                          ),
-                        ),
-        
-                      ],
-                    ),
-        
-                    SizedBox(height: 20.h),
-                    Row(
-                      children: [
 
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CustomText(text:
-                              AppLocalizations.of(context)!.stroke,
+                              Expanded(
+                                child: Column(
+                                  children: [
 
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
+                                    CustomText(text:
+                                    AppLocalizations.of(context)!.gender,
 
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14.sp,
+
+                                    ),
+
+                                    SizedBox(height: 10.h),
+
+                                    VerticalSelector(
+                                      items:  ["",AppLocalizations.of(context)!.women, AppLocalizations.of(context)!.men, ],
+                                      selected: state.from,
+                                      onTap: controller.selectFrom,
+                                    )
+                                  ],
+                                ),
                               ),
 
-                              SizedBox(height: 10.h),
+                              SizedBox(width: 12.w),
+
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    CustomText(text:
+                                    AppLocalizations.of(context)!.course,
+
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14.sp,
+
+                                    ),
+
+                                    SizedBox(height: 10.h),
 
 
 
-
-                              VerticalSelector(
-                                items:  [AppLocalizations.of(context)!.fly,AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.free, AppLocalizations.of(context)!.im,AppLocalizations.of(context)!.breast],
-                                selected: [state.stroke],
-                                onTap: controller.selectStroke,
-                              )
-                            ],
-                          ),
-                        ),
-
-                        SizedBox(width: 12.w),
-
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CustomText(text:
-                              AppLocalizations.of(context)!.distance,
-
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
-
+                                    VerticalSelector(
+                                      items:  [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
+                                      selected: state.to,
+                                      onTap: controller.selectTo,
+                                    )
+                                  ],
+                                ),
                               ),
 
-                              SizedBox(height: 10.h),
-
-
-
-                              VerticalSelector(
-                                items: const ["50", "100", "150","200","250"],
-                                selected: [state.distance],
-                                onTap: controller.selectDistance,
-                              )
                             ],
                           ),
-                        ),
 
-                      ],
-                    ),
-
-                    SizedBox(height: 20.h),
-                    Row(
-                      children: [
-
-
-
-
-
-                        Expanded(
-                          child: Column(
+                          SizedBox(height: 20.h),
+                          Row(
                             children: [
-                              CustomText(text:
-                              AppLocalizations.of(context)!.splitSize,
 
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    CustomText(text:
+                                    AppLocalizations.of(context)!.stroke,
 
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14.sp,
+
+                                    ),
+
+                                    SizedBox(height: 10.h),
+
+
+
+
+                                    VerticalSelector(
+                                      items:  [AppLocalizations.of(context)!.fly,AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.free, AppLocalizations.of(context)!.im,AppLocalizations.of(context)!.breast],
+                                      selected: [state.stroke],
+                                      onTap: controller.selectStroke,
+                                    )
+                                  ],
+                                ),
                               ),
 
-                              SizedBox(height: 10.h),
+                              SizedBox(width: 12.w),
+
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    CustomText(text:
+                                    AppLocalizations.of(context)!.distance,
+
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14.sp,
+
+                                    ),
+
+                                    SizedBox(height: 10.h),
 
 
 
-                              VerticalSelector(
-                                items: const ["50", "100", "150","200","250"],
-                                selected: [state.distance],
-                                onTap: controller.selectDistance,
-                              )
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CustomText(text:
-                              AppLocalizations.of(context)!.startType,
-
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
-
+                                    VerticalSelector(
+                                      items: const ["50", "100", "150","200","250"],
+                                      selected: [state.distance],
+                                      onTap: controller.selectDistance,
+                                    )
+                                  ],
+                                ),
                               ),
 
-                              SizedBox(height: 10.h),
-
-
-
-
-                              VerticalSelector(
-                                items: [AppLocalizations.of(context)!.fromStart,AppLocalizations.of(context)!.fromMiddle,AppLocalizations.of(context)!.fromLast ],
-                                selected: [state.stroke],
-                                onTap: controller.selectStroke,
-                              )
                             ],
                           ),
-                        ),
 
-                      ],
-                    ),
-                    SizedBox(height: 20.h),
+                          SizedBox(height: 20.h),
+                          Row(
+                            children: [
+
+
+
+
+
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    CustomText(text:
+                                    AppLocalizations.of(context)!.splitSize,
+
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14.sp,
+
+                                    ),
+
+                                    SizedBox(height: 10.h),
+
+
+
+                                    VerticalSelector(
+                                      items: const ["50", "100", "150","200","250"],
+                                      selected: [state.distance],
+                                      onTap: controller.selectDistance,
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 12.w),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    CustomText(text:
+                                    AppLocalizations.of(context)!.startType,
+
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14.sp,
+
+                                    ),
+
+                                    SizedBox(height: 10.h),
+
+
+
+
+                                    VerticalSelector(
+                                      items: [AppLocalizations.of(context)!.fromStart,AppLocalizations.of(context)!.fromMiddle,AppLocalizations.of(context)!.fromLast ],
+                                      selected: [state.stroke],
+                                      onTap: controller.selectStroke,
+                                    )
+                                  ],
+                                ),
+                              ),
+
+                            ],
+                          ),
+                          SizedBox(height: 20.h),
+                        ],
+                      ),
+
                     Card(
 
                       child: Center(child: Padding(
@@ -690,6 +768,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       ),
                       onPressed: (){
                        // context.go(RouteNames.loginScreen);
+                        ref.read(showCourseSectionStopWatchProvider2.notifier).state = false;
                       },
                       child: Center(child:  Row(
                         mainAxisAlignment: MainAxisAlignment.center,

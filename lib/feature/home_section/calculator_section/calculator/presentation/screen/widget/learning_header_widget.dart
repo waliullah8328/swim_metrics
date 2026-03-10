@@ -8,21 +8,35 @@ import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
+import '../../../../setting_section/settings/riverpod/setting_controller.dart';
 
 
-class LearningHeaderWidget extends StatefulWidget {
-  const LearningHeaderWidget({super.key, required this.isDarkMode});
+class LearningHeaderWidget extends  StatefulWidget{
+  const LearningHeaderWidget({super.key, required this.isDarkMode,required this.fontSizeOption, });
   final bool isDarkMode;
+  final FontSizeOption fontSizeOption;
 
   @override
   State<LearningHeaderWidget> createState() => _LearningHeaderWidgetState();
 }
 
 class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
+
+  double getAdjustedFontSize(double baseSize, FontSizeOption option) {
+    switch (option) {
+      case FontSizeOption.small:
+        return baseSize - 2;
+      case FontSizeOption.medium:
+        return baseSize;
+      case FontSizeOption.big:
+        return baseSize + 2;
+    }
+  }
   bool isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
+
     return Card(
       color: widget.isDarkMode?Color(0xff153250):Color(0xffEAEDF1),
       child: Padding(
@@ -42,7 +56,7 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                     SizedBox(width: 6.w,),
                     CustomText(text:
                       AppLocalizations.of(context)!.learning,
-                      fontSize: 16.sp, fontWeight: FontWeight.bold
+                      fontSize: getAdjustedFontSize(16, widget.fontSizeOption).sp, fontWeight: FontWeight.bold
                     ),
                   ],
                 ),
@@ -73,15 +87,15 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: AppLocalizations.of(context)!.summary,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.summary,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
                     Divider(),
-                    CustomText(text: AppLocalizations.of(context)!.ideasForUse,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.ideasForUse,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
                     Divider(),
                     GestureDetector(
                       onTap: (){
                         context.push(RouteNames.fAQScreen);
                       },
-                        child: CustomText(text: AppLocalizations.of(context)!.fags,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,)),
+                        child: CustomText(text: AppLocalizations.of(context)!.fags,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,)),
                     SizedBox(height: 16.h,),
                   ],
                 ),

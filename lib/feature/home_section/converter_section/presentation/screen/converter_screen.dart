@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
@@ -12,6 +13,8 @@ import '../../../../../core/utils/constants/icon_path.dart';
 import '../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import '../../riverpod/converter_controller.dart';
 
+final showCourseSectionConverter = StateProvider<bool>((ref) => true);
+
 class ConverterScreen extends ConsumerWidget {
    ConverterScreen({super.key});
 
@@ -23,6 +26,7 @@ class ConverterScreen extends ConsumerWidget {
     final controller = ref.read(converterProvider.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final showCourse = ref.watch(showCourseSectionConverter);
 
     return Scaffold(
       key: scaffoldKey,
@@ -61,6 +65,34 @@ class ConverterScreen extends ConsumerWidget {
 
         child: Column(
           children: [
+            if(!showCourse)
+              Center(
+                child: GestureDetector(
+                  onTap: (){
+                    ref.read(showCourseSectionConverter.notifier).state = true;
+
+                  },
+                  child: Column(
+                    children: [
+                      SizedBox(height: 10.h,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(IconPath.pullIcon),
+                          CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: 14.sp,color: Color(0xffC7C7C7),)
+                        ],
+                      ),
+                      SizedBox(height: 20.h,)
+                    ],
+                  ),
+                ),
+                // child: IconButton(
+                //   icon: const Icon(Icons.keyboard_arrow_down, size: 32),
+                //   onPressed: () {
+                //     ref.read(showCourseSectionProvider.notifier).state = true;
+                //   },
+                // ),
+              ),
 
             Container(
               padding: const EdgeInsets.all(16),
@@ -78,150 +110,157 @@ class ConverterScreen extends ConsumerWidget {
 
               child: Column(
                 children: [
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-
-                      CustomText(text:
-                      AppLocalizations.of(context)!.multipleCourses,
-
-                          color: Colors.grey,
-
-                      ),
-
-                      Checkbox(
-                        value: state.multiple,
-                        onChanged: (v) =>
-                            controller.toggleMultiple(v!),
-                      )
-                    ],
-                  ),
-
-                 SizedBox(height: 10.h),
-
-                  /// FROM / TO
-                  Row(
-                    children: [
-
-                      Expanded(
-                        child: Column(
+                  if(showCourse)
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
 
                             CustomText(text:
-                            AppLocalizations.of(context)!.from,
+                            AppLocalizations.of(context)!.multipleCourses,
 
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
+                              color: Colors.grey,
 
                             ),
 
-                            SizedBox(height: 10.h),
-
-                            VerticalSelector(
-                              items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
-                              selected: state.from,
-                              onTap: controller.selectFrom,
+                            Checkbox(
+                              value: state.multiple,
+                              onChanged: (v) =>
+                                  controller.toggleMultiple(v!),
                             )
                           ],
                         ),
-                      ),
 
-                      SizedBox(width: 12.w),
+                        SizedBox(height: 10.h),
 
-                      Expanded(
-                        child: Column(
+                        /// FROM / TO
+                        Row(
                           children: [
-                            CustomText(text:
-                            AppLocalizations.of(context)!.to,
 
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
+                            Expanded(
+                              child: Column(
+                                children: [
 
+                                  CustomText(text:
+                                  AppLocalizations.of(context)!.from,
+
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+
+                                  ),
+
+                                  SizedBox(height: 10.h),
+
+                                  VerticalSelector(
+                                    items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
+                                    selected: state.from,
+                                    onTap: controller.selectFrom,
+                                  )
+                                ],
+                              ),
                             ),
 
-                            SizedBox(height: 10.h),
+                            SizedBox(width: 12.w),
+
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomText(text:
+                                  AppLocalizations.of(context)!.to,
+
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+
+                                  ),
+
+                                  SizedBox(height: 10.h),
 
 
 
-                            VerticalSelector(
-                              items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
-                              selected: state.to,
-                              onTap: controller.selectTo,
-                            )
+                                  VerticalSelector(
+                                    items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
+                                    selected: state.to,
+                                    onTap: controller.selectTo,
+                                  )
+                                ],
+                              ),
+                            ),
+
                           ],
                         ),
-                      ),
 
-                    ],
-                  ),
+                        SizedBox(height: 20.h),
 
-                  SizedBox(height: 20.h),
+                        /// STROKE / DISTANCE
 
-                  /// STROKE / DISTANCE
-
-                  Row(
-                    children: [
-
-                      Expanded(
-                        child: Column(
+                        Row(
                           children: [
-                            CustomText(text:
-                            AppLocalizations.of(context)!.stroke,
 
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomText(text:
+                                  AppLocalizations.of(context)!.stroke,
 
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+
+                                  ),
+
+                                  SizedBox(height: 10.h),
+
+
+
+
+                                  VerticalSelector(
+                                    items:  [AppLocalizations.of(context)!.fly,AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.free, AppLocalizations.of(context)!.im,AppLocalizations.of(context)!.breast],
+                                    selected: [state.stroke],
+                                    onTap: controller.selectStroke,
+                                  )
+                                ],
+                              ),
                             ),
 
-                            SizedBox(height: 10.h),
+                            SizedBox(width: 12.w),
+
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomText(text:
+                                  AppLocalizations.of(context)!.distance,
+
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+
+                                  ),
+
+                                  SizedBox(height: 10.h),
 
 
 
-
-                            VerticalSelector(
-                              items:  [AppLocalizations.of(context)!.fly,AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.free, AppLocalizations.of(context)!.im,AppLocalizations.of(context)!.breast],
-                              selected: [state.stroke],
-                              onTap: controller.selectStroke,
-                            )
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(width: 12.w),
-
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CustomText(text:
-                            AppLocalizations.of(context)!.distance,
-
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
-
+                                  VerticalSelector(
+                                    items: const ["50", "100", "150","200","250"],
+                                    selected: [state.distance],
+                                    onTap: controller.selectDistance,
+                                  )
+                                ],
+                              ),
                             ),
 
-                            SizedBox(height: 10.h),
-
-
-
-                            VerticalSelector(
-                              items: const ["50", "100", "150","200","250"],
-                              selected: [state.distance],
-                              onTap: controller.selectDistance,
-                            )
                           ],
                         ),
-                      ),
+                        SizedBox(height: 25.h),
+                      ],
+                    ),
 
-                    ],
-                  ),
 
-                 SizedBox(height: 25.h),
+
+
 
                   /// TIME INPUT
                   CustomTextField(hintText: "",controller: timeController,),
@@ -232,19 +271,24 @@ class ConverterScreen extends ConsumerWidget {
 
                   /// CONVERT BUTTON
 
-                  Container(
-                    width: double.infinity,
-                    height: 55,
-                    decoration: BoxDecoration(
-                      color: const Color(0xffc59d3f),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    alignment: Alignment.center,
-                    child:  Text(
-                      AppLocalizations.of(context)!.convertTime,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
+                  GestureDetector(
+                    onTap: (){
+                      ref.read(showCourseSectionConverter.notifier).state = false;
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 55,
+                      decoration: BoxDecoration(
+                        color: const Color(0xffc59d3f),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      alignment: Alignment.center,
+                      child:  Text(
+                        AppLocalizations.of(context)!.convertTime,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

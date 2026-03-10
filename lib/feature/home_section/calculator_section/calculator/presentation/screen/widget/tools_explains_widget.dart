@@ -6,17 +6,31 @@ import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
+import '../../../../setting_section/settings/riverpod/setting_controller.dart';
 
 
 class ToolsHeader extends StatefulWidget {
-  const ToolsHeader({super.key, required this.isDarkMode});
+  const ToolsHeader({super.key, required this.isDarkMode, required this.currentLanguageCode, required this.fontSizeOption});
   final bool isDarkMode;
+  final String currentLanguageCode;
+  final FontSizeOption fontSizeOption;
 
   @override
   State<ToolsHeader> createState() => _ToolsHeaderState();
 }
 
 class _ToolsHeaderState extends State<ToolsHeader> {
+
+  double getAdjustedFontSize(double baseSize, FontSizeOption option) {
+    switch (option) {
+      case FontSizeOption.small:
+        return baseSize - 2;
+      case FontSizeOption.medium:
+        return baseSize;
+      case FontSizeOption.big:
+        return baseSize + 2;
+    }
+  }
   bool isExpanded = false;
 
   @override
@@ -40,7 +54,7 @@ class _ToolsHeaderState extends State<ToolsHeader> {
                     SizedBox(width: 6.w,),
                     Text(
                       AppLocalizations.of(context)!.toolsExplain,
-                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: getAdjustedFontSize(widget.currentLanguageCode !="en"?14:16, widget.fontSizeOption).sp, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -71,11 +85,11 @@ class _ToolsHeaderState extends State<ToolsHeader> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: AppLocalizations.of(context)!.splitCalculation,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.splitCalculation,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
                     Divider(),
-                    CustomText(text: AppLocalizations.of(context)!.courseConversion,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.courseConversion,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize:getAdjustedFontSize(12, widget.fontSizeOption).sp,),
                     Divider(),
-                    CustomText(text: AppLocalizations.of(context)!.stopWatch,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.stopWatch,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
                     SizedBox(height: 16.h,),
                   ],
                 ),

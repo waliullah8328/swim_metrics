@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
-class VerticalSelector extends StatelessWidget {
+import '../../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
+
+class VerticalSelector extends ConsumerWidget {
   final List<String> items;
   final List<String> selected;
   final Function(String) onTap;
@@ -15,12 +18,14 @@ class VerticalSelector extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Height of each item
     const double itemHeight = 55;
     // Max number of visible items
     final visibleItems = items.length > 3 ? 3 : items.length;
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
 
     return Container(
       height: itemHeight * visibleItems, // fix container height
@@ -55,7 +60,7 @@ class VerticalSelector extends StatelessWidget {
                   child: Text(
                     e,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: currentLanguageCode.toString() != "en"?13:16.sp,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
                       color: isSelected ? isDark?AppColors.textWhite:Color(0xff1c1f3a) : Colors.grey,
                     ),
