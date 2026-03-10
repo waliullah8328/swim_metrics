@@ -13,6 +13,7 @@ import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 import 'package:swim_metrics/feature/auth/sign_up_section/sign_up/presentation/riverpod/sign_up_controller.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_account_widget.dart';
@@ -20,6 +21,7 @@ import '../../../../../../core/common/widgets/new_custon_widgets/custom_account_
 import '../../../../../../core/utils/constants/app_sizer.dart';
 import '../../../../../../core/utils/constants/image_path.dart';
 import '../../../../../../core/utils/validators/app_validator.dart';
+import '../../../../../home_section/calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 
 
 
@@ -53,7 +55,10 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
     print("build");
+    print(currentLanguageCode.toString());
 
 
 
@@ -71,12 +76,12 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                 children: [
                   Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
                   SizedBox(height: 32.h,),
-                  CustomText(text: "Create An Account",fontSize: 23.sp,fontWeight: FontWeight.w700),
+                  CustomText(text: AppLocalizations.of(context)!.createAnAccount,fontSize: 23.sp,fontWeight: FontWeight.w700),
                   SizedBox(height: 24.h,),
                   CustomTextField(
                     focusNode: _nameFocusNode,
 
-                    hintText: "Enter your name",
+                    hintText: AppLocalizations.of(context)!.enterYourName,
 
                     validator: AppValidator.validateName,
 
@@ -99,7 +104,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                   CustomTextField(
                     focusNode: _emailFocusNode,
 
-                    hintText: "Enter your email",
+                    hintText: AppLocalizations.of(context)!.enterYourEmail,
 
                     validator: AppValidator.validateEmail,
 
@@ -123,7 +128,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                     final isRemember = ref.watch(signUpProvider.select((s)=>s.isPasswordVisible));
                     return  CustomTextField(
                       focusNode: _passwordFocusNode,
-                      hintText: "Enter your password",
+                      hintText: AppLocalizations.of(context)!.enterYourPassword,
                       obscureText: !isRemember ,
                       validator: AppValidator.validatePassword,
                       onChanged: (password) {
@@ -161,7 +166,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                     final isPasswordVisible = ref.watch(signUpProvider.select((s)=>s.isConfirmPasswordVisible));
                     return  CustomTextField(
                       focusNode: _confirmPasswordFocusNode,
-                      hintText: "Enter your confirm password",
+                      hintText: AppLocalizations.of(context)!.enterYourConfirmPassword,
                       obscureText: !isPasswordVisible ,
                       validator: (value){
                         final password = ref.watch(signUpProvider.select((s)=>s.password));
@@ -219,8 +224,8 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                             );
                           },),
 
-                          CustomText(text: "I agree to ",fontSize: 14.sp,fontWeight: FontWeight.w400,),
-                          CustomText(text: "Terms and Privacy Policy.",color: AppColors.primary,fontSize: 14.sp,fontWeight: FontWeight.w400,),
+                          CustomText(text: "${AppLocalizations.of(context)!.iAgreeTo} ",fontSize:currentLanguageCode.toString() != "en"?10.sp: 14.sp,fontWeight: FontWeight.w400,),
+                          CustomText(text: AppLocalizations.of(context)!.termsAndPrivacyPolicy,color: AppColors.primary,fontSize: currentLanguageCode.toString() != "en"?10.sp: 14.sp,fontWeight: FontWeight.w400,),
                         ],
                       ),
 
@@ -261,7 +266,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
 
                   SizedBox(height: 68.h,),
 
-                  CustomAccountWidget(firstTitle: "Already have an account?",buttonTitle: " Sign In",onTap: (){
+                  CustomAccountWidget(firstTitle: AppLocalizations.of(context)!.alreadyHaveAnAccount,buttonTitle: " ${AppLocalizations.of(context)!.signIn}",onTap: (){
                     context.go(RouteNames.loginScreen);
                   },),
 

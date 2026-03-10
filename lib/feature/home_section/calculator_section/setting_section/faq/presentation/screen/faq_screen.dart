@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../../core/utils/constants/icon_path.dart';
@@ -18,7 +19,7 @@ class FAQScreen extends StatelessWidget {
 
       appBar: AppBar(
         title: CustomText(
-          text: "FAQ",
+          text: AppLocalizations.of(context)!.fags,
           fontSize: 24.sp,
           fontWeight: FontWeight.w600,
         ),
@@ -67,7 +68,7 @@ class FAQScreen extends StatelessWidget {
               /// Title
                CustomText(
                  text:
-                "FAQs",
+                 AppLocalizations.of(context)!.fags,
 
                   fontSize: 28.sp,
                   fontWeight: FontWeight.bold,

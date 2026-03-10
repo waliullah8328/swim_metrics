@@ -5,6 +5,7 @@ import 'package:swim_metrics/config/route/routes_name.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 
@@ -39,9 +40,9 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                   children: [
                     SvgPicture.asset(IconPath.learningIcon),
                     SizedBox(width: 6.w,),
-                    Text(
-                      "Learning",
-                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                    CustomText(text:
+                      AppLocalizations.of(context)!.learning,
+                      fontSize: 16.sp, fontWeight: FontWeight.bold
                     ),
                   ],
                 ),
@@ -72,15 +73,15 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: "Summary",color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.summary,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "Ideas for use",color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.ideasForUse,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
                     GestureDetector(
                       onTap: (){
                         context.push(RouteNames.fAQScreen);
                       },
-                        child: CustomText(text: "FAQs",color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,)),
+                        child: CustomText(text: AppLocalizations.of(context)!.fags,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,)),
                     SizedBox(height: 16.h,),
                   ],
                 ),

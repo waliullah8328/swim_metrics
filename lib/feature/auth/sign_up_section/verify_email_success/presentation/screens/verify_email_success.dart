@@ -6,6 +6,7 @@ import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/image_path.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../config/route/routes_name.dart';
 import '../../../../../../core/utils/constants/app_sizer.dart';
@@ -36,10 +37,10 @@ class VerifyEmailSuccess extends ConsumerWidget {
               SizedBox(height: 16.h,),
               CustomText(text: subTitle,fontSize: 15.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
               SizedBox(height: 150.h,),
-              isSignUp == "true"?CustomPrimaryButton(title: "Continue",onPressed: (){
+              isSignUp == "true"?CustomPrimaryButton(title: AppLocalizations.of(context)!.continue1,onPressed: (){
                 context.go(RouteNames.loginScreen);
 
-              },):CustomPrimaryButton(title: "Back To Login",onPressed: (){
+              },):CustomPrimaryButton(title: AppLocalizations.of(context)!.backToLogin,onPressed: (){
                 context.go(RouteNames.loginScreen);
 
               },)

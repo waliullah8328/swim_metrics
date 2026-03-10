@@ -114,4 +114,290 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get specialThanksToMyFriends =>
       'Special thanks to my friends and mentors\n DCS, JCU, and ECR';
+
+  @override
+  String get toolsExplain => 'Tools Explained';
+
+  @override
+  String get splitCalculation => 'Split calculation';
+
+  @override
+  String get courseConversion => 'Course conversion';
+
+  @override
+  String get stopWatch => 'Stopwatch';
+
+  @override
+  String get learning => 'Learning';
+
+  @override
+  String get summary => 'Summary';
+
+  @override
+  String get ideasForUse => 'Ideas for use';
+
+  @override
+  String get fags => 'FAQs';
+
+  @override
+  String get legal => 'Legal';
+
+  @override
+  String get termsAndConditions => 'Terms and Conditions';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get copyRight => 'Copyright';
+
+  @override
+  String get fillUpTheInformation => 'Fill up the Information';
+
+  @override
+  String get subjectOfProblemOrSuggestion => 'Subject of Problem or Suggestion';
+
+  @override
+  String get problemOrSuggestion => 'Problem or Suggestion';
+
+  @override
+  String get screenshotOptional => 'Screenshot (Optional)';
+
+  @override
+  String get tapToAddAScreenshot => 'Tap to add a screenshot';
+
+  @override
+  String get jPGPNGFileFormats => 'JPG, PNG File Formats';
+
+  @override
+  String get typeHere => 'Type here';
+
+  @override
+  String get calculator => 'Calculator';
+
+  @override
+  String get converter => 'Converter';
+
+  @override
+  String get splitCalculator => 'Split Calculator';
+
+  @override
+  String get pullDownToSeeOptions => 'Pull Down To See Options';
+
+  @override
+  String get course => 'Course';
+
+  @override
+  String get scy => 'SCY';
+
+  @override
+  String get scm => 'SCM';
+
+  @override
+  String get lcm => 'LCM';
+
+  @override
+  String get gender => 'GENDER';
+
+  @override
+  String get men => 'Men';
+
+  @override
+  String get women => 'Women';
+
+  @override
+  String get stroke => 'STROKE';
+
+  @override
+  String get fly => 'Fly';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get breast => 'Breast';
+
+  @override
+  String get free => 'Free';
+
+  @override
+  String get im => 'IM';
+
+  @override
+  String get dist => 'DIST';
+
+  @override
+  String get goalTime => 'GOAL TIME';
+
+  @override
+  String get enterYourTime => 'Enter your time';
+
+  @override
+  String get calculateSplit => 'Calculate Split';
+
+  @override
+  String get split => 'SPLIT';
+
+  @override
+  String get splitTime => 'SPLIT TIME';
+
+  @override
+  String get total => 'TOTAL';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get export => 'Export';
+
+  @override
+  String get noSplitsYet => 'No splits yet';
+
+  @override
+  String get normal => 'NORMAL';
+
+  @override
+  String get predictor => 'PREDICTOR';
+
+  @override
+  String get mode => 'MODE';
+
+  @override
+  String get start => 'START';
+
+  @override
+  String get undoSplit => 'UNDO SPLIT';
+
+  @override
+  String get stop => 'STOP';
+
+  @override
+  String get resume => 'RESUME';
+
+  @override
+  String get clearTime => 'CLEAR TIME';
+
+  @override
+  String get from => 'FROM';
+
+  @override
+  String get to => 'TO';
+
+  @override
+  String get distance => 'DISTANCE';
+
+  @override
+  String get splitSize => 'SPLIT SIZE';
+
+  @override
+  String get startType => 'START TYPE';
+
+  @override
+  String get fromStart => 'FROM START';
+
+  @override
+  String get fromMiddle => 'FROM MIDDLE';
+
+  @override
+  String get fromLast => 'FROM LAST';
+
+  @override
+  String get multipleCourses => 'MULTIPLE COURSES';
+
+  @override
+  String get convertTime => 'Convert Time';
+
+  @override
+  String get convertedTime => 'CONVERTED TIME';
+
+  @override
+  String get tapTimeToShowSplits => 'Tap time to show splits';
+
+  @override
+  String get welcomeBack => 'Welcome back';
+
+  @override
+  String get enterYourPassword => 'Enter your password';
+
+  @override
+  String get signIn => 'Sign In';
+
+  @override
+  String get rememberMe => 'Remember Me';
+
+  @override
+  String get forgetPassword => 'Forget Password?';
+
+  @override
+  String get donNotHaveAnAccount => 'Don’t have an account?';
+
+  @override
+  String get signUp => 'Sign Up';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get continueWithApple => 'Continue with Apple';
+
+  @override
+  String get doNotWorryPleaseEnterYourEmail =>
+      'Don\'t worry! Please enter the email address linked with your account.';
+
+  @override
+  String get sendOtp => 'Send OTP';
+
+  @override
+  String get verifyYourEmail => 'Verify Your Email';
+
+  @override
+  String get tips => 'Tips: Make sure check your inbox and spam folders';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get verifiedEmail => 'Verified Email !';
+
+  @override
+  String get yourAccountHasBeenCreatedSuccessfully =>
+      'Your Account has been created successfully.';
+
+  @override
+  String get createNewPassword => 'Create new password';
+
+  @override
+  String get yourNewPasswordMustBeUnique =>
+      'Your new password must be unique from those previously used.';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get passwordChanged => 'Password Changed !';
+
+  @override
+  String get yourPasswordHasBeenChangedSuccessfully =>
+      'Your password has been changed successfully.';
+
+  @override
+  String get continue1 => 'Continue';
+
+  @override
+  String get backToLogin => 'Back To Login';
+
+  @override
+  String get createAnAccount => 'Create An Account';
+
+  @override
+  String get iAgreeTo => 'I agree to';
+
+  @override
+  String get termsAndPrivacyPolicy => 'Terms and Privacy Policy.';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get alreadyHaveAnAccount => 'Already have an account?';
 }

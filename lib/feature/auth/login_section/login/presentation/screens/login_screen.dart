@@ -10,6 +10,7 @@ import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_prima
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_account_widget.dart';
@@ -82,11 +83,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
                 SizedBox(height: 24.h,),
-                CustomText(text: "Welcome back",fontSize: 23.sp,fontWeight: FontWeight.w700),
+                CustomText(text: AppLocalizations.of(context)!.welcomeBack,fontSize: 23.sp,fontWeight: FontWeight.w700),
                 SizedBox(height: 24.h,),
                 CustomTextField(
                   controller: emailController,
-                  hintText: "Enter your email",
+                  hintText: AppLocalizations.of(context)!.enterYourEmail,
             
                   validator: AppValidator.validateEmail,
             
@@ -110,7 +111,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                  final isRemember = ref.watch(loginProvider.select((s)=>s.isPasswordVisible));
                  return  CustomTextField(
                    controller: passwordController,
-                   hintText: "Enter your password",
+                   hintText: AppLocalizations.of(context)!.enterYourPassword,
                    obscureText: !isRemember ,
                    validator: AppValidator.validatePassword,
                    onChanged: (password) {
@@ -147,7 +148,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Consumer(builder: (context,ref,child){
                   final isLoading = ref.watch(loginProvider.select((s)=>s.isLoading));
             
-                  return CustomPrimaryButton(title: "Sign In",
+                  return CustomPrimaryButton(title: AppLocalizations.of(context)!.signIn,
                     isLoading: isLoading,
                     onPressed: () async {
                      final result = await ref.read(loginProvider.notifier).login();
@@ -182,7 +183,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           );
                         },),
                         SizedBox(width: 10.w,),
-                        CustomText(text: "Remember Me",color: AppColors.textGrey,fontSize: 16.sp,fontWeight: FontWeight.w400,),
+                        CustomText(text: AppLocalizations.of(context)!.rememberMe,color: AppColors.textGrey,fontSize: 16.sp,fontWeight: FontWeight.w400,),
                       ],
                     ),
                     GestureDetector(
@@ -190,7 +191,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                        context.go( RouteNames.forgetPasswordScreen);
                       },
                       child: CustomText(
-                        text: "Forget Password?",
+                        text: AppLocalizations.of(context)!.forgetPassword,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         color: AppColors.primary,
@@ -207,7 +208,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             
                 SizedBox(height: 60.h,),
             
-                CustomAccountWidget(firstTitle: "Don’t have an account?",buttonTitle: " Sign Up",onTap: (){
+                CustomAccountWidget(firstTitle: AppLocalizations.of(context)!.donNotHaveAnAccount,buttonTitle: " ${AppLocalizations.of(context)!.signUp}",onTap: (){
                   context.go(RouteNames.signUpScreen);
                 },),
             

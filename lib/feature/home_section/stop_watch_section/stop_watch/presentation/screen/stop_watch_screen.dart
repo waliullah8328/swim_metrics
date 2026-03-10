@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
@@ -57,7 +58,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
   int selectedIndex = 0;
 
-  final List<String> items = ["NORMAL", "CONVERTER", "PREDICTOR"];
+
 
 
   @override
@@ -67,13 +68,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final status = ref.watch(stopwatchProvider1);
+    final List<String> items = [AppLocalizations.of(context)!.normal, AppLocalizations.of(context)!.converter, AppLocalizations.of(context)!.predictor];
 
 
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
         title: CustomText(
-          text: "Stop Watch",
+          text: AppLocalizations.of(context)!.stopWatch,
           fontSize: 24.sp,
           fontWeight: FontWeight.w600,
         ),
@@ -106,7 +108,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           child: Column(
             children: [
               /// Top Buttons
-              CustomText(text: "MODE",fontSize: 18.sp,fontWeight: FontWeight.w600,color: Color(0xffE3D99B),),
+              CustomText(text: AppLocalizations.of(context)!.mode,fontSize: 18.sp,fontWeight: FontWeight.w600,color: Color(0xffE3D99B),),
               SizedBox(height: 10.h,),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -210,12 +212,12 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                   SvgPicture.asset(
                                     IconPath.startIcon,
                                     colorFilter: ColorFilter.mode(
-                                        isDark ? AppColors.textWhite : Colors.black,
+                                        Colors.black,
                                         BlendMode.srcIn),
                                   ),
                                   SizedBox(width: 10.w),
                                   Text(
-                                    "START",
+                                    AppLocalizations.of(context)!.start,
                                     style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
                                   ),
                                 ],
@@ -233,33 +235,81 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     side: BorderSide(color: Color(0xff2DA8F0)),
                                   ),
                                     onPressed: () {},
-                                    child: Center(child: CustomText(text: "SPLIT",fontSize: 16.sp,fontWeight: FontWeight.w600,)),
+                                    child: Center(child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                          IconPath.splitIcon,
+                                          colorFilter: ColorFilter.mode(
+                                             Colors.black,
+                                              BlendMode.srcIn),
+                                        ),
+                                        SizedBox(width: 6.w,),
+                                        CustomText(text: AppLocalizations.of(context)!.split,fontSize: 16.sp,fontWeight: FontWeight.w600,),
+                                      ],
+                                    )),
                                   ),
 
 
-                                SizedBox(height: 10.h),
+                                SizedBox(height: 20.h),
                                 Row(
                                   children: [
 
 
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          fixedSize: Size(double.infinity, 52.h),
+                                          backgroundColor:  Color(0xff475569) ,
+                                          side: BorderSide(color: Color(0xff475569)),
+                                        ),
+                                        onPressed: () {},
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            SvgPicture.asset(
+                                              IconPath. undoIcon,
+                                              colorFilter: ColorFilter.mode(
+                                                 AppColors.textWhite ,
+                                                  BlendMode.srcIn),
+                                            ),
+                                            SizedBox(width: 6.w,),
+                                            CustomText(text: AppLocalizations.of(context)!.undoSplit,color: AppColors.textWhite,fontSize: 12.sp,fontWeight: FontWeight.w700,),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.w),
+
+
 
                                     Expanded(
                                       child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          fixedSize: Size(double.infinity, 52.h),
+                                          backgroundColor:  Color(0xffFE484C) ,
+                                          side: BorderSide(color:  Color(0xffFE484C)),
+                                        ),
                                         onPressed: () {
                                           ref.read(stopwatchProvider1.notifier).stop();
                                         },
-                                        child: Text("STOP"),
+                                        child:Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            SvgPicture.asset(
+                                              IconPath. stopIcon,
+                                              colorFilter: ColorFilter.mode(
+                                                  AppColors.textWhite ,
+                                                  BlendMode.srcIn),
+                                            ),
+                                            SizedBox(width: 6.w,),
+                                            CustomText(text: AppLocalizations.of(context)!.stop,color: AppColors.textWhite,fontSize: 12.sp,fontWeight: FontWeight.w700,),
+                                          ],
+                                        ),
                                       ),
                                     ),
 
-                                    SizedBox(width: 10.w),
 
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        child: Text("UNDO SPLIT"),
-                                      ),
-                                    ),
                                   ],
                                 ),
                               ],
@@ -272,10 +322,29 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                 Expanded(
                                   child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      fixedSize: Size(double.infinity, 52.h),
+                                      backgroundColor: AppColors.primary ,
+                                      side: BorderSide(color: AppColors.primary),
+                                    ),
+
+
                                     onPressed: () {
                                       ref.read(stopwatchProvider1.notifier).resume();
                                     },
-                                    child: Text("RESUME"),
+                                    child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                          IconPath.startIcon,
+                                          colorFilter: ColorFilter.mode(
+                                              Colors.black ,
+                                              BlendMode.srcIn),
+                                        ),
+                                        SizedBox(width: 6.w,),
+                                        CustomText(text: AppLocalizations.of(context)!.resume,color: Colors.black,fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                                      ],
+                                    ),
                                   ),
                                 ),
 
@@ -283,10 +352,27 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                 Expanded(
                                   child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      fixedSize: Size(double.infinity, 52.h),
+                                      backgroundColor:  Color(0xff6F35CA) ,
+                                      side: BorderSide(color:   Color(0xff6F35CA)),
+                                    ),
                                     onPressed: () {
                                       ref.read(stopwatchProvider1.notifier).clear();
                                     },
-                                    child: Text("CLEAR TIME"),
+                                    child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                          IconPath.clearIcon,
+                                          colorFilter: ColorFilter.mode(
+                                              AppColors.textWhite ,
+                                              BlendMode.srcIn),
+                                        ),
+                                        SizedBox(width: 6.w,),
+                                        CustomText(text: AppLocalizations.of(context)!.clearTime,color: AppColors.textWhite,fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -319,7 +405,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                             children: [
 
                               CustomText(text:
-                              "FROM",
+                              AppLocalizations.of(context)!.from,
 
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -330,7 +416,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               SizedBox(height: 10.h),
 
                               VerticalSelector(
-                                items: const ["SCM", "SCY", "LCM"],
+                                items:  [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
                                 selected: state.from,
                                 onTap: controller.selectFrom,
                               )
@@ -344,7 +430,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           child: Column(
                             children: [
                               CustomText(text:
-                              "TO",
+                              AppLocalizations.of(context)!.to,
 
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -357,7 +443,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
 
                               VerticalSelector(
-                                items: const ["SCY", "LCM", "SCM"],
+                                items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
                                 selected: state.to,
                                 onTap: controller.selectTo,
                               )
@@ -389,8 +475,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       child: Center(child:  Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
-                          Text("START",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600,),),
+                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                          Text(AppLocalizations.of(context)!.start,style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600,),),
                         ],
                       )),
                     ),
@@ -419,7 +505,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                             children: [
         
                               CustomText(text:
-                              "GENDER",
+                              AppLocalizations.of(context)!.gender,
         
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -430,7 +516,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               SizedBox(height: 10.h),
         
                               VerticalSelector(
-                                items: const ["","WOMEN", "MEN", ],
+                                items:  ["",AppLocalizations.of(context)!.women, AppLocalizations.of(context)!.men, ],
                                 selected: state.from,
                                 onTap: controller.selectFrom,
                               )
@@ -444,7 +530,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           child: Column(
                             children: [
                               CustomText(text:
-                              "COURSE",
+                              AppLocalizations.of(context)!.course,
         
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -457,7 +543,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         
         
                               VerticalSelector(
-                                items: const ["SCY", "LCM", "SCM"],
+                                items:  [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
                                 selected: state.to,
                                 onTap: controller.selectTo,
                               )
@@ -476,7 +562,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           child: Column(
                             children: [
                               CustomText(text:
-                              "STROKE",
+                              AppLocalizations.of(context)!.stroke,
 
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -490,7 +576,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
 
                               VerticalSelector(
-                                items: const ["FLY","BACK", "FREE", "IM","BREAST"],
+                                items:  [AppLocalizations.of(context)!.fly,AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.free, AppLocalizations.of(context)!.im,AppLocalizations.of(context)!.breast],
                                 selected: [state.stroke],
                                 onTap: controller.selectStroke,
                               )
@@ -504,7 +590,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           child: Column(
                             children: [
                               CustomText(text:
-                              "DISTANCE",
+                              AppLocalizations.of(context)!.distance,
 
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -540,7 +626,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           child: Column(
                             children: [
                               CustomText(text:
-                              "SPLIT SIZE",
+                              AppLocalizations.of(context)!.splitSize,
 
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -565,7 +651,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           child: Column(
                             children: [
                               CustomText(text:
-                              "START TYPE",
+                              AppLocalizations.of(context)!.startType,
 
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -579,7 +665,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
 
                               VerticalSelector(
-                                items: const ["FROM START","FROM MIDDLE","FROM LAST" ],
+                                items: [AppLocalizations.of(context)!.fromStart,AppLocalizations.of(context)!.fromMiddle,AppLocalizations.of(context)!.fromLast ],
                                 selected: [state.stroke],
                                 onTap: controller.selectStroke,
                               )
@@ -608,8 +694,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       child: Center(child:  Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
-                          Text("START",style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
+                          SvgPicture.asset(IconPath.startIcon  ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                          Text(AppLocalizations.of(context)!.start,style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
                         ],
                       )),
                     ),
@@ -629,9 +715,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 child:Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CustomText(text: "SPLIT",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                    CustomText(text: "SPLIT TIME",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                    CustomText(text: "TOTAL",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                    CustomText(text: AppLocalizations.of(context)!.split,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                    CustomText(text: AppLocalizations.of(context)!.splitTime,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                    CustomText(text: AppLocalizations.of(context)!.total,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
 
                   ],
                 ),
@@ -645,9 +731,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                   ),
                   child: state.splits.isEmpty
-                      ? const Center(
+                      ?  Center(
                     child: Text(
-                      "No splits yet",
+                      AppLocalizations.of(context)!.noSplitsYet,
                       style: TextStyle(color: Colors.grey),
                     ),
                   )
@@ -711,7 +797,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           children: [
                             SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
                             SizedBox(width: 6.w,),
-                            CustomText(text: "Clear",fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                            CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
                           ],
                         ),
                       ),
@@ -727,9 +813,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
+                          SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
                           SizedBox(width: 6.w,),
-                          CustomText(text: "Export",fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                          CustomText(text: AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
                         ],
                       ),
                     ),
