@@ -2,13 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
+import '../../../../setting_section/settings/riverpod/setting_controller.dart';
+
 class CustomDrawerButtonWidget extends StatelessWidget {
   const CustomDrawerButtonWidget({
-    super.key, required this.icon, required this.buttonTitle, this.onTap, required this.isDarkMode,
+    super.key, required this.icon, required this.buttonTitle, this.onTap, required this.isDarkMode, required this.fontSizeOption,
   });
   final String icon,buttonTitle;
   final void Function()? onTap;
   final bool isDarkMode;
+  final FontSizeOption fontSizeOption;
+
+  double getAdjustedFontSize(double baseSize, FontSizeOption option) {
+    switch (option) {
+      case FontSizeOption.small:
+        return baseSize - 2;
+      case FontSizeOption.medium:
+        return baseSize;
+      case FontSizeOption.big:
+        return baseSize + 2;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +47,7 @@ class CustomDrawerButtonWidget extends StatelessWidget {
                       SizedBox(width: 6.w,),
                       Text(
                         buttonTitle,
-                        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: getAdjustedFontSize(16,fontSizeOption).sp, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),

@@ -875,6 +875,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Already have an account?'**
   String get alreadyHaveAnAccount;
+
+  /// No description provided for @converterBig.
+  ///
+  /// In en, this message translates to:
+  /// **'CONVERTER'**
+  String get converterBig;
 }
 
 class _AppLocalizationsDelegate

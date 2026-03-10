@@ -8,6 +8,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../calculator_section/calculator/presentation/screen/calculator_page.dart';
 
+import '../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import '../../../converter_section/presentation/screen/converter_screen.dart';
 import '../../../stop_watch_section/stop_watch/presentation/screen/stop_watch_screen.dart';
 import '../riverpod/home_controller.dart';
@@ -15,10 +16,13 @@ import '../riverpod/home_controller.dart';
 class HomeNavBarScreen extends ConsumerWidget {
   const HomeNavBarScreen({super.key});
 
+
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(bottomNavProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
 
     final pages = [
       SplitCalculatorPage(),
@@ -67,6 +71,7 @@ class HomeNavBarScreen extends ConsumerWidget {
               )
                   : SvgPicture.asset(IconPath.converterInActiveIcon),
               label: AppLocalizations.of(context)!.converter,
+
             ),
           ],
         ),

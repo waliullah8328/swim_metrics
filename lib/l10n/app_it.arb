@@ -140,6 +140,7 @@
               "iAgreeTo": "Accetto",
               "termsAndPrivacyPolicy": "Termini e Privacy Policy.",
               "createAccount": "Crea account",
-              "alreadyHaveAnAccount": "Hai già un account?"
+              "alreadyHaveAnAccount": "Hai già un account?",
+              "converterBig": "CONVERTITORE"
 
 }
