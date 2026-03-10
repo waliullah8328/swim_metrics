@@ -236,217 +236,241 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         
               /// Main Content
               selectedIndex == 0
-                  ? Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isDark?Color(0xff0C3156): Color(0xffFFFFFF),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            spreadRadius: 1,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-        
-                      child: Column(
-                        children: [
-                          Card(
+                  ? Column(
+                    children: [
 
-                            child: Center(child: Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: CustomText(text: "00.00",fontSize: 35.sp,fontWeight: FontWeight.w700,),
-                            )),
-                          ),
-                          SizedBox(height: 20.h),
-                          /// INITIAL STATE
-                          if (status == StopwatchStatus.initial)
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                fixedSize: Size(double.infinity, 52.h),
-                                backgroundColor: isDark ? Color(0xffC69C3F) : null,
-                              ),
-                              onPressed: () {
-                                ref.read(stopwatchProvider1.notifier).start();
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    IconPath.startIcon,
-                                    colorFilter: ColorFilter.mode(
-                                        Colors.black,
-                                        BlendMode.srcIn),
-                                  ),
-                                  SizedBox(width: 10.w),
-                                  Text(
-                                    AppLocalizations.of(context)!.start,
-                                    style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
-                                  ),
-                                ],
-                              ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                          CustomText(text: "WATCHES",fontSize: 14.sp,fontWeight: FontWeight.w500,),
+                            SizedBox(width: 16.w,),
+                            Padding(
+                              padding:  EdgeInsets.only(left: 16.w),
+                              child: SvgPicture.asset(IconPath.minusIcon),
                             ),
 
-                          /// RUNNING STATE
-                          if (status == StopwatchStatus.running)
-                            Column(
-                              children: [
+                            Padding(
+                              padding:  EdgeInsets.only(left: 16.w),
+                              child: SvgPicture.asset(IconPath.plusIcon),
+                            ),
+                        ],),
+                      ),
+                      SizedBox(height: 10.h,),
+                      Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: isDark?Color(0xff0C3156): Color(0xffFFFFFF),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+
+                          child: Column(
+                            children: [
+                              Card(
+
+                                child: Center(child: Padding(
+                                  padding: const EdgeInsets.all(24.0),
+                                  child: CustomText(text: "00.00",fontSize: 35.sp,fontWeight: FontWeight.w700,),
+                                )),
+                              ),
+                              SizedBox(height: 20.h),
+                              /// INITIAL STATE
+                              if (status == StopwatchStatus.initial)
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     fixedSize: Size(double.infinity, 52.h),
-                                    backgroundColor:  Color(0xff2DA8F0) ,
-                                    side: BorderSide(color: Color(0xff2DA8F0)),
+                                    backgroundColor: isDark ? Color(0xffC69C3F) : null,
                                   ),
-                                    onPressed: () {},
-                                    child: Center(child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                          IconPath.splitIcon,
-                                          colorFilter: ColorFilter.mode(
-                                             Colors.black,
-                                              BlendMode.srcIn),
-                                        ),
-                                        SizedBox(width: 6.w,),
-                                        CustomText(text: AppLocalizations.of(context)!.split,fontSize: 16.sp,fontWeight: FontWeight.w600,),
-                                      ],
-                                    )),
+                                  onPressed: () {
+                                    ref.read(stopwatchProvider1.notifier).start();
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SvgPicture.asset(
+                                        IconPath.startIcon,
+                                        colorFilter: ColorFilter.mode(
+                                            Colors.black,
+                                            BlendMode.srcIn),
+                                      ),
+                                      SizedBox(width: 10.w),
+                                      Text(
+                                        AppLocalizations.of(context)!.start,
+                                        style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
                                   ),
+                                ),
 
-
-                                SizedBox(height: 20.h),
-                                Row(
+                              /// RUNNING STATE
+                              if (status == StopwatchStatus.running)
+                                Column(
                                   children: [
-
-
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          fixedSize: Size(double.infinity, 52.h),
-                                          backgroundColor:  Color(0xff475569) ,
-                                          side: BorderSide(color: Color(0xff475569)),
-                                        ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        fixedSize: Size(double.infinity, 52.h),
+                                        backgroundColor:  Color(0xff2DA8F0) ,
+                                        side: BorderSide(color: Color(0xff2DA8F0)),
+                                      ),
                                         onPressed: () {},
-                                        child: Row(
+                                        child: Center(child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             SvgPicture.asset(
-                                              IconPath. undoIcon,
+                                              IconPath.splitIcon,
                                               colorFilter: ColorFilter.mode(
-                                                 AppColors.textWhite ,
+                                                 Colors.black,
                                                   BlendMode.srcIn),
                                             ),
                                             SizedBox(width: 6.w,),
-                                            CustomText(text: AppLocalizations.of(context)!.undoSplit,color: AppColors.textWhite,fontSize: 12.sp,fontWeight: FontWeight.w700,),
+                                            CustomText(text: AppLocalizations.of(context)!.split,fontSize: 16.sp,fontWeight: FontWeight.w600,),
                                           ],
-                                        ),
+                                        )),
                                       ),
+
+
+                                    SizedBox(height: 20.h),
+                                    Row(
+                                      children: [
+
+
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              fixedSize: Size(double.infinity, 52.h),
+                                              backgroundColor:  Color(0xff475569) ,
+                                              side: BorderSide(color: Color(0xff475569)),
+                                            ),
+                                            onPressed: () {},
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                SvgPicture.asset(
+                                                  IconPath. undoIcon,
+                                                  colorFilter: ColorFilter.mode(
+                                                     AppColors.textWhite ,
+                                                      BlendMode.srcIn),
+                                                ),
+                                                SizedBox(width: 6.w,),
+                                                CustomText(text: AppLocalizations.of(context)!.undoSplit,color: AppColors.textWhite,fontSize: 12.sp,fontWeight: FontWeight.w700,),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 10.w),
+
+
+
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              fixedSize: Size(double.infinity, 52.h),
+                                              backgroundColor:  Color(0xffFE484C) ,
+                                              side: BorderSide(color:  Color(0xffFE484C)),
+                                            ),
+                                            onPressed: () {
+                                              ref.read(stopwatchProvider1.notifier).stop();
+                                            },
+                                            child:Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                SvgPicture.asset(
+                                                  IconPath. stopIcon,
+                                                  colorFilter: ColorFilter.mode(
+                                                      AppColors.textWhite ,
+                                                      BlendMode.srcIn),
+                                                ),
+                                                SizedBox(width: 6.w,),
+                                                CustomText(text: AppLocalizations.of(context)!.stop,color: AppColors.textWhite,fontSize: 12.sp,fontWeight: FontWeight.w700,),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+
+                                      ],
                                     ),
-                                    SizedBox(width: 10.w),
+                                  ],
+                                ),
 
-
+                              /// STOPPED STATE
+                              if (status == StopwatchStatus.stopped)
+                                Row(
+                                  children: [
 
                                     Expanded(
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           fixedSize: Size(double.infinity, 52.h),
-                                          backgroundColor:  Color(0xffFE484C) ,
-                                          side: BorderSide(color:  Color(0xffFE484C)),
+                                          backgroundColor: AppColors.primary ,
+                                          side: BorderSide(color: AppColors.primary),
                                         ),
+
+
                                         onPressed: () {
-                                          ref.read(stopwatchProvider1.notifier).stop();
+                                          ref.read(stopwatchProvider1.notifier).resume();
                                         },
                                         child:Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             SvgPicture.asset(
-                                              IconPath. stopIcon,
+                                              IconPath.startIcon,
                                               colorFilter: ColorFilter.mode(
-                                                  AppColors.textWhite ,
+                                                  Colors.black ,
                                                   BlendMode.srcIn),
                                             ),
                                             SizedBox(width: 6.w,),
-                                            CustomText(text: AppLocalizations.of(context)!.stop,color: AppColors.textWhite,fontSize: 12.sp,fontWeight: FontWeight.w700,),
+                                            CustomText(text: AppLocalizations.of(context)!.resume,color: Colors.black,fontSize: currentLanguageCode.toString() != "en"?12:16.sp,fontWeight: FontWeight.w700,),
                                           ],
                                         ),
                                       ),
                                     ),
 
+                                    SizedBox(width: 10.w),
 
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          fixedSize: Size(double.infinity, 52.h),
+                                          backgroundColor:  Color(0xff6F35CA) ,
+                                          side: BorderSide(color:   Color(0xff6F35CA)),
+                                        ),
+                                        onPressed: () {
+                                          ref.read(stopwatchProvider1.notifier).clear();
+                                        },
+                                        child:Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            SvgPicture.asset(
+                                              IconPath.clearIcon,
+                                              colorFilter: ColorFilter.mode(
+                                                  AppColors.textWhite ,
+                                                  BlendMode.srcIn),
+                                            ),
+                                            SizedBox(width: 6.w,),
+                                            CustomText(text: AppLocalizations.of(context)!.clearTime,color: AppColors.textWhite,fontSize: currentLanguageCode.toString() != "en"?12:16.sp,fontWeight: FontWeight.w700,),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
-                              ],
-                            ),
 
-                          /// STOPPED STATE
-                          if (status == StopwatchStatus.stopped)
-                            Row(
-                              children: [
-
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      fixedSize: Size(double.infinity, 52.h),
-                                      backgroundColor: AppColors.primary ,
-                                      side: BorderSide(color: AppColors.primary),
-                                    ),
-
-
-                                    onPressed: () {
-                                      ref.read(stopwatchProvider1.notifier).resume();
-                                    },
-                                    child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                          IconPath.startIcon,
-                                          colorFilter: ColorFilter.mode(
-                                              Colors.black ,
-                                              BlendMode.srcIn),
-                                        ),
-                                        SizedBox(width: 6.w,),
-                                        CustomText(text: AppLocalizations.of(context)!.resume,color: Colors.black,fontSize: currentLanguageCode.toString() != "en"?12:16.sp,fontWeight: FontWeight.w700,),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                                SizedBox(width: 10.w),
-
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      fixedSize: Size(double.infinity, 52.h),
-                                      backgroundColor:  Color(0xff6F35CA) ,
-                                      side: BorderSide(color:   Color(0xff6F35CA)),
-                                    ),
-                                    onPressed: () {
-                                      ref.read(stopwatchProvider1.notifier).clear();
-                                    },
-                                    child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                          IconPath.clearIcon,
-                                          colorFilter: ColorFilter.mode(
-                                              AppColors.textWhite ,
-                                              BlendMode.srcIn),
-                                        ),
-                                        SizedBox(width: 6.w,),
-                                        CustomText(text: AppLocalizations.of(context)!.clearTime,color: AppColors.textWhite,fontSize: currentLanguageCode.toString() != "en"?12:16.sp,fontWeight: FontWeight.w700,),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-        
-                          SizedBox(height: 20.h),
-                        ],
-                      ),
-                    )
+                              SizedBox(height: 20.h),
+                            ],
+                          ),
+                        ),
+                    ],
+                  )
                   : selectedIndex == 1?Container(
                 padding: const EdgeInsets.all(16),
 
@@ -874,7 +898,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
+                            SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
                             SizedBox(width: 6.w,),
                             CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
                           ],
