@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
@@ -11,9 +12,38 @@ import '../../../../calculator_section/calculator/presentation/screen/widget/cus
 import '../../../../converter_section/presentation/screen/widget/vertical_selector_widget.dart';
 
 import '../../riverpod/stop_watch_controller.dart';
-import '../widget/controll_button_widget.dart';
 
-import '../widget/time_display_widget.dart';
+
+enum StopwatchStatus {
+  initial,
+  running,
+  stopped,
+}
+
+class StopwatchController1 extends StateNotifier<StopwatchStatus> {
+  StopwatchController1() : super(StopwatchStatus.initial);
+
+  void start() {
+    state = StopwatchStatus.running;
+  }
+
+  void stop() {
+    state = StopwatchStatus.stopped;
+  }
+
+  void resume() {
+    state = StopwatchStatus.running;
+  }
+
+  void clear() {
+    state = StopwatchStatus.initial;
+  }
+}
+
+final stopwatchProvider1 =
+StateNotifierProvider<StopwatchController1, StopwatchStatus>(
+        (ref) => StopwatchController1());
+
 
 class StopwatchScreen extends ConsumerStatefulWidget {
   const StopwatchScreen({super.key});
@@ -36,6 +66,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     final controller = ref.read(stopwatchProvider.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final status = ref.watch(stopwatchProvider1);
 
 
     return Scaffold(
@@ -155,19 +186,113 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         
                       child: Column(
                         children: [
-                          TimerDisplay(duration: state.time),
-        
-                          const SizedBox(height: 20),
-        
-                          ControlButtons(
-                            running: state.isRunning,
-                            onStart: controller.start,
-                            onPause: controller.pause,
-                            onReset: controller.reset,
-                            onLap: controller.lap,
+                          Card(
+
+                            child: Center(child: Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: CustomText(text: "00.00",fontSize: 35.sp,fontWeight: FontWeight.w700,),
+                            )),
                           ),
+                          SizedBox(height: 20.h),
+                          /// INITIAL STATE
+                          if (status == StopwatchStatus.initial)
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: Size(double.infinity, 52.h),
+                                backgroundColor: isDark ? Color(0xffC69C3F) : null,
+                              ),
+                              onPressed: () {
+                                ref.read(stopwatchProvider1.notifier).start();
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    IconPath.startIcon,
+                                    colorFilter: ColorFilter.mode(
+                                        isDark ? AppColors.textWhite : Colors.black,
+                                        BlendMode.srcIn),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Text(
+                                    "START",
+                                    style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          /// RUNNING STATE
+                          if (status == StopwatchStatus.running)
+                            Column(
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    fixedSize: Size(double.infinity, 52.h),
+                                    backgroundColor:  Color(0xff2DA8F0) ,
+                                    side: BorderSide(color: Color(0xff2DA8F0)),
+                                  ),
+                                    onPressed: () {},
+                                    child: Center(child: CustomText(text: "SPLIT",fontSize: 16.sp,fontWeight: FontWeight.w600,)),
+                                  ),
+
+
+                                SizedBox(height: 10.h),
+                                Row(
+                                  children: [
+
+
+
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          ref.read(stopwatchProvider1.notifier).stop();
+                                        },
+                                        child: Text("STOP"),
+                                      ),
+                                    ),
+
+                                    SizedBox(width: 10.w),
+
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () {},
+                                        child: Text("UNDO SPLIT"),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                          /// STOPPED STATE
+                          if (status == StopwatchStatus.stopped)
+                            Row(
+                              children: [
+
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      ref.read(stopwatchProvider1.notifier).resume();
+                                    },
+                                    child: Text("RESUME"),
+                                  ),
+                                ),
+
+                                SizedBox(width: 10.w),
+
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      ref.read(stopwatchProvider1.notifier).clear();
+                                    },
+                                    child: Text("CLEAR TIME"),
+                                  ),
+                                ),
+                              ],
+                            ),
         
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                         ],
                       ),
                     )
