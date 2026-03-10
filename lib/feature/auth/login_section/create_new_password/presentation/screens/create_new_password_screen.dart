@@ -17,6 +17,7 @@ import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/utils/constants/app_sizer.dart';
 import '../../../../../../core/utils/constants/image_path.dart';
 import '../../../../../../core/utils/validators/app_validator.dart';
+import '../../../../../../l10n/app_localizations.dart';
 
 
 
@@ -72,16 +73,16 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                 children: [
                   Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
                   SizedBox(height: 32.h,),
-                  CustomText(text: "Create new password",fontSize: 23.sp,fontWeight: FontWeight.w700),
+                  CustomText(text: AppLocalizations.of(context)!.createNewPassword,fontSize: 23.sp,fontWeight: FontWeight.w700,textAlign: TextAlign.center,),
                   SizedBox(height: 16.h,),
-                  CustomText(text: "Your new password must be unique from those previously used.",fontSize: 14.sp,color: AppColors.primary,fontWeight: FontWeight.w400,textAlign: TextAlign.center,),
+                  CustomText(text: AppLocalizations.of(context)!.yourNewPasswordMustBeUnique,fontSize: 14.sp,color: AppColors.primary,fontWeight: FontWeight.w400,textAlign: TextAlign.center,),
                   SizedBox(height: 24.h,),
 
                   Consumer(builder:  (context,ref,child){
                     final isRemember = ref.watch(createNewPasswordProvider.select((s)=>s.isPasswordVisible));
                     return  CustomTextField(
                       focusNode: _passwordFocusNode,
-                      hintText: "Enter your password",
+                      hintText: AppLocalizations.of(context)!.enterYourPassword,
                       obscureText: !isRemember ,
                       validator: AppValidator.validatePassword,
                       onChanged: (password) {
@@ -119,7 +120,7 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                     final isPasswordVisible = ref.watch(createNewPasswordProvider.select((s)=>s.isConfirmPasswordVisible));
                     return  CustomTextField(
                       focusNode: _confirmPasswordFocusNode,
-                      hintText: "Enter your confirm password",
+                      hintText: AppLocalizations.of(context)!.enterYourConfirmPassword,
                       obscureText: !isPasswordVisible ,
                       validator: (value){
                         final password = ref.watch(createNewPasswordProvider.select((s)=>s.password));
@@ -162,11 +163,11 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                     final isLoading = ref.watch(createNewPasswordProvider.select((s)=>s.isLoading));
 
 
-                    return CustomPrimaryButton(title: "Save",
+                    return CustomPrimaryButton(title: AppLocalizations.of(context)!.save,
                       isLoading: isLoading,
                       onPressed: () async {
-                        final String title = "Password Changed !";
-                        final String subTitle = "Your password has been changed successfully.";
+                        final String title = AppLocalizations.of(context)!.passwordChanged;
+                        final String subTitle = AppLocalizations.of(context)!.yourPasswordHasBeenChangedSuccessfully;
                         final result = await ref.read(createNewPasswordProvider.notifier).createNewPassword(context: context);
                         if(result){
                           context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/false");

@@ -311,6 +311,570 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Special thanks to my friends and mentors\n DCS, JCU, and ECR'**
   String get specialThanksToMyFriends;
+
+  /// No description provided for @toolsExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools Explained'**
+  String get toolsExplain;
+
+  /// No description provided for @splitCalculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Split calculation'**
+  String get splitCalculation;
+
+  /// No description provided for @courseConversion.
+  ///
+  /// In en, this message translates to:
+  /// **'Course conversion'**
+  String get courseConversion;
+
+  /// No description provided for @stopWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopwatch'**
+  String get stopWatch;
+
+  /// No description provided for @learning.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning'**
+  String get learning;
+
+  /// No description provided for @summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get summary;
+
+  /// No description provided for @ideasForUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideas for use'**
+  String get ideasForUse;
+
+  /// No description provided for @fags.
+  ///
+  /// In en, this message translates to:
+  /// **'FAQs'**
+  String get fags;
+
+  /// No description provided for @legal.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal'**
+  String get legal;
+
+  /// No description provided for @termsAndConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and Conditions'**
+  String get termsAndConditions;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @copyRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Copyright'**
+  String get copyRight;
+
+  /// No description provided for @fillUpTheInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill up the Information'**
+  String get fillUpTheInformation;
+
+  /// No description provided for @subjectOfProblemOrSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject of Problem or Suggestion'**
+  String get subjectOfProblemOrSuggestion;
+
+  /// No description provided for @problemOrSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem or Suggestion'**
+  String get problemOrSuggestion;
+
+  /// No description provided for @screenshotOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshot (Optional)'**
+  String get screenshotOptional;
+
+  /// No description provided for @tapToAddAScreenshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add a screenshot'**
+  String get tapToAddAScreenshot;
+
+  /// No description provided for @jPGPNGFileFormats.
+  ///
+  /// In en, this message translates to:
+  /// **'JPG, PNG File Formats'**
+  String get jPGPNGFileFormats;
+
+  /// No description provided for @typeHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Type here'**
+  String get typeHere;
+
+  /// No description provided for @calculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator'**
+  String get calculator;
+
+  /// No description provided for @converter.
+  ///
+  /// In en, this message translates to:
+  /// **'Converter'**
+  String get converter;
+
+  /// No description provided for @splitCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Split Calculator'**
+  String get splitCalculator;
+
+  /// No description provided for @pullDownToSeeOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull Down To See Options'**
+  String get pullDownToSeeOptions;
+
+  /// No description provided for @course.
+  ///
+  /// In en, this message translates to:
+  /// **'Course'**
+  String get course;
+
+  /// No description provided for @scy.
+  ///
+  /// In en, this message translates to:
+  /// **'SCY'**
+  String get scy;
+
+  /// No description provided for @scm.
+  ///
+  /// In en, this message translates to:
+  /// **'SCM'**
+  String get scm;
+
+  /// No description provided for @lcm.
+  ///
+  /// In en, this message translates to:
+  /// **'LCM'**
+  String get lcm;
+
+  /// No description provided for @gender.
+  ///
+  /// In en, this message translates to:
+  /// **'GENDER'**
+  String get gender;
+
+  /// No description provided for @men.
+  ///
+  /// In en, this message translates to:
+  /// **'Men'**
+  String get men;
+
+  /// No description provided for @women.
+  ///
+  /// In en, this message translates to:
+  /// **'Women'**
+  String get women;
+
+  /// No description provided for @stroke.
+  ///
+  /// In en, this message translates to:
+  /// **'STROKE'**
+  String get stroke;
+
+  /// No description provided for @fly.
+  ///
+  /// In en, this message translates to:
+  /// **'Fly'**
+  String get fly;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @breast.
+  ///
+  /// In en, this message translates to:
+  /// **'Breast'**
+  String get breast;
+
+  /// No description provided for @free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get free;
+
+  /// No description provided for @im.
+  ///
+  /// In en, this message translates to:
+  /// **'IM'**
+  String get im;
+
+  /// No description provided for @dist.
+  ///
+  /// In en, this message translates to:
+  /// **'DIST'**
+  String get dist;
+
+  /// No description provided for @goalTime.
+  ///
+  /// In en, this message translates to:
+  /// **'GOAL TIME'**
+  String get goalTime;
+
+  /// No description provided for @enterYourTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your time'**
+  String get enterYourTime;
+
+  /// No description provided for @calculateSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Split'**
+  String get calculateSplit;
+
+  /// No description provided for @split.
+  ///
+  /// In en, this message translates to:
+  /// **'SPLIT'**
+  String get split;
+
+  /// No description provided for @splitTime.
+  ///
+  /// In en, this message translates to:
+  /// **'SPLIT TIME'**
+  String get splitTime;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL'**
+  String get total;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get export;
+
+  /// No description provided for @noSplitsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No splits yet'**
+  String get noSplitsYet;
+
+  /// No description provided for @normal.
+  ///
+  /// In en, this message translates to:
+  /// **'NORMAL'**
+  String get normal;
+
+  /// No description provided for @predictor.
+  ///
+  /// In en, this message translates to:
+  /// **'PREDICTOR'**
+  String get predictor;
+
+  /// No description provided for @mode.
+  ///
+  /// In en, this message translates to:
+  /// **'MODE'**
+  String get mode;
+
+  /// No description provided for @start.
+  ///
+  /// In en, this message translates to:
+  /// **'START'**
+  String get start;
+
+  /// No description provided for @undoSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'UNDO SPLIT'**
+  String get undoSplit;
+
+  /// No description provided for @stop.
+  ///
+  /// In en, this message translates to:
+  /// **'STOP'**
+  String get stop;
+
+  /// No description provided for @resume.
+  ///
+  /// In en, this message translates to:
+  /// **'RESUME'**
+  String get resume;
+
+  /// No description provided for @clearTime.
+  ///
+  /// In en, this message translates to:
+  /// **'CLEAR TIME'**
+  String get clearTime;
+
+  /// No description provided for @from.
+  ///
+  /// In en, this message translates to:
+  /// **'FROM'**
+  String get from;
+
+  /// No description provided for @to.
+  ///
+  /// In en, this message translates to:
+  /// **'TO'**
+  String get to;
+
+  /// No description provided for @distance.
+  ///
+  /// In en, this message translates to:
+  /// **'DISTANCE'**
+  String get distance;
+
+  /// No description provided for @splitSize.
+  ///
+  /// In en, this message translates to:
+  /// **'SPLIT SIZE'**
+  String get splitSize;
+
+  /// No description provided for @startType.
+  ///
+  /// In en, this message translates to:
+  /// **'START TYPE'**
+  String get startType;
+
+  /// No description provided for @fromStart.
+  ///
+  /// In en, this message translates to:
+  /// **'FROM START'**
+  String get fromStart;
+
+  /// No description provided for @fromMiddle.
+  ///
+  /// In en, this message translates to:
+  /// **'FROM MIDDLE'**
+  String get fromMiddle;
+
+  /// No description provided for @fromLast.
+  ///
+  /// In en, this message translates to:
+  /// **'FROM LAST'**
+  String get fromLast;
+
+  /// No description provided for @multipleCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'MULTIPLE COURSES'**
+  String get multipleCourses;
+
+  /// No description provided for @convertTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert Time'**
+  String get convertTime;
+
+  /// No description provided for @convertedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'CONVERTED TIME'**
+  String get convertedTime;
+
+  /// No description provided for @tapTimeToShowSplits.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap time to show splits'**
+  String get tapTimeToShowSplits;
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get welcomeBack;
+
+  /// No description provided for @enterYourPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get enterYourPassword;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signIn;
+
+  /// No description provided for @rememberMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember Me'**
+  String get rememberMe;
+
+  /// No description provided for @forgetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget Password?'**
+  String get forgetPassword;
+
+  /// No description provided for @donNotHaveAnAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don’t have an account?'**
+  String get donNotHaveAnAccount;
+
+  /// No description provided for @signUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @continueWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get continueWithApple;
+
+  /// No description provided for @doNotWorryPleaseEnterYourEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t worry! Please enter the email address linked with your account.'**
+  String get doNotWorryPleaseEnterYourEmail;
+
+  /// No description provided for @sendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send OTP'**
+  String get sendOtp;
+
+  /// No description provided for @verifyYourEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Your Email'**
+  String get verifyYourEmail;
+
+  /// No description provided for @tips.
+  ///
+  /// In en, this message translates to:
+  /// **'Tips: Make sure check your inbox and spam folders'**
+  String get tips;
+
+  /// No description provided for @verify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// No description provided for @verifiedEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified Email !'**
+  String get verifiedEmail;
+
+  /// No description provided for @yourAccountHasBeenCreatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Account has been created successfully.'**
+  String get yourAccountHasBeenCreatedSuccessfully;
+
+  /// No description provided for @createNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Create new password'**
+  String get createNewPassword;
+
+  /// No description provided for @yourNewPasswordMustBeUnique.
+  ///
+  /// In en, this message translates to:
+  /// **'Your new password must be unique from those previously used.'**
+  String get yourNewPasswordMustBeUnique;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @passwordChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Password Changed !'**
+  String get passwordChanged;
+
+  /// No description provided for @yourPasswordHasBeenChangedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed successfully.'**
+  String get yourPasswordHasBeenChangedSuccessfully;
+
+  /// No description provided for @continue1.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continue1;
+
+  /// No description provided for @backToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Back To Login'**
+  String get backToLogin;
+
+  /// No description provided for @createAnAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create An Account'**
+  String get createAnAccount;
+
+  /// No description provided for @iAgreeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to'**
+  String get iAgreeTo;
+
+  /// No description provided for @termsAndPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and Privacy Policy.'**
+  String get termsAndPrivacyPolicy;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @alreadyHaveAnAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAnAccount;
 }
 
 class _AppLocalizationsDelegate

@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 
@@ -38,7 +39,7 @@ class _ToolsHeaderState extends State<ToolsHeader> {
                     SvgPicture.asset(IconPath.toolsExplainIcon),
                     SizedBox(width: 6.w,),
                     Text(
-                      "Tools Explained",
+                      AppLocalizations.of(context)!.toolsExplain,
                       style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -70,11 +71,11 @@ class _ToolsHeaderState extends State<ToolsHeader> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: "Split calculation",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.splitCalculation,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "Course conversion",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.courseConversion,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "Stopwatch",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.stopWatch,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     SizedBox(height: 16.h,),
                   ],
                 ),

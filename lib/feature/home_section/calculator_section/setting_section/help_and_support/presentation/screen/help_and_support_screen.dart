@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../../core/utils/constants/icon_path.dart';
@@ -36,7 +37,7 @@ class HelpSupportScreen extends ConsumerWidget {
 
       appBar: AppBar(
         title: CustomText(
-          text: "Help & Support",
+          text: AppLocalizations.of(context)!.helpAndSupport,
           fontSize: 24.sp,
           fontWeight: FontWeight.w600,
         ),
@@ -68,7 +69,7 @@ class HelpSupportScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
            CustomText(text:
-              "Fill up the Information",
+              AppLocalizations.of(context)!.fillUpTheInformation,
 
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w600
@@ -92,37 +93,37 @@ class HelpSupportScreen extends ConsumerWidget {
                   SizedBox(height: 20.h),
 
                   /// Email
-                  CustomText(text:"Email",color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
+                  CustomText(text:AppLocalizations.of(context)!.email,color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
                   SizedBox(height: 6.h),
                   TextFormField(
                     controller: emailController,
-                    decoration: inputDecoration(isDarkMode: isDark),
+                    decoration: inputDecoration(isDarkMode: isDark,context: context),
                   ),
 
                    SizedBox(height: 16.h),
 
                   /// Subject
-                   CustomText(text:"Subject of Problem or Suggestion",color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
+                   CustomText(text:AppLocalizations.of(context)!.subjectOfProblemOrSuggestion,color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
 
                   SizedBox(height: 6.h),
                   TextFormField(
                     controller: subjectController,
-                    decoration: inputDecoration(isDarkMode: isDark),
+                    decoration: inputDecoration(isDarkMode: isDark,context: context),
                   ),
 
                  SizedBox(height: 16.h),
-                  CustomText(text:"Problem or Suggestion",color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
+                  CustomText(text:AppLocalizations.of(context)!.problemOrSuggestion,color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
 
 
                  SizedBox(height: 6.h),
                   TextFormField(
                     controller: problemController,
                     maxLines: 5,
-                    decoration: inputDecoration(isDarkMode: isDark),
+                    decoration: inputDecoration(isDarkMode: isDark,context: context),
                   ),
 
                   SizedBox(height: 16.h),
-                  CustomText(text:"Screenshot (Optional)",color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
+                  CustomText(text:AppLocalizations.of(context)!.screenshotOptional,color: isDark?Color(0xffE3D99B):Color(0xff82888E),),
 
                  SizedBox(height: 8.h),
 
@@ -138,16 +139,16 @@ class HelpSupportScreen extends ConsumerWidget {
                       child: state.screenshot == null
                           ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children:[
                           Icon(Icons.camera_alt,
                               size: 35, color: Colors.blue),
                           SizedBox(height: 8),
-                          Text("Tap to add a screenshot"),
+                          CustomText(text: AppLocalizations.of(context)!.tapToAddAScreenshot),
                           SizedBox(height: 4),
-                          Text(
-                            "JPG, PNG File Formats",
-                            style: TextStyle(
-                                color: Colors.blue, fontSize: 12),
+                          CustomText(text:
+                          AppLocalizations.of(context)!.jPGPNGFileFormats,
+
+                                color: Colors.blue, fontSize: 12.sp
                           )
                         ],
                       )
@@ -162,7 +163,7 @@ class HelpSupportScreen extends ConsumerWidget {
                   ),
 
                   SizedBox(height: 24.h),
-                  CustomPrimaryButton(title: "Save Changes",onPressed: (){},),
+                  CustomPrimaryButton(title: AppLocalizations.of(context)!.saveChanges,onPressed: (){},),
 
 
 
@@ -177,9 +178,9 @@ class HelpSupportScreen extends ConsumerWidget {
     );
   }
 
-  InputDecoration inputDecoration({required bool isDarkMode}) {
+  InputDecoration inputDecoration({required bool isDarkMode,required context}) {
     return InputDecoration(
-      hintText: "Type here",
+      hintText: AppLocalizations.of(context)!.typeHere,
       filled: true,
       fillColor: isDarkMode?Color(0xff153250): Color(0xffF1F3F6),
       border: OutlineInputBorder(

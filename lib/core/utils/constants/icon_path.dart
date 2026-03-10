@@ -45,6 +45,10 @@ class IconPath{
   static const  String exportIcon ='$_basePath/export_icon.svg';
   static const  String rightArrowIcon ='$_basePath/right_arrow_icon.svg';
   static const  String startIcon ='$_basePath/start_icon.svg';
+  static const  String splitIcon ='$_basePath/split_icon.svg';
+  static const  String undoIcon ='$_basePath/undo_icon.svg';
+  static const  String stopIcon ='$_basePath/stop_icon.svg';
+  static const  String pullIcon ='$_basePath/pull_icon.svg';
 
 
 

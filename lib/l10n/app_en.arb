@@ -35,5 +35,125 @@
 "helpAndSupport": "Help & Support",
 "version": "Version 2.5",
 "manyThanksToMyFamilyAndFriends": "Many thanks to my family and friends.",
-"specialThanksToMyFriends": "Special thanks to my friends and mentors\n DCS, JCU, and ECR"
+"specialThanksToMyFriends": "Special thanks to my friends and mentors\n DCS, JCU, and ECR",
+
+"toolsExplain": "Tools Explained",
+"splitCalculation": "Split calculation",
+"courseConversion": "Course conversion",
+"stopWatch": "Stopwatch",
+
+"learning": "Learning",
+"summary": "Summary",
+"ideasForUse": "Ideas for use",
+"fags": "FAQs",
+
+"legal": "Legal",
+"termsAndConditions": "Terms and Conditions",
+"privacyPolicy": "Privacy Policy",
+"copyRight": "Copyright",
+
+
+"fillUpTheInformation": "Fill up the Information",
+"subjectOfProblemOrSuggestion": "Subject of Problem or Suggestion",
+"problemOrSuggestion": "Problem or Suggestion",
+"screenshotOptional": "Screenshot (Optional)",
+"tapToAddAScreenshot": "Tap to add a screenshot",
+"jPGPNGFileFormats": "JPG, PNG File Formats",
+"saveChanges": "Save Changes",
+"typeHere": "Type here",
+
+"calculator": "Calculator",
+"converter": "Converter",
+
+
+"splitCalculator": "Split Calculator",
+"pullDownToSeeOptions": "Pull Down To See Options",
+"course": "Course",
+"scy": "SCY",
+"scm": "SCM",
+"lcm": "LCM",
+"gender": "GENDER",
+"men": "Men",
+"women": "Women",
+"stroke": "STROKE",
+"fly": "Fly",
+"back": "Back",
+"breast": "Breast",
+"free": "Free",
+"im": "IM",
+"dist": "DIST",
+"goalTime": "GOAL TIME",
+"enterYourTime": "Enter your time",
+"calculateSplit": "Calculate Split",
+"split": "SPLIT",
+"splitTime": "SPLIT TIME",
+"total": "TOTAL",
+"clear": "Clear",
+"export": "Export",
+"noSplitsYet": "No splits yet",
+
+
+"normal": "NORMAL",
+"predictor": "PREDICTOR",
+"mode": "MODE",
+"start": "START",
+"undoSplit": "UNDO SPLIT",
+"stop": "STOP",
+"resume": "RESUME",
+"clearTime": "CLEAR TIME",
+"from": "FROM",
+"to": "TO",
+"distance": "DISTANCE",
+"splitSize": "SPLIT SIZE",
+"startType": "START TYPE",
+"fromStart": "FROM START",
+"fromMiddle": "FROM MIDDLE",
+"fromLast": "FROM LAST",
+
+"multipleCourses": "MULTIPLE COURSES",
+"convertTime": "Convert Time",
+"convertedTime": "CONVERTED TIME",
+"tapTimeToShowSplits": "Tap time to show splits",
+
+"welcomeBack": "Welcome back",
+"enterYourEmail": "Enter your email",
+"enterYourPassword": "Enter your password",
+"signIn": "Sign In",
+"rememberMe": "Remember Me",
+"forgetPassword": "Forget Password?",
+"donNotHaveAnAccount": "Don’t have an account?",
+"signUp": "Sign Up",
+"continueWithGoogle": "Continue with Google",
+"continueWithApple": "Continue with Apple",
+
+"doNotWorryPleaseEnterYourEmail": "Don't worry! Please enter the email address linked with your account.",
+"sendOtp": "Send OTP",
+
+"verifyYourEmail": "Verify Your Email",
+"tips": "Tips: Make sure check your inbox and spam folders",
+"verify": "Verify",
+
+"verifiedEmail": "Verified Email !",
+"yourAccountHasBeenCreatedSuccessfully": "Your Account has been created successfully.",
+
+"createNewPassword": "Create new password",
+"yourNewPasswordMustBeUnique": "Your new password must be unique from those previously used.",
+"save": "Save",
+"passwordChanged": "Password Changed !",
+"yourPasswordHasBeenChangedSuccessfully": "Your password has been changed successfully.",
+
+"continue1": "Continue",
+"backToLogin": "Back To Login",
+
+"createAnAccount": "Create An Account",
+"iAgreeTo": "I agree to",
+"termsAndPrivacyPolicy": "Terms and Privacy Policy.",
+"createAccount": "Create Account",
+"alreadyHaveAnAccount": "Already have an account?"
+
+
+
+
+
+
 }

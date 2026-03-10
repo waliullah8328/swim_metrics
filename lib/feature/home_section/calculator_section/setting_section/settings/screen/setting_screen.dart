@@ -437,8 +437,9 @@ class SettingsScreen extends ConsumerWidget {
                   child: Center(child:  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset(IconPath.logOutIcon ,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
-                      Text(AppLocalizations.of(context)!.logout,style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w600),),
+                      SvgPicture.asset(IconPath.logOutIcon ,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                      SizedBox(width: 10.w,),
+                      Text(AppLocalizations.of(context)!.logout,style: TextStyle(fontSize: 17.sp,fontWeight: FontWeight.w600),),
                     ],
                   )),
                 )

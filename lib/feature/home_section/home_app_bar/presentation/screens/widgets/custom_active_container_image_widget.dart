@@ -20,7 +20,7 @@ class CustomActiveContainerImage extends StatelessWidget {
           BoxShadow(
             color: Color(0xff2DA8F0),
             blurRadius: 10,
-            spreadRadius: 2,
+            spreadRadius: 0.5,
           ),
 
         ],

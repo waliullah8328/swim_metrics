@@ -11,6 +11,7 @@ import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_prima
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 
 import 'package:swim_metrics/feature/auth/sign_up_section/verify_email/presentation/riverpod/verify_otp_controller.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 
@@ -53,7 +54,7 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
               children: [
                 Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
                 SizedBox(height: 24.h,),
-                CustomText(text: "Verify Your Email",fontSize: 23.sp,fontWeight: FontWeight.w700),
+                CustomText(text: AppLocalizations.of(context)!.verifyYourEmail,fontSize: 23.sp,fontWeight: FontWeight.w700),
                 SizedBox(height: 24.h,),
                 PinCodeTextField(
                   appContext: context,
@@ -89,18 +90,18 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                   },
                 ),
                 SizedBox(height: 16.h,),
-                CustomText(text: "Tips: Make sure check your inbox and spam folders",fontSize: 14.sp,color: AppColors.primary,fontWeight: FontWeight.w400,),
+                CustomText(text: AppLocalizations.of(context)!.tips,fontSize: 14.sp,color: AppColors.primary,fontWeight: FontWeight.w400,textAlign: TextAlign.center,),
 
                 SizedBox(height: 230.h,),
                 widget.isSignUp== 'true'?Consumer(builder: (context,ref,child){
                   final isLoading = ref.watch(verifyEmailProvider.select((s)=>s.isLoading));
 
-                  return CustomPrimaryButton(title: "Verify",
+                  return CustomPrimaryButton(title: AppLocalizations.of(context)!.verify,
                     isLoading: isLoading,
                     onPressed: () async {
 
-                    final String title = "Verified Email !";
-                    final String subTitle = "Your Account has been created successfully.";
+                    final String title = AppLocalizations.of(context)!.verifiedEmail;
+                    final String subTitle = AppLocalizations.of(context)!.yourAccountHasBeenCreatedSuccessfully;
                       final result = await ref.read(verifyEmailProvider.notifier).verifyOtp();
                       if(result){
                         context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/${widget.isSignUp}");
@@ -115,7 +116,7 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                 Consumer(builder: (context,ref,child){
                   final isLoading = ref.watch(verifyEmailProvider.select((s)=>s.isLoading));
 
-                  return CustomPrimaryButton(title: "Verify",
+                  return CustomPrimaryButton(title: AppLocalizations.of(context)!.verify,
                     isLoading: isLoading,
                     onPressed: () async {
 

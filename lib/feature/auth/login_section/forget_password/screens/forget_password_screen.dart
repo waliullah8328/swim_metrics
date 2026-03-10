@@ -10,6 +10,7 @@ import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_prima
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/utils/constants/app_sizer.dart';
@@ -54,13 +55,13 @@ class _LoginScreenState extends ConsumerState<ForgetPasswordScreen> {
               children: [
                 Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
                 SizedBox(height: 24.h,),
-                CustomText(text: "Forgot password?",fontSize: 23.sp,fontWeight: FontWeight.w700),
+                CustomText(text: AppLocalizations.of(context)!.forgetPassword,fontSize: 23.sp,fontWeight: FontWeight.w700),
                 SizedBox(height: 14.h,),
-                CustomText(text: "Don't worry! Please enter the email address linked with your account.",fontSize: 13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,textAlign: TextAlign.center,),
+                CustomText(text: AppLocalizations.of(context)!.doNotWorryPleaseEnterYourEmail,fontSize: 13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,textAlign: TextAlign.center,),
                 SizedBox(height: 24.h,),
                 CustomTextField(
                   focusNode: _emailFocusNode,
-                  hintText: "Enter your email",
+                  hintText: AppLocalizations.of(context)!.enterYourEmail,
             
                   validator: AppValidator.validateEmail,
             
@@ -84,7 +85,7 @@ class _LoginScreenState extends ConsumerState<ForgetPasswordScreen> {
                 Consumer(builder: (context,ref,child){
                   final isLoading = ref.watch(forgetPasswordProvider.select((s)=>s.isLoading));
             
-                  return CustomPrimaryButton(title: "Send OTP",
+                  return CustomPrimaryButton(title: AppLocalizations.of(context)!.sendOtp,
                     isLoading: isLoading,
                     onPressed: () async {
                      final result = await ref.read(forgetPasswordProvider.notifier).forgetPassword(context: context);

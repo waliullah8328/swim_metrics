@@ -7,6 +7,7 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
+import '../../../../../../../l10n/app_localizations.dart';
 
 
 class LegalHeaderWidget extends StatefulWidget {
@@ -39,9 +40,9 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                   children: [
                     SvgPicture.asset(IconPath.legalIcon),
                     SizedBox(width: 6.w,),
-                    Text(
-                      "Legal",
-                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                    CustomText(text:
+                      AppLocalizations.of(context)!.legal,
+                     fontSize: 16.sp, fontWeight: FontWeight.bold
                     ),
                   ],
                 ),
@@ -79,14 +80,14 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CustomText(text: "Terms and Conditions",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                          CustomText(text: AppLocalizations.of(context)!.termsAndConditions,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                           Divider(),
                         ],
                       ),
                     ),
-                    CustomText(text: "Privacy Policy",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.privacyPolicy,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     Divider(),
-                    CustomText(text: "Copyright",color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
+                    CustomText(text: AppLocalizations.of(context)!.copyRight,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: 14.sp,),
                     SizedBox(height: 16.h,),
                   ],
                 ),

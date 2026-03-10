@@ -5,6 +5,7 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../../core/utils/constants/icon_path.dart';
+import '../../../../../../../l10n/app_localizations.dart';
 
 class TermsConditionsScreen extends StatelessWidget {
   const TermsConditionsScreen({super.key});
@@ -16,7 +17,7 @@ class TermsConditionsScreen extends StatelessWidget {
 
       appBar: AppBar(
         title: CustomText(
-          text: "Terms & Conditions",
+          text: AppLocalizations.of(context)!.termsAndConditions,
           fontSize: 24.sp,
           fontWeight: FontWeight.w600,
         ),

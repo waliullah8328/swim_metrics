@@ -11,8 +11,10 @@ import 'package:swim_metrics/feature/home_section/calculator_section/calculator/
 
 import 'package:swim_metrics/feature/home_section/calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/calculator/presentation/screen/widget/distance_wheel_selector_widget.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 import '../../riverpod/calculator_split_state.dart';
 final currencyProvider = StateProvider<String>((ref) => "SCY");
+final showCourseSectionProvider = StateProvider<bool>((ref) => true);
 class SplitCalculatorPage extends ConsumerWidget {
   SplitCalculatorPage({super.key});
 
@@ -25,13 +27,14 @@ class SplitCalculatorPage extends ConsumerWidget {
     final notifier = ref.read(splitProvider.notifier);
     final selected = ref.watch(currencyProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final showCourse = ref.watch(showCourseSectionProvider);
 
     return Scaffold(
       key: _scaffoldKey,
 
       drawer: CustomDrawer(),
       appBar: AppBar(
-        title: CustomText(text: "Split Calculator",fontSize: 24.sp,fontWeight: FontWeight.w600,),
+        title: CustomText(text: AppLocalizations.of(context)!.splitCalculator,fontSize: 24.sp,fontWeight: FontWeight.w600,),
         centerTitle: true,
         leading: GestureDetector(
           onTap: (){
@@ -64,6 +67,34 @@ class SplitCalculatorPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if(!showCourse)
+                  Center(
+                    child: GestureDetector(
+                      onTap: (){
+                        ref.read(showCourseSectionProvider.notifier).state = true;
+
+                      },
+                      child: Column(
+                        children: [
+                          SizedBox(height: 10.h,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(IconPath.pullIcon),
+                              CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: 14.sp,color: Color(0xffC7C7C7),)
+                            ],
+                          ),
+                          SizedBox(height: 20.h,)
+                        ],
+                      ),
+                    ),
+                    // child: IconButton(
+                    //   icon: const Icon(Icons.keyboard_arrow_down, size: 32),
+                    //   onPressed: () {
+                    //     ref.read(showCourseSectionProvider.notifier).state = true;
+                    //   },
+                    // ),
+                  ),
 
                 /// COURSE CARD
                 Container(
@@ -80,138 +111,145 @@ class SplitCalculatorPage extends ConsumerWidget {
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding:  EdgeInsets.only(left: 16.w,right: 16.w,top: 10.h,bottom: 16.h),
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CustomText(
-                              text: "Course",
-                              fontSize: 20.sp,
-                              color: AppColors.primary,
-                            ),
-
-
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 6),
-                              decoration: BoxDecoration(
-                                color: isDark?Color(0xff033A5E):Color(0xFFD9D9D9),
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: selected,
-                                  isDense: true, // removes extra height
-                                  itemHeight: null, // removes default 48 height
-                                  icon: const Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Color(0xFFB8892D),
-                                  ),
-                                  dropdownColor: Colors.white,
-                                  style: TextStyle(
-                                    color: const Color(0xFFB8892D),
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  items: [
-                                    DropdownMenuItem(
-                                      value: "SCY",
-                                      child: CustomText(text: "SCY", fontSize: 12.sp),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: "SCM",
-                                      child: CustomText(text: "SCM", fontSize: 12.sp),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: "LCM",
-                                      child: CustomText(text: "LCM", fontSize: 12.sp),
-                                    ),
-                                  ],
-                                  onChanged: (value) {
-                                    ref.read(currencyProvider.notifier).state = value!;
-                                  },
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 20.h),
-
-                        /// GENDER, STROKE, DIST
-                        SizedBox(
-                          width: double.infinity,
-                          child: Row(
+                        if(showCourse)
+                          Column(
                             children: [
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    CustomText(
-                                      text: "GENDER",
-                                      fontSize: 16.sp,
-                                      color: AppColors.primary,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CustomText(
+                                    text: AppLocalizations.of(context)!.course,
+                                    fontSize: 20.sp,
+                                    color: AppColors.primary,
+                                  ),
+
+
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: isDark?Color(0xff033A5E):Color(0xFFD9D9D9),
+                                      borderRadius: BorderRadius.circular(40),
                                     ),
-                                    SizedBox(height: 6.h),
-                                    SplitCalculatorSelector(
-                                      items: const ["Men", "Women"],
-                                      onChanged: (value) {
-                                        ref.read(splitProvider.notifier).setGender(value);
-                                      },
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        value: selected,
+                                        isDense: true, // removes extra height
+                                        itemHeight: null, // removes default 48 height
+                                        icon: const Icon(
+                                          Icons.keyboard_arrow_down,
+                                          color: Color(0xFFB8892D),
+                                        ),
+                                        dropdownColor: Colors.white,
+                                        style: TextStyle(
+                                          color: const Color(0xFFB8892D),
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: "SCY",
+                                            child: CustomText(text: AppLocalizations.of(context)!.scy, fontSize: 12.sp),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: "SCM",
+                                            child: CustomText(text: AppLocalizations.of(context)!.scm, fontSize: 12.sp),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: "LCM",
+                                            child: CustomText(text: AppLocalizations.of(context)!.lcm, fontSize: 12.sp),
+                                          ),
+                                        ],
+                                        onChanged: (value) {
+                                          ref.read(currencyProvider.notifier).state = value!;
+                                        },
+                                      ),
                                     ),
-                                  ],
-                                ),
+                                  )
+                                ],
                               ),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: Column(
+                              SizedBox(height: 20.h),
+
+                              /// GENDER, STROKE, DIST
+                              SizedBox(
+                                width: double.infinity,
+                                child: Row(
                                   children: [
-                                    CustomText(
-                                      text: "STROKE",
-                                      fontSize: 16.sp,
-                                      color: AppColors.primary,
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(context)!.gender,
+                                            fontSize: 16.sp,
+                                            color: AppColors.primary,
+                                          ),
+                                          SizedBox(height: 6.h),
+                                          SplitCalculatorSelector(
+                                            items:  [AppLocalizations.of(context)!.men, AppLocalizations.of(context)!.women],
+                                            onChanged: (value) {
+                                              ref.read(splitProvider.notifier).setGender(value);
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    SizedBox(height: 6.h),
-                                    SplitCalculatorSelector(
-                                      items: const ["Fly", "Back","Breast","Free","IM"],
-                                      onChanged: (value) {
-                                        ref.read(splitProvider.notifier).setStroke(value);
-                                      },
+                                    SizedBox(width: 12.w),
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(context)!.stroke,
+                                            fontSize: 16.sp,
+                                            color: AppColors.primary,
+                                          ),
+                                          SizedBox(height: 6.h),
+                                          SplitCalculatorSelector(
+                                            items: [AppLocalizations.of(context)!.fly, AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.breast,AppLocalizations.of(context)!.free,AppLocalizations.of(context)!.im],
+                                            onChanged: (value) {
+                                              ref.read(splitProvider.notifier).setStroke(value);
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    CustomText(
-                                      text: "DIST",
-                                      fontSize: 16.sp,
-                                      color: AppColors.primary,
-                                    ),
-                                    SizedBox(height: 6.h),
-                                    DistanceWheelSelector(
-                                      items: [50, 100, 150, 200, 250],
-                                      onChanged: (value) {
-                                        ref.read(splitProvider.notifier).setDistance(value);
-                                      },
+                                    SizedBox(width: 12.w),
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(context)!.dist,
+                                            fontSize: 16.sp,
+                                            color: AppColors.primary,
+                                          ),
+                                          SizedBox(height: 6.h),
+                                          DistanceWheelSelector(
+                                            items: [50, 100, 150, 200, 250],
+                                            onChanged: (value) {
+                                              ref.read(splitProvider.notifier).setDistance(value);
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                        
+
 
                         SizedBox(height: 20.h),
                         CustomText(
-                          text: "Goal Time",
+                          text: AppLocalizations.of(context)!.goalTime,
                           fontSize: 18.sp,
                           color: AppColors.primary,
                         ),
                         SizedBox(height: 16.h),
                         CustomTextField(
-                          hintText: "Enter your time",
+                          hintText: AppLocalizations.of(context)!.enterYourTime,
                           controller: timeController,
                           suffixIcon: GestureDetector(
                             onTap: (){
@@ -243,13 +281,14 @@ class SplitCalculatorPage extends ConsumerWidget {
                               notifier.setGoalTime(goal);
                               notifier.calculateSplits(); // This updates state
                             }
+                            ref.read(showCourseSectionProvider.notifier).state = false;
                           },
                           child: Center(child:  Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SvgPicture.asset(IconPath.calculatorSplitIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
                               SizedBox(width: 6.w,),
-                              CustomText(text: "Calculate Split",fontSize: 14.sp,fontWeight: FontWeight.w600),
+                              CustomText(text: AppLocalizations.of(context)!.calculateSplit,fontSize: 14.sp,fontWeight: FontWeight.w600),
                             ],
                           )),
                         ),
@@ -275,9 +314,9 @@ class SplitCalculatorPage extends ConsumerWidget {
                   child:Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CustomText(text: "SPLIT",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                      CustomText(text: "SPLIT TIME",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                      CustomText(text: "TOTAL",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                      CustomText(text: AppLocalizations.of(context)!.split,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                      CustomText(text: AppLocalizations.of(context)!.splitTime,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                      CustomText(text: AppLocalizations.of(context)!.total,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
 
                     ],
                   ),
@@ -291,10 +330,10 @@ class SplitCalculatorPage extends ConsumerWidget {
 
                     ),
                     child: state.splits.isEmpty
-                        ? const Center(
-                      child: Text(
-                        "No splits yet",
-                        style: TextStyle(color: Colors.grey),
+                        ?  Center(
+                      child: CustomText(text:
+                      AppLocalizations.of(context)!.noSplitsYet,
+                       color: Colors.grey
                       ),
                     )
                         : ListView.builder(
@@ -357,7 +396,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                             children: [
                               SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
                               SizedBox(width: 6.w,),
-                              CustomText(text: "Clear",fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                              CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
                             ],
                           ),
                         ),
@@ -373,9 +412,9 @@ class SplitCalculatorPage extends ConsumerWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
+                            SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
                             SizedBox(width: 6.w,),
-                            CustomText(text: "Export",fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                            CustomText(text:  AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
                           ],
                         ),
                       ),

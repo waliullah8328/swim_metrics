@@ -60,7 +60,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get name => 'Name';
 
   @override
-  String get enterYourEmail => 'Enter your email';
+  String get enterYourEmail => 'Inserisci la tua email';
 
   @override
   String get email => 'Email';
@@ -72,7 +72,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get phone => 'Phone';
 
   @override
-  String get saveChanges => 'Save Changes';
+  String get saveChanges => 'Salva modifiche';
 
   @override
   String get securityDetails => 'SECURITY DETAILS';
@@ -114,4 +114,293 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get specialThanksToMyFriends =>
       'Un ringraziamento speciale ai miei amici e mentori\n DCS, JCU ed ECR';
+
+  @override
+  String get toolsExplain => 'Strumenti spiegati';
+
+  @override
+  String get splitCalculation => 'Calcolo della divisione';
+
+  @override
+  String get courseConversion => 'Conversione del corso';
+
+  @override
+  String get stopWatch => 'Cronometro';
+
+  @override
+  String get learning => 'Apprendimento';
+
+  @override
+  String get summary => 'Riepilogo';
+
+  @override
+  String get ideasForUse => 'Idee per l\'uso';
+
+  @override
+  String get fags => 'Domande frequenti';
+
+  @override
+  String get legal => 'Legale';
+
+  @override
+  String get termsAndConditions => 'Termini e condizioni';
+
+  @override
+  String get privacyPolicy => 'Informativa sulla privacy';
+
+  @override
+  String get copyRight => 'Copyright';
+
+  @override
+  String get fillUpTheInformation => 'Compila le informazioni';
+
+  @override
+  String get subjectOfProblemOrSuggestion =>
+      'Oggetto del problema o suggerimento';
+
+  @override
+  String get problemOrSuggestion => 'Problema o suggerimento';
+
+  @override
+  String get screenshotOptional => 'Screenshot (Opzionale)';
+
+  @override
+  String get tapToAddAScreenshot => 'Tocca per aggiungere uno screenshot';
+
+  @override
+  String get jPGPNGFileFormats => 'Formati di file JPG, PNG';
+
+  @override
+  String get typeHere => 'Scrivi qui';
+
+  @override
+  String get calculator => 'Calcolatrice';
+
+  @override
+  String get converter => 'Convertitore';
+
+  @override
+  String get splitCalculator => 'Calcolatore di split';
+
+  @override
+  String get pullDownToSeeOptions =>
+      'Scorri verso il basso per vedere le opzioni';
+
+  @override
+  String get course => 'Corso';
+
+  @override
+  String get scy => 'SCY';
+
+  @override
+  String get scm => 'SCM';
+
+  @override
+  String get lcm => 'LCM';
+
+  @override
+  String get gender => 'GENERE';
+
+  @override
+  String get men => 'Uomini';
+
+  @override
+  String get women => 'Donne';
+
+  @override
+  String get stroke => 'STILE';
+
+  @override
+  String get fly => 'Farfalla';
+
+  @override
+  String get back => 'Dorso';
+
+  @override
+  String get breast => 'Rana';
+
+  @override
+  String get free => 'Stile libero';
+
+  @override
+  String get im => 'IM';
+
+  @override
+  String get dist => 'DIST';
+
+  @override
+  String get goalTime => 'TEMPO OBIETTIVO';
+
+  @override
+  String get enterYourTime => 'Inserisci il tuo tempo';
+
+  @override
+  String get calculateSplit => 'Calcola split';
+
+  @override
+  String get split => 'SPLIT';
+
+  @override
+  String get splitTime => 'TEMPO SPLIT';
+
+  @override
+  String get total => 'TOTALE';
+
+  @override
+  String get clear => 'Cancella';
+
+  @override
+  String get export => 'Esporta';
+
+  @override
+  String get noSplitsYet => 'Nessuno split ancora';
+
+  @override
+  String get normal => 'NORMALE';
+
+  @override
+  String get predictor => 'PREDICTOR';
+
+  @override
+  String get mode => 'MODALITÀ';
+
+  @override
+  String get start => 'AVVIA';
+
+  @override
+  String get undoSplit => 'ANNULLA SPLIT';
+
+  @override
+  String get stop => 'FERMA';
+
+  @override
+  String get resume => 'RIPRENDI';
+
+  @override
+  String get clearTime => 'CANCELLA TEMPO';
+
+  @override
+  String get from => 'DA';
+
+  @override
+  String get to => 'A';
+
+  @override
+  String get distance => 'DISTANZA';
+
+  @override
+  String get splitSize => 'DIMENSIONE SPLIT';
+
+  @override
+  String get startType => 'TIPO DI PARTENZA';
+
+  @override
+  String get fromStart => 'DALL\'INIZIO';
+
+  @override
+  String get fromMiddle => 'DAL CENTRO';
+
+  @override
+  String get fromLast => 'DALL\'ULTIMO';
+
+  @override
+  String get multipleCourses => 'MULTIPLI CORSI';
+
+  @override
+  String get convertTime => 'Converti tempo';
+
+  @override
+  String get convertedTime => 'TEMPO CONVERTITO';
+
+  @override
+  String get tapTimeToShowSplits => 'Tocca il tempo per mostrare gli split';
+
+  @override
+  String get welcomeBack => 'Bentornato';
+
+  @override
+  String get enterYourPassword => 'Inserisci la password';
+
+  @override
+  String get signIn => 'Accedi';
+
+  @override
+  String get rememberMe => 'Ricordami';
+
+  @override
+  String get forgetPassword => 'Hai dimenticato la password?';
+
+  @override
+  String get donNotHaveAnAccount => 'Non hai un account?';
+
+  @override
+  String get signUp => 'Registrati';
+
+  @override
+  String get continueWithGoogle => 'Continua con Google';
+
+  @override
+  String get continueWithApple => 'Continua con Apple';
+
+  @override
+  String get doNotWorryPleaseEnterYourEmail =>
+      'Non preoccuparti! Inserisci l\'indirizzo email associato al tuo account.';
+
+  @override
+  String get sendOtp => 'Invia OTP';
+
+  @override
+  String get verifyYourEmail => 'Verifica la tua email';
+
+  @override
+  String get tips =>
+      'Suggerimento: Assicurati di controllare la posta in arrivo e la cartella spam';
+
+  @override
+  String get verify => 'Verifica';
+
+  @override
+  String get verifiedEmail => 'Email verificata!';
+
+  @override
+  String get yourAccountHasBeenCreatedSuccessfully =>
+      'Il tuo account è stato creato con successo.';
+
+  @override
+  String get createNewPassword => 'Crea una nuova password';
+
+  @override
+  String get yourNewPasswordMustBeUnique =>
+      'La tua nuova password deve essere unica rispetto a quelle precedentemente utilizzate.';
+
+  @override
+  String get save => 'Salva';
+
+  @override
+  String get passwordChanged => 'Password modificata!';
+
+  @override
+  String get yourPasswordHasBeenChangedSuccessfully =>
+      'La tua password è stata modificata con successo.';
+
+  @override
+  String get continue1 => 'Continua';
+
+  @override
+  String get backToLogin => 'Torna al login';
+
+  @override
+  String get createAnAccount => 'Crea un account';
+
+  @override
+  String get iAgreeTo => 'Accetto';
+
+  @override
+  String get termsAndPrivacyPolicy => 'Termini e Privacy Policy.';
+
+  @override
+  String get createAccount => 'Crea account';
+
+  @override
+  String get alreadyHaveAnAccount => 'Hai già un account?';
 }

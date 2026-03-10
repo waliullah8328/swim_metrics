@@ -5,6 +5,7 @@ import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/feature/home_section/converter_section/presentation/screen/widget/vertical_selector_widget.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../core/utils/constants/icon_path.dart';
@@ -28,7 +29,7 @@ class ConverterScreen extends ConsumerWidget {
 
       drawer: CustomDrawer(),
       appBar: AppBar(
-        title: CustomText(text: "Converter",fontSize: 24.sp,fontWeight: FontWeight.w600,),
+        title: CustomText(text: AppLocalizations.of(context)!.converter,fontSize: 24.sp,fontWeight: FontWeight.w600,),
         centerTitle: true,
         leading: GestureDetector(
           onTap: (){
@@ -83,7 +84,7 @@ class ConverterScreen extends ConsumerWidget {
                     children: [
 
                       CustomText(text:
-                        "MULTIPLE COURSES",
+                      AppLocalizations.of(context)!.multipleCourses,
 
                           color: Colors.grey,
 
@@ -108,7 +109,7 @@ class ConverterScreen extends ConsumerWidget {
                           children: [
 
                             CustomText(text:
-                              "FROM",
+                            AppLocalizations.of(context)!.from,
 
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -119,7 +120,7 @@ class ConverterScreen extends ConsumerWidget {
                             SizedBox(height: 10.h),
 
                             VerticalSelector(
-                              items: const ["SCM", "SCY", "LCM"],
+                              items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
                               selected: state.from,
                               onTap: controller.selectFrom,
                             )
@@ -133,7 +134,7 @@ class ConverterScreen extends ConsumerWidget {
                         child: Column(
                           children: [
                             CustomText(text:
-                            "TO",
+                            AppLocalizations.of(context)!.to,
 
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
@@ -146,7 +147,7 @@ class ConverterScreen extends ConsumerWidget {
 
 
                             VerticalSelector(
-                              items: const ["SCY", "LCM", "SCM"],
+                              items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
                               selected: state.to,
                               onTap: controller.selectTo,
                             )
@@ -168,7 +169,7 @@ class ConverterScreen extends ConsumerWidget {
                         child: Column(
                           children: [
                             CustomText(text:
-                            "STROKE",
+                            AppLocalizations.of(context)!.stroke,
 
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
@@ -182,7 +183,7 @@ class ConverterScreen extends ConsumerWidget {
 
 
                             VerticalSelector(
-                              items: const ["FLY","BACK", "FREE", "IM","BREAST"],
+                              items:  [AppLocalizations.of(context)!.fly,AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.free, AppLocalizations.of(context)!.im,AppLocalizations.of(context)!.breast],
                               selected: [state.stroke],
                               onTap: controller.selectStroke,
                             )
@@ -190,13 +191,13 @@ class ConverterScreen extends ConsumerWidget {
                         ),
                       ),
 
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12.w),
 
                       Expanded(
                         child: Column(
                           children: [
                             CustomText(text:
-                            "DISTANCE",
+                            AppLocalizations.of(context)!.distance,
 
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
@@ -239,8 +240,8 @@ class ConverterScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
-                      "Convert Time",
+                    child:  Text(
+                      AppLocalizations.of(context)!.convertTime,
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -269,19 +270,19 @@ class ConverterScreen extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  CustomText(text: "CONVERTED TIME",fontSize: 16.sp,fontWeight: FontWeight.w500,color: Color(0xff368ABB),),
+                  CustomText(text: AppLocalizations.of(context)!.convertedTime,fontSize: 16.sp,fontWeight: FontWeight.w500,color: Color(0xff368ABB),),
                   SizedBox(height: 10.h,),
-                  CustomText(text: "Tap time to show splits",fontSize: 12.sp,fontWeight: FontWeight.w400,color:AppColors.textGrey,),
+                  CustomText(text: AppLocalizations.of(context)!.tapTimeToShowSplits,fontSize: 12.sp,fontWeight: FontWeight.w400,color:AppColors.textGrey,),
                   CustomText(text: "01 : 06.54",fontSize:36.sp,fontWeight: FontWeight.w600,),
                 SizedBox(height: 16.h,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CustomText(text: "SCY",fontSize:13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
+                  CustomText(text: AppLocalizations.of(context)!.scm,fontSize:13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
                   SizedBox(width: 10.w,),
                   SvgPicture.asset(IconPath.rightArrowIcon),
                   SizedBox(width: 10.w,),
-                  CustomText(text: "LCM",fontSize:13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
+                  CustomText(text: AppLocalizations.of(context)!.lcm,fontSize:13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
 
                 ],
               ),
@@ -308,7 +309,7 @@ class ConverterScreen extends ConsumerWidget {
                         children: [
                           SvgPicture.asset(IconPath.clearIcon),
                           SizedBox(width: 6.w,),
-                          CustomText(text: "Clear",fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                          CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
                         ],
                       ),
                     ),
@@ -324,9 +325,9 @@ class ConverterScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
+                        SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
                         SizedBox(width: 6.w,),
-                        CustomText(text: "Export",fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                        CustomText(text: AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
                       ],
                     ),
                   ),
