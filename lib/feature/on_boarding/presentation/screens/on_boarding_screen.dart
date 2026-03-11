@@ -97,7 +97,7 @@ class _OnboardingScreenState
                 child: CustomPrimaryButton(onPressed: (){
                   TokenStorage.setOnboardingSeen(true);
                   context.go(RouteNames.getStartedScreen);
-                },title: "Purchase Now",),
+                },title: "Continue",),
               ),
 
             

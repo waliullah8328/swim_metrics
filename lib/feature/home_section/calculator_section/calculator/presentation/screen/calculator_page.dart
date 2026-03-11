@@ -394,7 +394,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Colors.black, BlendMode.srcIn),),
+                              SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
                               SizedBox(width: 6.w,),
                               CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
                             ],

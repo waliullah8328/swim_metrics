@@ -403,4 +403,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get converterBig => 'CONVERTER';
+
+  @override
+  String get paymentScreen => 'Payment Screen';
+
+  @override
+  String get thePlanWeHave => 'The Plan We Have';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get oneTimePay => 'One Time Pay';
+
+  @override
+  String get enterPromoCode => 'Enter promo code';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
+  String get purchaseNow => 'Purchase Now';
+
+  @override
+  String get purchasePlanToContinue => 'Purchase plan to continue';
 }

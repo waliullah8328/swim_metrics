@@ -9,6 +9,7 @@ import 'package:swim_metrics/config/route/routes_name.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
+import 'package:swim_metrics/feature/auth/sign_up_section/payment/presentation/screen/payment_screen.dart';
 
 import 'package:swim_metrics/feature/auth/sign_up_section/verify_email/presentation/riverpod/verify_otp_controller.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
@@ -104,6 +105,7 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                     final String subTitle = AppLocalizations.of(context)!.yourAccountHasBeenCreatedSuccessfully;
                       final result = await ref.read(verifyEmailProvider.notifier).verifyOtp();
                       if(result){
+
                         context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/${widget.isSignUp}");
                       }
 

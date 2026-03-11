@@ -283,12 +283,20 @@ class ConverterScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       alignment: Alignment.center,
-                      child:  Text(
-                        AppLocalizations.of(context)!.convertTime,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.white,
-                        ),
+                      child:  Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(IconPath.calculatorSplitIcon),
+                          SizedBox(width: 6.w,),
+                          Text(
+                            AppLocalizations.of(context)!.convertTime,
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600
+
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

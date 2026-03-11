@@ -150,7 +150,16 @@
 "termsAndPrivacyPolicy": "Terms and Privacy Policy.",
 "createAccount": "Create Account",
 "alreadyHaveAnAccount": "Already have an account?",
-"converterBig": "CONVERTER"
+"converterBig": "CONVERTER",
+
+"paymentScreen": "Payment Screen",
+"thePlanWeHave": "The Plan We Have",
+"premium": "Premium",
+"oneTimePay": "One Time Pay",
+"enterPromoCode": "Enter promo code",
+"apply": "Apply",
+"purchaseNow": "Purchase Now",
+"purchasePlanToContinue": "Purchase plan to continue"
 
 
 

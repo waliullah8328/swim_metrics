@@ -881,6 +881,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'CONVERTER'**
   String get converterBig;
+
+  /// No description provided for @paymentScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Screen'**
+  String get paymentScreen;
+
+  /// No description provided for @thePlanWeHave.
+  ///
+  /// In en, this message translates to:
+  /// **'The Plan We Have'**
+  String get thePlanWeHave;
+
+  /// No description provided for @premium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get premium;
+
+  /// No description provided for @oneTimePay.
+  ///
+  /// In en, this message translates to:
+  /// **'One Time Pay'**
+  String get oneTimePay;
+
+  /// No description provided for @enterPromoCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter promo code'**
+  String get enterPromoCode;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
+  /// No description provided for @purchaseNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Now'**
+  String get purchaseNow;
+
+  /// No description provided for @purchasePlanToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase plan to continue'**
+  String get purchasePlanToContinue;
 }
 
 class _AppLocalizationsDelegate

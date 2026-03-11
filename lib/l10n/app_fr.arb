@@ -138,10 +138,18 @@
 "continue1": "Continuer",
 "backToLogin": "Retour à la connexion",
 "createAnAccount": "Créer un compte",
-  "iAgreeTo": "J'accepte",
-  "termsAndPrivacyPolicy": "Conditions et Politique de confidentialité.",
-  "createAccount": "Créer un compte",
-  "alreadyHaveAnAccount": "Vous avez déjà un compte ?",
-  "converterBig": "CONVERTISSEUR"
+"iAgreeTo": "J'accepte",
+"termsAndPrivacyPolicy": "Conditions et Politique de confidentialité.",
+"createAccount": "Créer un compte",
+"alreadyHaveAnAccount": "Vous avez déjà un compte ?",
+"converterBig": "CONVERTISSEUR",
+"paymentScreen": "Écran de paiement",
+"thePlanWeHave": "Le plan que nous avons",
+"premium": "Premium",
+"oneTimePay": "Paiement unique",
+"enterPromoCode": "Entrez le code promo",
+"apply": "Appliquer",
+"purchaseNow": "Acheter maintenant",
+"purchasePlanToContinue": "Achetez un plan pour continuer"
 
 }
