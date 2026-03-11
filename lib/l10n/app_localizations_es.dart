@@ -408,4 +408,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get converterBig => 'CONVERTIDOR';
+
+  @override
+  String get paymentScreen => 'Pantalla de pago';
+
+  @override
+  String get thePlanWeHave => 'El plan que tenemos';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get oneTimePay => 'Pago único';
+
+  @override
+  String get enterPromoCode => 'Ingresa el código promocional';
+
+  @override
+  String get apply => 'Aplicar';
+
+  @override
+  String get purchaseNow => 'Comprar ahora';
+
+  @override
+  String get purchasePlanToContinue => 'Compra un plan para continuar';
 }

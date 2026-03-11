@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
-
 import '../../../../../core/utils/constants/app_colors.dart';
 
 class CourseWheelSelector extends StatefulWidget {
@@ -16,16 +15,26 @@ class CourseWheelSelector extends StatefulWidget {
   });
 
   @override
-  State<CourseWheelSelector> createState() =>
-      _CourseWheelSelectorState();
+  State<CourseWheelSelector> createState() => _CourseWheelSelectorState();
 }
 
-class _CourseWheelSelectorState
-    extends State<CourseWheelSelector> {
-  final FixedExtentScrollController _controller =
-  FixedExtentScrollController();
+class _CourseWheelSelectorState extends State<CourseWheelSelector> {
+  late FixedExtentScrollController _controller;
 
   int selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// start from first item
+    _controller = FixedExtentScrollController(initialItem: selectedIndex);
+
+    /// return first value
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onChanged(widget.items[selectedIndex]);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +51,7 @@ class _CourseWheelSelectorState
       child: Stack(
         alignment: Alignment.center,
         children: [
-
-          /// Scroll List
+          /// Wheel List
           ListWheelScrollView.useDelegate(
             controller: _controller,
             itemExtent: itemHeight,
@@ -54,6 +62,7 @@ class _CourseWheelSelectorState
               setState(() {
                 selectedIndex = index;
               });
+
               widget.onChanged(widget.items[index]);
             },
             childDelegate: ListWheelChildBuilderDelegate(
@@ -64,37 +73,46 @@ class _CourseWheelSelectorState
 
                 final isSelected = index == selectedIndex;
 
+                /// Dynamic numbering based on selected index
+                int displayNumber = (index - selectedIndex).abs() + 1;
+
                 return Center(
                   child: Padding(
-                    padding: EdgeInsets.only(left: 24.w,right: 24.w),
+                    padding: EdgeInsets.only(left: 24.w, right: 24.w),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("${index + 1}.",
-                            style: TextStyle(
-                              fontSize: 19.sp,
+                        /// Number
+                        Text(
+                          "$displayNumber.",
+                          style: TextStyle(
+                            fontSize: 19.sp,
+                            color:
+                            isSelected ? Colors.amber : Colors.white70,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
 
-                              color: isSelected
-                                  ? Colors.amber
-                                  : Colors.white70,
-                              fontWeight: isSelected
-                                  ? FontWeight.w500
-                                  : FontWeight.normal,
-                            )),
+                        /// Course Name
                         Text(
                           widget.items[index],
                           style: TextStyle(
                             fontSize: 18.sp,
-
-                            color: isSelected
-                                ? Colors.amber
-                                : Colors.white70,
+                            color:
+                            isSelected ? Colors.amber : Colors.white70,
                             fontWeight: isSelected
-                                ? FontWeight.w500
+                                ? FontWeight.w600
                                 : FontWeight.normal,
                           ),
                         ),
-                        SvgPicture.asset(IconPath.courseIcon),
+
+                        /// Icon
+                        SvgPicture.asset(
+                          IconPath.courseIcon,
+                          height: 20.h,
+                        ),
                       ],
                     ),
                   ),
@@ -104,14 +122,20 @@ class _CourseWheelSelectorState
             ),
           ),
 
-          /// Center Highlight Line
+          /// Center highlight
           IgnorePointer(
             child: Container(
               height: itemHeight,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: AppColors.primary,width: 0.5),
-                  bottom: BorderSide(color: AppColors.primary,width: 0.5),
+                  top: BorderSide(
+                    color: AppColors.primary,
+                    width: 0.5,
+                  ),
+                  bottom: BorderSide(
+                    color: AppColors.primary,
+                    width: 0.5,
+                  ),
                 ),
               ),
             ),
