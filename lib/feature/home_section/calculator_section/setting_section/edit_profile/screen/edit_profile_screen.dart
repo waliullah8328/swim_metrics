@@ -13,6 +13,7 @@ import '../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../../core/utils/constants/image_path.dart';
 import '../../../../../../l10n/app_localizations.dart';
 import '../../settings/riverpod/setting_controller.dart';
+import '../data/repository/profile_repository.dart';
 import '../riverpod/edit_profile_controller.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -34,23 +35,31 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         return baseSize + 2;
     }
   }
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
+
+  String name = '';
+  final  TextEditingController nameController = TextEditingController() ;
+ final TextEditingController  _emailController = TextEditingController() ;
+  final  TextEditingController  _phoneController= TextEditingController() ;
+  final  TextEditingController  _currentPasswordController= TextEditingController() ;
+  final  TextEditingController  _newPasswordController= TextEditingController() ;
+  final  TextEditingController  _confirmPasswordController= TextEditingController() ;
 
   @override
   void initState() {
     super.initState();
 
-    // Example: load data or initialize controllers
   }
+
 
   @override
   void dispose() {
     super.dispose();
-    _nameController.dispose();
+   nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _currentPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    _newPasswordController.dispose();
 
     // Example: load data or initialize controllers
   }
@@ -59,6 +68,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final fontOption = ref.watch(settingsProvider).fontSize;
+    final info = ref.watch(profileProvider);
+    final profile = ref.watch(getMeProvider);
+
+    // Update controllers when state changes
+    nameController.text = info.name;
+    _emailController.text = info.email;
+    _phoneController.text = info.phone;
 
 
     return Scaffold(
@@ -112,24 +128,30 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
               child: Column(
                 children: [
-                  GestureDetector(
-                    onTap: (){
-                      ref.read(profileProvider.notifier).pickImage(ref: ref);
-                    },
-                    child: CircleAvatar(
-                      radius: getAdjustedFontSize(45, fontOption),
-                      backgroundImage: ref.watch(profileProvider).profileImage != null
-                          ? FileImage(ref.watch(profileProvider).profileImage!)
-                          : AssetImage(ImagePath.profileDeleteImage)
-                      as ImageProvider,
-                    ),
+                  profile.when(data:(data) {
+                    return  GestureDetector(
+                      onTap: (){
+                        ref.read(profileProvider.notifier).pickImage(ref: ref);
+                      },
+                      child: CircleAvatar(
+                        radius: getAdjustedFontSize(45, fontOption),
+                        backgroundImage: ref.watch(profileProvider).profileImage != null
+                            ? FileImage(ref.watch(profileProvider).profileImage!)
+                            :data.profilePicture != ""?NetworkImage(data.profilePicture.toString()): AssetImage(ImagePath.profileDeleteImage)
+                        as ImageProvider,
+                      ),
+                    );
+                  },
+                      error: (error,stack)=> Text("No data found"),
+                      loading: ()=>CircularProgressIndicator(),
                   ),
+
 
                   SizedBox(height: 20.h),
                   CustomEditProfileTextFieldWidget(
                     fontOption: fontOption,
 
-                    controller:_nameController ,
+                    controller:nameController ,
                     hintText: AppLocalizations.of(context)!.enterYourName,
                     titleName: AppLocalizations.of(context)!.name,
                     onChanged: (value) {
@@ -148,7 +170,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   CustomEditProfileTextFieldWidget(
                     fontOption: fontOption,
 
-                    controller:_emailController ,
+                    controller:_phoneController ,
                     hintText: AppLocalizations.of(context)!.enterYourPhoneNumber,
                     titleName: AppLocalizations.of(context)!.phone,
                     onChanged: (value) {
@@ -160,7 +182,23 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
 
                   SizedBox(height: 20.h),
-                  CustomPrimaryButton(title: AppLocalizations.of(context)!.saveChanges,onPressed: (){},)
+
+                  Consumer(builder: (context,ref,child){
+                    final isLoading = ref.watch(profileProvider.select((s)=>s.isLoading));
+
+                    return CustomPrimaryButton(title: AppLocalizations.of(context)!.saveChanges,
+                      isLoading: isLoading,
+                      onPressed: () async {
+                         ref.read(profileProvider.notifier).saveProfile(context: context);
+                      
+
+
+
+
+                      },);
+
+                  }),
+                  
 
 
                 ],
@@ -191,36 +229,52 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   CustomEditProfileTextFieldWidget(
                     fontOption: fontOption,
 
-                    controller:_phoneController ,
+                    controller:_currentPasswordController ,
                     hintText: AppLocalizations.of(context)!.enterYourCurrentPassword,
                     titleName: AppLocalizations.of(context)!.currentPassword,
                     onChanged: (value) {
-                      ref.read(profileProvider.notifier).updateEmail(value);
+                      ref.read(profileProvider.notifier).updateCurrentPassword(value);
                     },),
 
                   CustomEditProfileTextFieldWidget(
                     fontOption: fontOption,
 
-                    controller:_phoneController ,
+                    controller:_newPasswordController ,
                     hintText: AppLocalizations.of(context)!.enterYourNewPassword,
                     titleName: AppLocalizations.of(context)!.newPassword,
                     onChanged: (value) {
-                      ref.read(profileProvider.notifier).updateEmail(value);
+                      ref.read(profileProvider.notifier).updateNewPassword(value);
                     },),
                   CustomEditProfileTextFieldWidget(
                     fontOption: fontOption,
 
-                    controller:_phoneController ,
+                    controller:_confirmPasswordController ,
                     hintText: AppLocalizations.of(context)!.enterYourConfirmPassword,
                     titleName: AppLocalizations.of(context)!.confirmPassword,
                     onChanged: (value) {
-                      ref.read(profileProvider.notifier).updateEmail(value);
+                      ref.read(profileProvider.notifier).updateConfirmPassword(value);
                     },),
 
 
                    SizedBox(height: 20.h),
 
-                  CustomPrimaryButton(title: AppLocalizations.of(context)!.savePassword,onPressed: (){},)
+                  Consumer(builder: (context,ref,child){
+                    final isLoading = ref.watch(profileProvider.select((s)=>s.isPasswordLoading));
+
+                    return CustomPrimaryButton(title: AppLocalizations.of(context)!.savePassword,
+                      isLoading: isLoading,
+                      onPressed: () async {
+                        ref.read(profileProvider.notifier).changePassword(context: context);
+
+
+
+
+
+                      },);
+
+                  }),
+
+
                 ],
               ),
             ),

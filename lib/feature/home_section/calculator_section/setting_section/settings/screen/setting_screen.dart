@@ -9,6 +9,7 @@ import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/image_path.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/screen/widget/course_drop_down_widget.dart';
+import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/screen/widget/profile_shimmer_widget.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_switch_widget.dart';
@@ -128,7 +129,7 @@ class SettingsScreen extends ConsumerWidget {
                 );
               },
               error: (error,stack)=> CustomText(text: "No data found"),
-              loading: () => CircularProgressIndicator(),
+              loading: () => ProfileCardShimmer(isDark: isDark,),
           ),
 
 

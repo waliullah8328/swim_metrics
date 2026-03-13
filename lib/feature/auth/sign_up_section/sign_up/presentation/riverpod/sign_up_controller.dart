@@ -100,45 +100,7 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
 
 
 
-  /// Login logic
-  // Future<bool> signUp({required context}) async {
-  //   try {
-  //     state = state.copyWith(
-  //       isLoading: true,
-  //       errorMessage: null,
-  //       successMessage: null,
-  //     );
-  //
-  //     await Future.delayed(const Duration(seconds: 2));
-  //
-  //     if (state.email.isEmpty || state.password.isEmpty) {
-  //       throw Exception("Email and password required");
-  //     }
-  //
-  //     /// Save credentials if Remember Me is checked
-  //
-  //
-  //     state = state.copyWith(
-  //       isLoading: false,
-  //       successMessage: "Sign Up Successful",
-  //     );
-  //
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Sign Up Successful")),
-  //     );
-  //
-  //     return true;
-  //   } catch (e) {
-  //     state = state.copyWith(
-  //       isLoading: false,
-  //       errorMessage: e.toString(),
-  //     );
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text(e.toString())),
-  //     );
-  //     return false;
-  //   }
-  // }
+
 }
 
 final signUpProvider =
