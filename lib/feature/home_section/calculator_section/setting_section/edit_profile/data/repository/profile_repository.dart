@@ -98,101 +98,193 @@ class ProfileRepository {
 
 
 
-  // Future<Map<String, dynamic>> deleteHistory({
-  //   required String id,
-  // }
-  //     ) async {
-  //   try {
-  //     final Map<String, dynamic> payload = {
-  //
-  //     };
-  //
-  //
-  //     final endpoint = 'history/daily-progress-delete/$id/';
-  //
-  //     // Log API request
-  //     debugPrint('🚀 API REQUEST - USER DELETE HISTORY');
-  //     debugPrint('📍 URL: $_baseUrl$endpoint');
-  //     debugPrint('📦 Payload: ${jsonEncode(payload)}');
-  //     debugPrint('🔑 Headers: ${_dio.options.headers}');
-  //     debugPrint('⏰ Timestamp: ${DateTime.now()}');
-  //
-  //
-  //     final response = await _dio.delete(
-  //       endpoint,
-  //       data: jsonEncode(payload),
-  //       options: await _authorizedHeader(),
-  //     );
-  //
-  //     // Log API response
-  //     debugPrint('✅ API RESPONSE - USER DELETE HISTORY');
-  //     debugPrint('📊 Status Code: ${response.statusCode}');
-  //     debugPrint('📦 Response Data: ${response.data}');
-  //     debugPrint('⏰ Response Time: ${DateTime.now()}');
-  //
-  //     final data = response.data is String ? jsonDecode(response.data) : response.data;
-  //
-  //     // Handle success response (201 Created or 200 OK)
-  //     if (response.statusCode == 201 || response.statusCode == 200) {
-  //       // Check if the response contains tokens (new API format)
-  //       return {
-  //         'success': true,
-  //         'message': data['message'] ?? 'Delete account  successfully',
-  //         'data': null,
-  //       };
-  //     }
-  //
-  //     // Handle unexpected success codes
-  //     return {
-  //       'success': false,
-  //       'error': 'Unexpected response from server',
-  //     };
-  //
-  //   } on DioException catch (e) {
-  //     // Handle specific error cases
-  //     debugPrint(e.message);
-  //     debugPrint(e.response.toString());
-  //
-  //     if (e.response != null) {
-  //       final data = e.response!.data is String ? jsonDecode(e.response!.data) : e.response!.data;
-  //
-  //       // Handle 400 Bad Request - Email already registered
-  //       if (e.response!.statusCode == 400) {
-  //         return {
-  //           'success': false,
-  //           'error': data['error'] ?? 'Old password is incorrect',
-  //         };
-  //       }
-  //
-  //       // Handle other HTTP errors
-  //       return {
-  //         'success': false,
-  //         'error': data['error'] ?? data['message'] ?? 'Deactivation failed',
-  //       };
-  //     }
-  //
-  //     // Handle network/connection errors
-  //     return {
-  //       'success': false,
-  //       'error': _handleError(e),
-  //     };
-  //   } catch (e) {
-  //     // Handle any other unexpected errors
-  //     return {
-  //       'success': false,
-  //       'error': 'An unexpected error occurred during deactivation of account',
-  //     };
-  //   }
-  // }
+
+  Future<Map<String, dynamic>> updateProfile({
+    required String email,
+    required String name,
+    required String phoneNumber,
+    required String profilePicturePath,
+  }) async {
+    try {
+      final endpoint = dotenv.env['AUTH_ME_ENDPOINT'] ?? '/user/profile/';
+      final token = await TokenStorage.getAccessToken();
+
+      if (token == null || token.isEmpty) {
+        return {
+          'success': false,
+          'error': 'Authentication token missing',
+        };
+      }
+
+      /// ---------- DATE FORMAT ----------
+
+
+      /// ---------- FORM DATA ----------
+      final formData = FormData.fromMap({
+        "name": name,
+        "email": email,
+        "phone": phoneNumber,
+
+      });
+
+      /// ---------- IMAGE (ONLY LOCAL FILE) ----------
+      if (profilePicturePath.isNotEmpty &&
+          !profilePicturePath.startsWith('http')) {
+        formData.files.add(
+          MapEntry(
+            "profile_picture",
+            await MultipartFile.fromFile(
+              profilePicturePath,
+              filename: profilePicturePath.split('/').last,
+            ),
+          ),
+        );
+      }
+
+      /// ---------- REQUEST ----------
+      final response = await _dio.put(
+        endpoint,
+        data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            // ❌ Do NOT set Content-Type manually
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'message':
+          response.data['message'] ?? 'Profile updated successfully',
+        };
+      }
+
+      debugPrint('✅ API RESPONSE - GET TERMS POLICY');
+      debugPrint('📊 Status Code: ${response.statusCode}');
+      debugPrint('📦 Response Data: ${response.data}');
+      debugPrint('⏰ Response Time: ${DateTime.now()}');
+
+      return {
+        'success': false,
+        'error': 'Unexpected server response',
+      };
+    }
+
+    /// ---------- DIO ERROR ----------
+    on DioException catch (e) {
+      if (e.response != null) {
+        final data =
+        e.response!.data is Map ? e.response!.data : {};
+
+        return {
+          'success': false,
+          'error':
+          data['error'] ?? data['message'] ?? 'Profile update failed',
+        };
+      }
+
+      return {
+        'success': false,
+        'error': 'Network error occurred',
+      };
+    }
+
+    /// ---------- UNKNOWN ERROR ----------
+    catch (e) {
+      return {
+        'success': false,
+        'error': 'Unexpected error occurred',
+      };
+    }
+  }
+
+
+  Future<Map<String, dynamic>> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final payload = {
+        "old_password": oldPassword,
+        "new_password": newPassword
+      };
+
+      final endpoint = dotenv.env['USER_CHANGE_PASSWORD_ENDPOINT']
+          ?? '/user/profile/change-password/';
+      final token = await TokenStorage.getAccessToken();
+
+      // 🚀 Request Logs
+      debugPrint('🚀 API REQUEST - USER CHANGE PASSWORD');
+      debugPrint('📍 URL: $_baseUrl$endpoint');
+      debugPrint('📦 Payload: ${jsonEncode(payload)}');
+      debugPrint('🔑 Headers: ${_dio.options.headers}');
+      debugPrint('⏰ Timestamp: ${DateTime.now()}');
+
+      final response = await _dio.patch(
+        endpoint,
+        data: payload, // ✅ Dio handles JSON
+
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            // ❌ Do NOT set Content-Type manually
+          },
+        ),
+      );
+
+      // ✅ Response Logs
+      debugPrint('✅ API RESPONSE - USER CHANGE PASSWORD');
+      debugPrint('📊 Status Code: ${response.statusCode}');
+      debugPrint('📦 Response Data: ${response.data}');
+      debugPrint('⏰ Response Time: ${DateTime.now()}');
+
+      final data = response.data is String
+          ? jsonDecode(response.data)
+          : response.data;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Password change successfully',
+          'forgetPasswordToken': data["forgot_password_token"],
+        };
+      }
+
+      return {
+        'success': false,
+        'error': 'Unexpected server response',
+      };
+    }
+
+    // 🔴 Dio Error Handling
+    on DioException catch (e) {
+      debugPrint('❌ DIO ERROR: ${e.message}');
+      debugPrint('❌ RESPONSE: ${e.response?.data}');
+
+
+
+      return {
+        'success': false,
+        'error': _handleError(e),
+      };
+    }
+
+    // 🔴 Unknown Error
+    catch (e) {
+      return {
+        'success': false,
+        'error': 'Unexpected error occurred',
+      };
+    }
+  }
 
 
 
 
 
 
-
-
-  // ---------------- ERROR HANDLER ---------------- //
   String _handleError(DioException e) {
     debugPrint("❌ AUTH API ERROR DETAILS");
     debugPrint("🔍 Error Type: ${e.type}");

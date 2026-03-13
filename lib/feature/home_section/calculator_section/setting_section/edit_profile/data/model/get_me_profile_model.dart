@@ -13,6 +13,7 @@ class GetMeModel {
   dynamic phone;
   String? profilePicture;
 
+
   GetMeModel({
     this.id,
     this.name,
