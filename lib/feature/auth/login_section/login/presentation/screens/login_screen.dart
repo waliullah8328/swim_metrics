@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swim_metrics/config/route/routes_name.dart';
+import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
@@ -50,15 +51,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     ref.listen<LoginState>(loginProvider, (previous, next) {
       if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.errorMessage!)),
-        );
+
+        AppSnackBar.showError(context, next.errorMessage.toString());
       }
 
       if (next.successMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.successMessage!)),
-        );
+
+        AppSnackBar.showSuccess(context, next.successMessage.toString());
       }
 
       /// Update controllers whenever email/password state changes
@@ -151,7 +150,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   return CustomPrimaryButton(title: AppLocalizations.of(context)!.signIn,
                     isLoading: isLoading,
                     onPressed: () async {
-                     final result = await ref.read(loginProvider.notifier).login();
+                     final result = await ref.read(loginProvider.notifier).login(context: context);
                      if(result){
                        await TokenStorage.setLogin(true);
                        context.go(RouteNames.homeNavBarScreen);

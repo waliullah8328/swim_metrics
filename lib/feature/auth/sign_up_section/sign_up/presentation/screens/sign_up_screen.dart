@@ -86,7 +86,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                     validator: AppValidator.validateName,
 
                     onChanged: (value) {
-                      ref.read(signUpProvider.notifier).setEmail(value);
+                      ref.read(signUpProvider.notifier).setName(value);
                     },
                     prefixIcon: Padding(
                       padding: EdgeInsets.all(13.w),
@@ -246,7 +246,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                         //   }
                         //
                         // }
-                        final result = await ref.read(signUpProvider.notifier).signUp(context: context);
+                        final result = await ref.read(signUpProvider.notifier).createAccount(context: context);
                         if(result){
                           context.go("${RouteNames.verifyEmailScreen}/$email/true");
                         }

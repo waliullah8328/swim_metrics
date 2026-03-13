@@ -2,8 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:swim_metrics/config/route/routes_name.dart';
+import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar.dart';
 
 import 'package:swim_metrics/feature/auth/sign_up_section/sign_up/presentation/riverpod/sign_up_state.dart';
+
+import '../../../../data/repository/authentication_repository.dart';
 
 
 class SignUpNotifier extends StateNotifier<SignUpState> {
@@ -44,47 +47,98 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
 
   }
 
+  Future<bool> createAccount({required BuildContext context}) async {
+
+    debugPrint(state.email);
+    debugPrint(state.password);
+
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    try {
+      final response = await AuthenticationRepository().signup(
+          email:state.email,
+          password: state.password,
+        confirmPassword: state.confirmPassword,
+        name: state.name
+      );
+
+      debugPrint("Signup response: $response");
+
+
+      if (response['success'] == true) {
+        state = state.copyWith(isLoading: false,errorMessage: null,successMessage: response['message']);
+
+        AppSnackBar.showSuccess(context,  response['message']);
+
+
+
+
+
+        return true;
+      } else {
+        // Handle specific error messages from the API
+        final error = response['error'] ?? response['message'];
+        AppSnackBar.showSuccess(context,  error);
+
+
+        state = state.copyWith(isLoading: false,errorMessage: error);
+
+        // Notify UI of error
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Signup exception: $e");
+      AppSnackBar.showSuccess(context,  e.toString());
+
+      state = state.copyWith(isLoading: false,errorMessage: e.toString());
+      // Notify UI of exception
+      return false;
+    }
+
+
+  }
+
 
 
   /// Login logic
-  Future<bool> signUp({required context}) async {
-    try {
-      state = state.copyWith(
-        isLoading: true,
-        errorMessage: null,
-        successMessage: null,
-      );
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (state.email.isEmpty || state.password.isEmpty) {
-        throw Exception("Email and password required");
-      }
-
-      /// Save credentials if Remember Me is checked
-
-
-      state = state.copyWith(
-        isLoading: false,
-        successMessage: "Sign Up Successful",
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Sign Up Successful")),
-      );
-
-      return true;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-      return false;
-    }
-  }
+  // Future<bool> signUp({required context}) async {
+  //   try {
+  //     state = state.copyWith(
+  //       isLoading: true,
+  //       errorMessage: null,
+  //       successMessage: null,
+  //     );
+  //
+  //     await Future.delayed(const Duration(seconds: 2));
+  //
+  //     if (state.email.isEmpty || state.password.isEmpty) {
+  //       throw Exception("Email and password required");
+  //     }
+  //
+  //     /// Save credentials if Remember Me is checked
+  //
+  //
+  //     state = state.copyWith(
+  //       isLoading: false,
+  //       successMessage: "Sign Up Successful",
+  //     );
+  //
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Sign Up Successful")),
+  //     );
+  //
+  //     return true;
+  //   } catch (e) {
+  //     state = state.copyWith(
+  //       isLoading: false,
+  //       errorMessage: e.toString(),
+  //     );
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(e.toString())),
+  //     );
+  //     return false;
+  //   }
+  // }
 }
 
 final signUpProvider =
