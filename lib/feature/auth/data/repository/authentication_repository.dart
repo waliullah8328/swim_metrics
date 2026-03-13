@@ -435,34 +435,24 @@ class AuthenticationRepository{
       if (response.statusCode == 201 || response.statusCode == 200) {
         // Check if the response contains tokens (new API format)
 
-        if (data['data'] != null ) {
-          //final tokens = data['data']['access'];
-          final tokens = data['access'];
-          //final refreshToken = data['data']['refresh'];
-          final refreshToken = data['refresh'];
-          //final user = data['data']["user"];
+        final tokens = data['access'];
+        debugPrint("tokens $tokens");
+        //final refreshToken = data['data']['refresh'];
+        final refreshToken = data['refresh'];
+        debugPrint("refreshToken: $refreshToken");
+        //final user = data['data']["user"];
 
 
-          // Store user data in SharedPreferences
+        // Store user data in SharedPreferences
 
 
-          return {
-            'success': true,
-            'message': data['message'] ?? 'Login successfully',
-            'data': {
-              //'user': user,
-              'tokens': tokens,
-              'refreshToken':refreshToken
-            },
-          };
-        } else {
-          // Handle old API format (without tokens)
-          return {
-            'success': true,
-            'message': data['message'] ?? 'Login  successfully',
-            'data': null,
-          };
-        }
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Login successfully',
+          'tokens': tokens,
+          'refreshToken':refreshToken
+
+        };
       }
 
       // Handle unexpected success codes
