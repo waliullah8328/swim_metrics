@@ -100,12 +100,13 @@ class Routes {
         } ,
       ),
       GoRoute(
-        path: "${RouteNames.createNewPasswordScreen}/:email/:code/:isSignUp",
+        path: "${RouteNames.createNewPasswordScreen}/:email/:code/:isSignUp/:forgetToken",
         builder: (context, state) {
           String email = state.pathParameters['email']??'';
           String code = state.pathParameters['code']??'';
           String isSignUp = state.pathParameters['isSignUp']??'';
-          return CreateNewPasswordScreen (email: email,code: code,isSignUp:isSignUp);
+          String forgetToken = state.pathParameters['forgetToken']??'';
+          return CreateNewPasswordScreen (email: email,code: code,isSignUp:isSignUp,forgetToken);
         } ,
       ),
 

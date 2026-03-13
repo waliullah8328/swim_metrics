@@ -103,7 +103,7 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
 
                     final String title = AppLocalizations.of(context)!.verifiedEmail;
                     final String subTitle = AppLocalizations.of(context)!.yourAccountHasBeenCreatedSuccessfully;
-                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp();
+                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp(context: context,email: widget.email);
                       if(result){
 
                         context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/${widget.isSignUp}");
@@ -122,10 +122,8 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                     isLoading: isLoading,
                     onPressed: () async {
 
-                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp();
-                      if(result){
-                       context.go("${RouteNames.createNewPasswordScreen}/${widget.email}/${ref.read(verifyEmailProvider.select((s)=>s.code))}/${widget.isSignUp}");
-                      }
+                       ref.read(verifyEmailProvider.notifier). verifyForgetOtp(context: context,email: widget.email,code: ref.read(verifyEmailProvider.select((s)=>s.code)),isSignUp: widget.isSignUp!);
+
 
 
 

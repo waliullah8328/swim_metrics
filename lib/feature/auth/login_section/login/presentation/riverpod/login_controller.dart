@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar.dart';
+import 'package:swim_metrics/core/services/token_storage.dart';
+import '../../../../data/repository/authentication_repository.dart';
 import 'login_state.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
@@ -70,37 +74,117 @@ class LoginNotifier extends StateNotifier<LoginState> {
     await prefs.setBool(rememberKey, true);
   }
 
-  /// Login logic
-  Future<bool> login() async {
+  Future<bool> login({required BuildContext context}) async {
+
+    debugPrint(state.email);
+    debugPrint(state.password);
+
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
     try {
-      state = state.copyWith(
-        isLoading: true,
-        errorMessage: null,
-        successMessage: null,
+      final response = await AuthenticationRepository().login(
+          email:state.email,
+          password: state.password
       );
 
-      await Future.delayed(const Duration(seconds: 2));
+      debugPrint("Login response: $response");
 
-      if (state.email.isEmpty || state.password.isEmpty) {
-        throw Exception("Email and password required");
+
+      if (response['success'] == true) {
+        state = state.copyWith(isLoading: false,errorMessage: null);
+        final prefs = await SharedPreferences.getInstance();
+
+        state = state.copyWith(isLoading: false,errorMessage: null,successMessage: response['message']);
+
+
+
+        // Check if tokens were received and stored
+        if (response['data'] != null && response['data']['tokens'] != null) {
+          final tokens = response['data']['tokens'];
+          debugPrint("Get Access Token : $tokens");
+          final refreshToken = response['data']['refreshToken'];
+          debugPrint("Get Refresh Token : $refreshToken");
+
+          await saveCredentialsIfRemembered();
+
+
+
+         TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
+
+
+
+
+
+
+        } else {
+          debugPrint("User login successfully (legacy format)");
+        }
+
+        // Register FCM token after successful sign in
+        try {
+          // await FCMService().registerFCMToken();
+          debugPrint("FCM token registered successfully after sign in");
+        } catch (fcmError) {
+          debugPrint("FCM token registration failed after sign in: $fcmError");
+          // Don't fail the sign in process if FCM registration fails
+        }
+
+
+        return true;
+      } else {
+        // Handle specific error messages from the API
+        final error = response['error'] ?? response['message'];
+
+
+        state = state.copyWith(isLoading: false,errorMessage: error);
+
+
+        // Notify UI of error
+        return false;
       }
-
-      /// Save credentials if Remember Me is checked
-      await saveCredentialsIfRemembered();
-
-      state = state.copyWith(
-        isLoading: false,
-        successMessage: "Login Successful",
-      );
-      return true;
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
+      debugPrint("Signup exception: $e");
+
+      state = state.copyWith(isLoading: false,errorMessage: e.toString());
+
+      // Notify UI of exception
       return false;
     }
+
+
   }
+
+  /// Login logic
+  // Future<bool> login() async {
+  //   try {
+  //     state = state.copyWith(
+  //       isLoading: true,
+  //       errorMessage: null,
+  //       successMessage: null,
+  //     );
+  //
+  //     await Future.delayed(const Duration(seconds: 2));
+  //
+  //     if (state.email.isEmpty || state.password.isEmpty) {
+  //       throw Exception("Email and password required");
+  //     }
+  //
+  //     /// Save credentials if Remember Me is checked
+  //     await saveCredentialsIfRemembered();
+  //
+  //     state = state.copyWith(
+  //       isLoading: false,
+  //       successMessage: "Login Successful",
+  //     );
+  //     return true;
+  //   } catch (e) {
+  //     state = state.copyWith(
+  //       isLoading: false,
+  //       errorMessage: e.toString(),
+  //     );
+  //     return false;
+  //   }
+  // }
 }
 
 final loginProvider =

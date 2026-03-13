@@ -23,9 +23,9 @@ import '../../../../../../l10n/app_localizations.dart';
 
 
 class CreateNewPasswordScreen extends ConsumerStatefulWidget {
-  const CreateNewPasswordScreen({super.key, required this.email, required this.code, required this.isSignUp});
+  const CreateNewPasswordScreen(this.forgetToken, {super.key, required this.email, required this.code, required this.isSignUp});
 
-  final String email,code,isSignUp;
+  final String email,code,isSignUp,forgetToken;
 
   @override
   ConsumerState<CreateNewPasswordScreen> createState() => _LoginScreenState();
@@ -54,6 +54,7 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
     debugPrint("build");
     debugPrint(widget.email);
     debugPrint(widget.code);
+    debugPrint(widget.forgetToken);
 
 
 
@@ -168,7 +169,7 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                       onPressed: () async {
                         final String title = AppLocalizations.of(context)!.passwordChanged;
                         final String subTitle = AppLocalizations.of(context)!.yourPasswordHasBeenChangedSuccessfully;
-                        final result = await ref.read(createNewPasswordProvider.notifier).createNewPassword(context: context);
+                        final result = await ref.read(createNewPasswordProvider.notifier).resetPassword(context: context,email: widget.email,forgotPasswordToken: widget.forgetToken);
                         if(result){
                           context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/false");
                         }
