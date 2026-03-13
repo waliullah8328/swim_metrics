@@ -112,9 +112,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: getAdjustedFontSize(45, fontOption),
-                    backgroundImage: AssetImage(ImagePath.profileDeleteImage),
+                  GestureDetector(
+                    onTap: (){
+                      ref.read(profileProvider.notifier).pickImage(ref: ref);
+                    },
+                    child: CircleAvatar(
+                      radius: getAdjustedFontSize(45, fontOption),
+                      backgroundImage: ref.watch(profileProvider).profileImage != null
+                          ? FileImage(ref.watch(profileProvider).profileImage!)
+                          : AssetImage(ImagePath.profileDeleteImage)
+                      as ImageProvider,
+                    ),
                   ),
 
                   SizedBox(height: 20.h),
