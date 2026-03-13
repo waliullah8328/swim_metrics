@@ -15,6 +15,7 @@ import '../../../../../../core/common/widgets/new_custon_widgets/custom_switch_w
 import '../../../../../../core/services/token_storage.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../../l10n/app_localizations.dart';
+import '../../edit_profile/riverpod/edit_profile_controller.dart';
 import '../riverpod/setting_controller.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -38,6 +39,8 @@ class SettingsScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final settings = ref.watch(settingsProvider);
     final currentLanguageCode = settings.language.code;
+
+    final profile = ref.watch(getMeProvider);
 
 
 
@@ -74,52 +77,60 @@ class SettingsScreen extends ConsumerWidget {
         children: [
 
           /// PROFILE
-          Card(
-            margin: EdgeInsets.zero,
-            color: isDark?Color(0xff0F3253):Color(0xffEAEDF1),
+          profile.when(
+              data: (data) {
+
+                return Card(
+                  margin: EdgeInsets.zero,
+                  color: isDark?Color(0xff0F3253):Color(0xffEAEDF1),
 
 
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Row(
-                children: [
-                 CircleAvatar(radius: 35,backgroundImage: AssetImage(ImagePath.profileDeleteImage),),
-                 SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Row(
                       children: [
-                        CustomText(
-                          text:
-                          "Mr. Sahil Khan",
-                          fontWeight: FontWeight.w600,
-                          fontSize: getAdjustedFontSize(19, fontOption).sp,
+                        CircleAvatar(radius: 35,backgroundImage:  data.profilePicture != ""?NetworkImage(data.profilePicture!):AssetImage(ImagePath.profileDeleteImage),),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                text:
+                                data.name.toString(),
+                                fontWeight: FontWeight.w600,
+                                fontSize: getAdjustedFontSize(19, fontOption).sp,
+                              ),
+                              CustomText(
+                                text:
+                                "Premium user",
+                                fontWeight: FontWeight.w400,
+                                fontSize: getAdjustedFontSize(15, fontOption).sp,
+                                color: AppColors.primary,
+                              ),
+                            ],
+                          ),
                         ),
-                        CustomText(
-                          text:
-                          "Premium user",
-                          fontWeight: FontWeight.w400,
-                          fontSize: getAdjustedFontSize(15, fontOption).sp,
-                          color: AppColors.primary,
+                        GestureDetector(
+                          onTap: (){
+                            context.push(RouteNames.editProfileScreen);
+                          },
+                          child: Card(
+                            color: isDark?Color(0xff00253F):AppColors.textGrey,
+                            child: Padding(
+                              padding: const EdgeInsets.all(14.0),
+                              child: Center(child: CustomText(text: AppLocalizations.of(context)!.editProfile,fontSize: getAdjustedFontSize(currentLanguageCode.toString()!= "en"?10:12, fontOption).sp,fontWeight: FontWeight.w400,color:isDark? AppColors.primary:null,)),
+                            ),),
                         ),
                       ],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: (){
-                      context.push(RouteNames.editProfileScreen);
-                    },
-                    child: Card(
-                      color: isDark?Color(0xff00253F):AppColors.textGrey,
-                      child: Padding(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Center(child: CustomText(text: AppLocalizations.of(context)!.editProfile,fontSize: getAdjustedFontSize(currentLanguageCode.toString()!= "en"?10:12, fontOption).sp,fontWeight: FontWeight.w400,color:isDark? AppColors.primary:null,)),
-                    ),),
-                  ),
-                ],
-              ),
-            ),
+                );
+              },
+              error: (error,stack)=> CustomText(text: "No data found"),
+              loading: () => CircularProgressIndicator(),
           ),
+
 
           Padding(
             padding: const EdgeInsets.all(16),

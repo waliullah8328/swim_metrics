@@ -95,30 +95,21 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final prefs = await SharedPreferences.getInstance();
 
         state = state.copyWith(isLoading: false,errorMessage: null,successMessage: response['message']);
+        await saveCredentialsIfRemembered();
+        final tokens = response['tokens'];
+        debugPrint("Get Access Token : $tokens");
+        final refreshToken = response['refreshToken'];
+        debugPrint("Get Refresh Token : $refreshToken");
 
 
 
-        // Check if tokens were received and stored
-        if (response['data'] != null && response['data']['tokens'] != null) {
-          final tokens = response['data']['tokens'];
-          debugPrint("Get Access Token : $tokens");
-          final refreshToken = response['data']['refreshToken'];
-          debugPrint("Get Refresh Token : $refreshToken");
+        await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
 
-          await saveCredentialsIfRemembered();
-
-
-
-         TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
+        debugPrint(await TokenStorage.getAccessToken());
 
 
 
 
-
-
-        } else {
-          debugPrint("User login successfully (legacy format)");
-        }
 
         // Register FCM token after successful sign in
         try {

@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../../../../core/services/auth_error_handler.dart';
 import '../../../../../../../core/services/token_storage.dart';
+import '../model/get_me_profile_model.dart';
 
 
 class ProfileRepository {
@@ -37,6 +38,7 @@ class ProfileRepository {
 
   Future<Options> _authorizedHeader({bool isMultipart = false}) async {
     final token = await TokenStorage.getAccessToken();
+    debugPrint("token : $token");
     return Options(
       headers: {
         'Authorization': 'Bearer $token',
@@ -51,137 +53,137 @@ class ProfileRepository {
   }
 
 
-  // Future<GetHistoryStepsModel > getHistorySteps() async {
-  //   try {
-  //     final endpoint = dotenv.env['HISTORY_DAILY_PROGRESS_LIST_ENDPOINT'] ?? 'history/daily-progress-list/';
-  //
-  //     debugPrint('🚀 API REQUEST - HISTORY STEPS');
-  //     debugPrint('📍 URL: $_baseUrl$endpoint');
-  //     debugPrint('🔑 Headers: ${(await _authorizedHeader()).headers}');
-  //     debugPrint('⏰ Timestamp: ${DateTime.now()}');
-  //
-  //     final response = await _dio.get(
-  //       endpoint,
-  //       options: await _authorizedHeader(),
-  //     );
-  //
-  //     debugPrint('✅ API RESPONSE - GET HISTORY STEPS');
-  //     debugPrint('📊 Status Code: ${response.statusCode}');
-  //     debugPrint('📦 Response Data: ${response.data}');
-  //     debugPrint('⏰ Response Time: ${DateTime.now()}');
-  //
-  //     if (response.statusCode == 200 && response.data != null) {
-  //       final data = response.data is String
-  //           ? jsonDecode(response.data)
-  //           : response.data;
-  //
-  //       if (data is Map<String, dynamic>) {
-  //         return GetHistoryStepsModel .fromJson(data);
-  //       } else {
-  //         throw Exception('Invalid response format');
-  //       }
-  //     } else {
-  //       throw Exception('Failed to get history steps list');
-  //     }
-  //   } on DioException catch (e) {
-  //     debugPrint("Get history steps list DioException: $e");
-  //     throw Exception(_handleError(e));
-  //   } catch (e) {
-  //     debugPrint("Get history Exception: $e");
-  //     throw Exception('Something went wrong. Please try again.');
-  //   }
-  // }
-
-
-
-  // Delete History
-
-  Future<Map<String, dynamic>> deleteHistory({
-    required String id,
-  }
-      ) async {
+  Future<GetMeModel > getMeProfile() async {
     try {
-      final Map<String, dynamic> payload = {
+      final endpoint = dotenv.env['PROFILE_GET_ME_ENDPOINT'] ?? '/user/profile/';
 
-      };
-
-
-      final endpoint = 'history/daily-progress-delete/$id/';
-
-      // Log API request
-      debugPrint('🚀 API REQUEST - USER DELETE HISTORY');
+      debugPrint('🚀 API REQUEST - PROFILE GET');
       debugPrint('📍 URL: $_baseUrl$endpoint');
-      debugPrint('📦 Payload: ${jsonEncode(payload)}');
-      debugPrint('🔑 Headers: ${_dio.options.headers}');
+      debugPrint('🔑 Headers: ${(await _authorizedHeader()).headers}');
       debugPrint('⏰ Timestamp: ${DateTime.now()}');
 
-
-      final response = await _dio.delete(
+      final response = await _dio.get(
         endpoint,
-        data: jsonEncode(payload),
         options: await _authorizedHeader(),
       );
 
-      // Log API response
-      debugPrint('✅ API RESPONSE - USER DELETE HISTORY');
+      debugPrint('✅ API RESPONSE - PROFILE GET');
       debugPrint('📊 Status Code: ${response.statusCode}');
       debugPrint('📦 Response Data: ${response.data}');
       debugPrint('⏰ Response Time: ${DateTime.now()}');
 
-      final data = response.data is String ? jsonDecode(response.data) : response.data;
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data is String
+            ? jsonDecode(response.data)
+            : response.data;
 
-      // Handle success response (201 Created or 200 OK)
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        // Check if the response contains tokens (new API format)
-        return {
-          'success': true,
-          'message': data['message'] ?? 'Delete account  successfully',
-          'data': null,
-        };
-      }
-
-      // Handle unexpected success codes
-      return {
-        'success': false,
-        'error': 'Unexpected response from server',
-      };
-
-    } on DioException catch (e) {
-      // Handle specific error cases
-      debugPrint(e.message);
-      debugPrint(e.response.toString());
-
-      if (e.response != null) {
-        final data = e.response!.data is String ? jsonDecode(e.response!.data) : e.response!.data;
-
-        // Handle 400 Bad Request - Email already registered
-        if (e.response!.statusCode == 400) {
-          return {
-            'success': false,
-            'error': data['error'] ?? 'Old password is incorrect',
-          };
+        if (data is Map<String, dynamic>) {
+          return GetMeModel  .fromJson(data);
+        } else {
+          throw Exception('Invalid response format');
         }
-
-        // Handle other HTTP errors
-        return {
-          'success': false,
-          'error': data['error'] ?? data['message'] ?? 'Deactivation failed',
-        };
+      } else {
+        throw Exception('Failed to get profile list');
       }
-
-      // Handle network/connection errors
-      return {
-        'success': false,
-        'error': _handleError(e),
-      };
+    } on DioException catch (e) {
+      debugPrint("Get profile DioException: $e");
+      throw Exception(_handleError(e));
     } catch (e) {
-      // Handle any other unexpected errors
-      return {
-        'success': false,
-        'error': 'An unexpected error occurred during deactivation of account',
-      };
+      debugPrint("Get profile Exception: $e");
+      throw Exception('Something went wrong. Please try again.');
     }
   }
+
+
+
+
+
+  // Future<Map<String, dynamic>> deleteHistory({
+  //   required String id,
+  // }
+  //     ) async {
+  //   try {
+  //     final Map<String, dynamic> payload = {
+  //
+  //     };
+  //
+  //
+  //     final endpoint = 'history/daily-progress-delete/$id/';
+  //
+  //     // Log API request
+  //     debugPrint('🚀 API REQUEST - USER DELETE HISTORY');
+  //     debugPrint('📍 URL: $_baseUrl$endpoint');
+  //     debugPrint('📦 Payload: ${jsonEncode(payload)}');
+  //     debugPrint('🔑 Headers: ${_dio.options.headers}');
+  //     debugPrint('⏰ Timestamp: ${DateTime.now()}');
+  //
+  //
+  //     final response = await _dio.delete(
+  //       endpoint,
+  //       data: jsonEncode(payload),
+  //       options: await _authorizedHeader(),
+  //     );
+  //
+  //     // Log API response
+  //     debugPrint('✅ API RESPONSE - USER DELETE HISTORY');
+  //     debugPrint('📊 Status Code: ${response.statusCode}');
+  //     debugPrint('📦 Response Data: ${response.data}');
+  //     debugPrint('⏰ Response Time: ${DateTime.now()}');
+  //
+  //     final data = response.data is String ? jsonDecode(response.data) : response.data;
+  //
+  //     // Handle success response (201 Created or 200 OK)
+  //     if (response.statusCode == 201 || response.statusCode == 200) {
+  //       // Check if the response contains tokens (new API format)
+  //       return {
+  //         'success': true,
+  //         'message': data['message'] ?? 'Delete account  successfully',
+  //         'data': null,
+  //       };
+  //     }
+  //
+  //     // Handle unexpected success codes
+  //     return {
+  //       'success': false,
+  //       'error': 'Unexpected response from server',
+  //     };
+  //
+  //   } on DioException catch (e) {
+  //     // Handle specific error cases
+  //     debugPrint(e.message);
+  //     debugPrint(e.response.toString());
+  //
+  //     if (e.response != null) {
+  //       final data = e.response!.data is String ? jsonDecode(e.response!.data) : e.response!.data;
+  //
+  //       // Handle 400 Bad Request - Email already registered
+  //       if (e.response!.statusCode == 400) {
+  //         return {
+  //           'success': false,
+  //           'error': data['error'] ?? 'Old password is incorrect',
+  //         };
+  //       }
+  //
+  //       // Handle other HTTP errors
+  //       return {
+  //         'success': false,
+  //         'error': data['error'] ?? data['message'] ?? 'Deactivation failed',
+  //       };
+  //     }
+  //
+  //     // Handle network/connection errors
+  //     return {
+  //       'success': false,
+  //       'error': _handleError(e),
+  //     };
+  //   } catch (e) {
+  //     // Handle any other unexpected errors
+  //     return {
+  //       'success': false,
+  //       'error': 'An unexpected error occurred during deactivation of account',
+  //     };
+  //   }
+  // }
 
 
 
