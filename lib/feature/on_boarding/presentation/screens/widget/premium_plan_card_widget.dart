@@ -21,7 +21,7 @@ class PremiumPlanCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final promoCode = ref.watch(promoCodeProvider);
+   // final promoCode = ref.watch(promoCodeProvider);
     final isApplying = ref.watch(isApplyingProvider);
     final payment = ref.watch( getPaymentProvider );
 

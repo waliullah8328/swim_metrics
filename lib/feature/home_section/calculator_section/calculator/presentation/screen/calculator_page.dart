@@ -12,7 +12,9 @@ import 'package:swim_metrics/feature/home_section/calculator_section/calculator/
 import 'package:swim_metrics/feature/home_section/calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/calculator/presentation/screen/widget/distance_wheel_selector_widget.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
+import '../../../../../../core/utils/utils/print_utils.dart';
 import '../../riverpod/calculator_split_state.dart';
+import '../../riverpod/split_calculator_controller.dart';
 final currencyProvider = StateProvider<String>((ref) => "SCY");
 final showCourseSectionProvider = StateProvider<bool>((ref) => true);
 class SplitCalculatorPage extends ConsumerWidget {
@@ -163,7 +165,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                                           ),
                                         ],
                                         onChanged: (value) {
-                                          ref.read(currencyProvider.notifier).state = value!;
+                                          ref.read(splitCalcProvider.notifier).setCourse((value ?? 'SCY').toLowerCase());
                                         },
                                       ),
                                     ),
@@ -189,7 +191,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                                           SplitCalculatorSelector(
                                             items:  [AppLocalizations.of(context)!.men, AppLocalizations.of(context)!.women],
                                             onChanged: (value) {
-                                              ref.read(splitProvider.notifier).setGender(value);
+                                              ref.read(splitCalcProvider.notifier).setGender((value ).toLowerCase());
                                             },
                                           ),
                                         ],
@@ -208,7 +210,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                                           SplitCalculatorSelector(
                                             items: [AppLocalizations.of(context)!.fly, AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.breast,AppLocalizations.of(context)!.free,AppLocalizations.of(context)!.im],
                                             onChanged: (value) {
-                                              ref.read(splitProvider.notifier).setStroke(value);
+                                              ref.read(splitCalcProvider.notifier).setStroke((value ?? 'SCY').toLowerCase());
                                             },
                                           ),
                                         ],
@@ -227,7 +229,8 @@ class SplitCalculatorPage extends ConsumerWidget {
                                           DistanceWheelSelector(
                                             items: [50, 100, 150, 200, 250],
                                             onChanged: (value) {
-                                              ref.read(splitProvider.notifier).setDistance(value);
+                                              ref.read(splitCalcProvider.notifier).setDistance(value.toString());
+
                                             },
                                           ),
                                         ],
@@ -250,9 +253,13 @@ class SplitCalculatorPage extends ConsumerWidget {
                         SizedBox(height: 16.h),
                         CustomTextField(
                           hintText: AppLocalizations.of(context)!.enterYourTime,
+                          onChanged: (value){
+                            ref.read(splitCalcProvider.notifier).setGoalTime(value);
+                          },
                           controller: timeController,
                           suffixIcon: GestureDetector(
                             onTap: (){
+
 
                             },
                             child: SizedBox(
@@ -271,17 +278,38 @@ class SplitCalculatorPage extends ConsumerWidget {
 
                         SizedBox(height: 16.h),
 
+                        // Row(
+                        //   children: [
+                        //     ElevatedButton(onPressed: () =>ref.read(splitCalcProvider.notifier).project(), child: const Text('Project')),
+                        //     const SizedBox(width: 8),
+                        //     ElevatedButton(
+                        //       onPressed: () => printTextDoc(
+                        //         title: 'Split Calculator',
+                        //         body: ref.read(splitCalcProvider).output.isEmpty ? 'No output yet.' : ref.read(splitCalcProvider).output,
+                        //       ),
+                        //       child: const Text('Print'),
+                        //     ),
+                        //   ],
+                        // ),
+                        // const SizedBox(height: 8),
+                        // Container(
+                        //     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+                        //     padding: const EdgeInsets.all(8),
+                        //     child: SingleChildScrollView(
+                        //       child: Text(ref.watch(splitCalcProvider).output, style: const TextStyle(fontFamily: 'monospace')),
+                        //     ),
+                        //   ),
+
+
+
+
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
                           ),
                           onPressed: (){
-                            final goal = double.tryParse(timeController.text);
-                            if (goal != null) {
-                              notifier.setGoalTime(goal);
-                              notifier.calculateSplits(); // This updates state
-                            }
-                            ref.read(showCourseSectionProvider.notifier).state = false;
+
+                            ref.read(splitCalcProvider.notifier).project1();
                           },
                           child: Center(child:  Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -292,6 +320,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                             ],
                           )),
                         ),
+
 
                       ],
                     ),
@@ -321,15 +350,13 @@ class SplitCalculatorPage extends ConsumerWidget {
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: 300.h, // fixed height for scrollable area
-                  child: Container(
+                 Container(
                     decoration: BoxDecoration(
                       color: isDark?Color(0xff1B3A5C):Color(0xffFFFFFF),
 
 
                     ),
-                    child: state.splits.isEmpty
+                    child: ref.watch(splitCalcProvider).splits.isEmpty
                         ?  Center(
                       child: CustomText(text:
                       AppLocalizations.of(context)!.noSplitsYet,
@@ -337,9 +364,11 @@ class SplitCalculatorPage extends ConsumerWidget {
                       ),
                     )
                         : ListView.builder(
-                      itemCount: state.splits.length,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: ref.watch(splitCalcProvider).splits.length,
                       itemBuilder: (context, index) {
-                        final split = state.splits[index];
+                        final split = ref.watch(splitCalcProvider).splits[index];
 
                         // alternate colors: even -> E3F0FF, odd -> FFFFFF
                         final bgColor = index % 2 == 0 ? Color(0xFFE3F0FF) : Color(0xFFFFFFFF);
@@ -374,7 +403,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                       },
                     ),
                   ),
-                ),
+
 
                 SizedBox(height: 16.h),
 
@@ -388,7 +417,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                           side: BorderSide(color: Color(0xff234B6E))
                         ),
                         onPressed: () {
-                          notifier.clear();
+                          ref.watch(splitCalcProvider.notifier).clear();
                         },
                         child: Center(
                           child: Row(
@@ -428,6 +457,7 @@ class SplitCalculatorPage extends ConsumerWidget {
     );
   }
 }
+
 
 
 
