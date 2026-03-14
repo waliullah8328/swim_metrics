@@ -189,7 +189,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     return CustomPrimaryButton(title: AppLocalizations.of(context)!.saveChanges,
                       isLoading: isLoading,
                       onPressed: () async {
-                         ref.read(profileProvider.notifier).saveProfile(context: context);
+                        final result = await ref.read(profileProvider.notifier).saveProfile(context: context);
+
+                        if(result){
+                          ref.invalidate(getMeProvider);
+                        }
+
                       
 
 

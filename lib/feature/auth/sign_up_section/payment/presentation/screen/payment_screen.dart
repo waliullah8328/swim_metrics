@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
+import 'package:swim_metrics/feature/auth/sign_up_section/payment/presentation/screen/widget/premium_card_shimmer_widget.dart';
 import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/premium_plan_card_widget.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
@@ -277,7 +278,7 @@ class PaymentScreen extends ConsumerWidget {
                   );
                 },
                 error:(error,stack)=>Center(child: CustomText(text: "No data found")),
-                loading: ()=>CircularProgressIndicator(),
+                loading: ()=>PremiumCardShimmer(isDark: isDark,),
             ),
 
             SizedBox(height: 118.h,),
