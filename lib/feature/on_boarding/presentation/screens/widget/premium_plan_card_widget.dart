@@ -9,6 +9,7 @@ import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 
+import '../../../../auth/sign_up_section/payment/presentation/screen/widget/premium_card_shimmer_widget.dart';
 import '../../../../auth/sign_up_section/payment/river_pod/payment_controller.dart';
 
 
@@ -202,7 +203,7 @@ class PremiumPlanCard extends ConsumerWidget {
           );
         },
         error: (error,stack)=> Center(child: CustomText(text: "No data found")),
-        loading: ()=>CircularProgressIndicator()
+        loading: ()=>PremiumCardShimmer(isDark: true,),
     );
   }
 }
