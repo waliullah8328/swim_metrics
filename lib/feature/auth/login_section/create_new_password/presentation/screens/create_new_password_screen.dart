@@ -169,9 +169,14 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                       onPressed: () async {
                         final String title = AppLocalizations.of(context)!.passwordChanged;
                         final String subTitle = AppLocalizations.of(context)!.yourPasswordHasBeenChangedSuccessfully;
-                        final result = await ref.read(createNewPasswordProvider.notifier).resetPassword(context: context,email: widget.email,forgotPasswordToken: widget.forgetToken);
-                        if(result){
-                          context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/false");
+
+                        if(_createNewPasswordFormKey.currentState!.validate()){
+                          final result = await ref.read(createNewPasswordProvider.notifier).resetPassword(context: context,email: widget.email,forgotPasswordToken: widget.forgetToken);
+                          if(result){
+                            context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/false");
+                          }
+
+
                         }
 
 

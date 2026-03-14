@@ -430,4 +430,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get purchasePlanToContinue => 'Acquista un piano per continuare';
+
+  @override
+  String get submit => 'Submit';
 }

@@ -6,15 +6,16 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../../../../core/services/auth_error_handler.dart';
 import '../../../../../../../core/services/token_storage.dart';
-import '../model/get_me_profile_model.dart';
+import '../model/payment_model.dart';
 
 
-class ProfileRepository {
+
+class PaymentRepository {
 
   late final Dio _dio;
   final String _baseUrl = dotenv.env['BASE_URL'] ?? '';
 
-  ProfileRepository() {
+  PaymentRepository() {
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl,
       headers: {'Content-Type': 'application/json'},
@@ -53,21 +54,21 @@ class ProfileRepository {
   }
 
 
-  Future<GetMeModel > getMeProfile() async {
+  Future<PaymentModel > getSubscriptionPackage() async {
     try {
-      final endpoint = dotenv.env['PROFILE_GET_ME_ENDPOINT'] ?? '/user/profile/';
+      final endpoint = dotenv.env['SUBSCRIPTION_PLAN_DETAILS_ENDPOINT'] ?? '/plan/details/';
 
-      debugPrint('🚀 API REQUEST - PROFILE GET');
+      debugPrint('🚀 API REQUEST - PLAN GET');
       debugPrint('📍 URL: $_baseUrl$endpoint');
       debugPrint('🔑 Headers: ${(await _authorizedHeader()).headers}');
       debugPrint('⏰ Timestamp: ${DateTime.now()}');
 
       final response = await _dio.get(
         endpoint,
-        options: await _authorizedHeader(),
+
       );
 
-      debugPrint('✅ API RESPONSE - PROFILE GET');
+      debugPrint('✅ API RESPONSE - PLAN GET');
       debugPrint('📊 Status Code: ${response.statusCode}');
       debugPrint('📦 Response Data: ${response.data}');
       debugPrint('⏰ Response Time: ${DateTime.now()}');
@@ -78,18 +79,18 @@ class ProfileRepository {
             : response.data;
 
         if (data is Map<String, dynamic>) {
-          return GetMeModel  .fromJson(data);
+          return PaymentModel .fromJson(data);
         } else {
           throw Exception('Invalid response format');
         }
       } else {
-        throw Exception('Failed to get profile list');
+        throw Exception('Failed to get payment list');
       }
     } on DioException catch (e) {
-      debugPrint("Get profile DioException: $e");
+      debugPrint("Get payment DioException: $e");
       throw Exception(_handleError(e));
     } catch (e) {
-      debugPrint("Get profile Exception: $e");
+      debugPrint("Get payment Exception: $e");
       throw Exception('Something went wrong. Please try again.');
     }
   }
@@ -99,206 +100,24 @@ class ProfileRepository {
 
 
 
-  Future<Map<String, dynamic>> updateProfile({
-    required String email,
-    required String name,
-    required String phoneNumber,
-    required String profilePicturePath,
-  }) async {
-    try {
-      final endpoint = dotenv.env['AUTH_ME_ENDPOINT'] ?? '/user/profile/';
-      final token = await TokenStorage.getAccessToken();
-
-      if (token == null || token.isEmpty) {
-        return {
-          'success': false,
-          'error': 'Authentication token missing',
-        };
-      }
-
-      /// ---------- DATE FORMAT ----------
-
-
-      /// ---------- FORM DATA ----------
-      final formData = FormData.fromMap({
-        "name": name,
-        "email": email,
-        "phone": phoneNumber,
-
-      });
-
-      /// ---------- IMAGE (ONLY LOCAL FILE) ----------
-      if (profilePicturePath.isNotEmpty &&
-          !profilePicturePath.startsWith('http')) {
-        formData.files.add(
-          MapEntry(
-            "profile_picture",
-            await MultipartFile.fromFile(
-              profilePicturePath,
-              filename: profilePicturePath.split('/').last,
-            ),
-          ),
-        );
-      }
-
-      /// ---------- REQUEST ----------
-      final response = await _dio.put(
-        endpoint,
-        data: formData,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            // ❌ Do NOT set Content-Type manually
-          },
-        ),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return {
-          'success': true,
-          'message':
-          response.data['message'] ?? 'Profile updated successfully',
-        };
-      }
-
-      debugPrint('✅ API RESPONSE - GET TERMS POLICY');
-      debugPrint('📊 Status Code: ${response.statusCode}');
-      debugPrint('📦 Response Data: ${response.data}');
-      debugPrint('⏰ Response Time: ${DateTime.now()}');
-
-      return {
-        'success': false,
-        'error': 'Unexpected server response',
-      };
-    }
-
-    /// ---------- DIO ERROR ----------
-    on DioException catch (e) {
-      if (e.response != null) {
-        final data =
-        e.response!.data is Map ? e.response!.data : {};
-
-        return {
-          'success': false,
-          'error':
-          data['error'] ?? data['message'] ?? 'Profile update failed',
-        };
-      }
-
-      return {
-        'success': false,
-        'error': 'Network error occurred',
-      };
-    }
-
-    /// ---------- UNKNOWN ERROR ----------
-    catch (e) {
-      return {
-        'success': false,
-        'error': 'Unexpected error occurred',
-      };
-    }
-  }
-
-
-  Future<Map<String, dynamic>> updateHelpAndSupport({
-    required String email,
-    required String subject,
-    required String problem,
-    required String profilePicturePath,
-  }) async {
-    try {
-      final endpoint = dotenv.env['USER_SUPPORT_ENDPOINT'] ?? '/user/support/';
-      final token = await TokenStorage.getAccessToken();
-
-      if (token == null || token.isEmpty) {
-        return {
-          'success': false,
-          'error': 'Authentication token missing',
-        };
-      }
-
-      /// ---------- DATE FORMAT ----------
-
-
-      /// ---------- FORM DATA ----------
-      final formData = FormData.fromMap({
-        "email": email,
-        "subject": subject,
-        "problem": problem
-      });
-
-      /// ---------- IMAGE (ONLY LOCAL FILE) ----------
-      if (profilePicturePath.isNotEmpty &&
-          !profilePicturePath.startsWith('http')) {
-        formData.files.add(
-          MapEntry(
-            "screenshot",
-            await MultipartFile.fromFile(
-              profilePicturePath,
-              filename: profilePicturePath.split('/').last,
-            ),
-          ),
-        );
-      }
-
-      /// ---------- REQUEST ----------
-      final response = await _dio.post(
-        endpoint,
-        data: formData,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            // ❌ Do NOT set Content-Type manually
-          },
-        ),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return {
-          'success': true,
-          'message':
-          response.data['message'] ?? 'Submitted successfully',
-        };
-      }
-
-      debugPrint('✅ API RESPONSE - GET TERMS POLICY');
-      debugPrint('📊 Status Code: ${response.statusCode}');
-      debugPrint('📦 Response Data: ${response.data}');
-      debugPrint('⏰ Response Time: ${DateTime.now()}');
-
-      return {
-        'success': false,
-        'error': 'Unexpected server response',
-      };
-    }
 
 
 
-    /// ---------- UNKNOWN ERROR ----------
-    catch (e) {
-      debugPrint(e.toString());
-      return {
-        'success': false,
-        'error': e.toString(),
-      };
-    }
-  }
+  Future<Map<String, dynamic>> applyCupon({
+    required String code,
 
 
-  Future<Map<String, dynamic>> changePassword({
-    required String oldPassword,
-    required String newPassword,
+
+    required String token
   }) async {
     try {
       final payload = {
-        "old_password": oldPassword,
-        "new_password": newPassword
+        "code": code
       };
 
-      final endpoint = dotenv.env['USER_CHANGE_PASSWORD_ENDPOINT']
-          ?? '/user/profile/change-password/';
-      final token = await TokenStorage.getAccessToken();
+      final endpoint = dotenv.env['PLAN_PROMO_CODE_ENDPOINT']
+          ?? '/plan/promo/apply/';
+
 
       // 🚀 Request Logs
       debugPrint('🚀 API REQUEST - USER CHANGE PASSWORD');
@@ -307,7 +126,7 @@ class ProfileRepository {
       debugPrint('🔑 Headers: ${_dio.options.headers}');
       debugPrint('⏰ Timestamp: ${DateTime.now()}');
 
-      final response = await _dio.patch(
+      final response = await _dio.post(
         endpoint,
         data: payload, // ✅ Dio handles JSON
 
@@ -332,8 +151,88 @@ class ProfileRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return {
           'success': true,
-          'message': data['message'] ?? 'Password change successfully',
-          'forgetPasswordToken': data["forgot_password_token"],
+          'message': data['detail'] ?? 'Promo code applied successfully',
+          'price': data["data"]["price"],
+        };
+      }
+
+      return {
+        'success': false,
+        'error': 'Unexpected server response',
+      };
+    }
+
+    // 🔴 Dio Error Handling
+    on DioException catch (e) {
+      debugPrint('❌ DIO ERROR: ${e.message}');
+      debugPrint('❌ RESPONSE: ${e.response?.data}');
+
+
+
+      return {
+        'success': false,
+        'error': _handleError(e),
+      };
+    }
+
+    // 🔴 Unknown Error
+    catch (e) {
+      return {
+        'success': false,
+        'error': 'Unexpected error occurred',
+      };
+    }
+  }
+
+
+  Future<Map<String, dynamic>> paymentFunction({
+
+
+
+
+    required String token
+  }) async {
+    try {
+      final payload = {
+
+      };
+
+      final endpoint = '/plan/payment/create-checkout-session/';
+
+
+      // 🚀 Request Logs
+      debugPrint('🚀 API REQUEST - USER CHANGE PASSWORD');
+      debugPrint('📍 URL: $_baseUrl$endpoint');
+      debugPrint('📦 Payload: ${jsonEncode(payload)}');
+      debugPrint('🔑 Headers: ${_dio.options.headers}');
+      debugPrint('⏰ Timestamp: ${DateTime.now()}');
+
+      final response = await _dio.post(
+        endpoint,
+        data: payload, // ✅ Dio handles JSON
+
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            // ❌ Do NOT set Content-Type manually
+          },
+        ),
+      );
+
+      // ✅ Response Logs
+      debugPrint('✅ API RESPONSE - USER CHANGE PASSWORD');
+      debugPrint('📊 Status Code: ${response.statusCode}');
+      debugPrint('📦 Response Data: ${response.data}');
+      debugPrint('⏰ Response Time: ${DateTime.now()}');
+
+      final data = response.data is String
+          ? jsonDecode(response.data)
+          : response.data;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'url': data["checkout_url"],
         };
       }
 

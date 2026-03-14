@@ -16,6 +16,7 @@ class RouteNames{
   static const String helpSupportScreen = "/helpSupportScreen";
   static const String termsConditionsScreen  = "/termsConditionsScreen";
   static const String fAQScreen  = "/fAQScreen";
+  static const String paymentScreen  = "/paymentScreen";
 
 
 

@@ -239,16 +239,13 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                     return CustomPrimaryButton(title: "Create Account",
                       isLoading: isLoading,
                       onPressed: () async {
-                        // if(_signUpFormKey.currentState!.validate()){
-                        //   final result = await ref.read(signUpProvider.notifier).signUp(context: context);
-                        //   if(result){
-                        //     context.go(RouteNames.verifyEmailScreen);
-                        //   }
-                        //
-                        // }
-                        final result = await ref.read(signUpProvider.notifier).createAccount(context: context);
-                        if(result){
-                          context.go("${RouteNames.verifyEmailScreen}/$email/true");
+                        if(_signUpFormKey.currentState!.validate()){
+                          final result = await ref.read(signUpProvider.notifier).createAccount(context: context);
+                          if(result){
+                            context.go("${RouteNames.verifyEmailScreen}/$email/true");
+                          }
+
+
                         }
 
 

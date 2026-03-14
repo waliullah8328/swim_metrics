@@ -36,6 +36,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final loginFormKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
     emailController.dispose();
@@ -76,144 +78,152 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Padding(
           padding:  EdgeInsets.only(left: 20.w,right: 20.w),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
-                SizedBox(height: 24.h,),
-                CustomText(text: AppLocalizations.of(context)!.welcomeBack,fontSize: 23.sp,fontWeight: FontWeight.w700),
-                SizedBox(height: 24.h,),
-                CustomTextField(
-                  controller: emailController,
-                  hintText: AppLocalizations.of(context)!.enterYourEmail,
-            
-                  validator: AppValidator.validateEmail,
-            
-                  onChanged: (value) {
-                    ref.read(loginProvider.notifier).setEmail(value);
-                  },
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.all(13.w),
-                    child: SvgPicture.asset(
-                      IconPath.emailIcon,
-                      width: 18.w,
-                      height: 18.h,
-                      fit: BoxFit.contain,
-                      colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
-                    ),
-                  ),
-            
-                ),
-                SizedBox(height: 16.h,),
-               Consumer(builder:  (context,ref,child){
-                 final isRemember = ref.watch(loginProvider.select((s)=>s.isPasswordVisible));
-                 return  CustomTextField(
-                   controller: passwordController,
-                   hintText: AppLocalizations.of(context)!.enterYourPassword,
-                   obscureText: !isRemember ,
-                   validator: AppValidator.validatePassword,
-                   onChanged: (password) {
-                     ref.read(loginProvider.notifier).
-                     setPassword(password);
-            
-                     /// 🔥 If checkbox is unchecked remove saved password
-            
-                   },
-                   prefixIcon: Padding(
-                     padding: EdgeInsets.all(13.w),
-                     child: SvgPicture.asset(
-                       IconPath.passwordIcon,
-                       width: 18.w,
-                       height: 18.h,
-                       fit: BoxFit.contain,
-                       colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
-                     ),
-                   ),
-                   suffixIcon: IconButton(
-                     icon: Icon(
-                       isRemember
-                           ? Icons.visibility
-                           : Icons.visibility_off,
-                     ),
-                     onPressed: () {
-                       ref.read(loginProvider.notifier)
-                           .togglePasswordVisibility();
-                     },
-                   ),
-                 );
-               }),
-                SizedBox(height: 24.h,),
-                Consumer(builder: (context,ref,child){
-                  final isLoading = ref.watch(loginProvider.select((s)=>s.isLoading));
-            
-                  return CustomPrimaryButton(title: AppLocalizations.of(context)!.signIn,
-                    isLoading: isLoading,
-                    onPressed: () async {
-                     final result = await ref.read(loginProvider.notifier).login(context: context);
-                     if(result){
-                       await TokenStorage.setLogin(true);
-                       context.go(RouteNames.homeNavBarScreen);
-                     }
-            
-            
-            
-            
-                  },);
-            
-                }),
-                SizedBox(height: 24.h,),
-            
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Consumer(builder: (context, ref, child) {
-                          final isRemember = ref.watch(loginProvider.select((s)=>s.isRemember));
-                          return CustomSwitchWidget(
-                            value: isRemember,
-                            onChanged: (value) {
-                              ref.read(loginProvider.notifier)
-                                  .toggleRemember(value );
-            
-            
-                            },
-                          );
-                        },),
-                        SizedBox(width: 10.w,),
-                        CustomText(text: AppLocalizations.of(context)!.rememberMe,color: AppColors.textGrey,fontSize: 16.sp,fontWeight: FontWeight.w400,),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                       context.go( RouteNames.forgetPasswordScreen);
-                      },
-                      child: CustomText(
-                        text: AppLocalizations.of(context)!.forgetPassword,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.primary,
+            child: Form(
+              key: loginFormKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
+                  SizedBox(height: 24.h,),
+                  CustomText(text: AppLocalizations.of(context)!.welcomeBack,fontSize: 23.sp,fontWeight: FontWeight.w700),
+                  SizedBox(height: 24.h,),
+                  CustomTextField(
+                    controller: emailController,
+                    hintText: AppLocalizations.of(context)!.enterYourEmail,
+              
+                    validator: AppValidator.validateEmail,
+              
+                    onChanged: (value) {
+                      ref.read(loginProvider.notifier).setEmail(value);
+                    },
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.all(13.w),
+                      child: SvgPicture.asset(
+                        IconPath.emailIcon,
+                        width: 18.w,
+                        height: 18.h,
+                        fit: BoxFit.contain,
+                        colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
                       ),
                     ),
-                  ],
-                ),
-            
-                SizedBox(height: 24.h,),
-                SvgPicture.asset(ImagePath.orImage),
-                SizedBox(height: 32.h,),
-                CustomSocialLogin(),
-            
-            
-                SizedBox(height: 60.h,),
-            
-                CustomAccountWidget(firstTitle: AppLocalizations.of(context)!.donNotHaveAnAccount,buttonTitle: " ${AppLocalizations.of(context)!.signUp}",onTap: (){
-                  context.go(RouteNames.signUpScreen);
-                },),
-            
-            
-            
-              ],
+              
+                  ),
+                  SizedBox(height: 16.h,),
+                 Consumer(builder:  (context,ref,child){
+                   final isRemember = ref.watch(loginProvider.select((s)=>s.isPasswordVisible));
+                   return  CustomTextField(
+                     controller: passwordController,
+                     hintText: AppLocalizations.of(context)!.enterYourPassword,
+                     obscureText: !isRemember ,
+                     validator: AppValidator.validatePassword,
+                     onChanged: (password) {
+                       ref.read(loginProvider.notifier).
+                       setPassword(password);
+              
+                       /// 🔥 If checkbox is unchecked remove saved password
+              
+                     },
+                     prefixIcon: Padding(
+                       padding: EdgeInsets.all(13.w),
+                       child: SvgPicture.asset(
+                         IconPath.passwordIcon,
+                         width: 18.w,
+                         height: 18.h,
+                         fit: BoxFit.contain,
+                         colorFilter: ColorFilter.mode(isDark?AppColors.textWhite:Color(0xff82888E),BlendMode.srcIn),
+                       ),
+                     ),
+                     suffixIcon: IconButton(
+                       icon: Icon(
+                         isRemember
+                             ? Icons.visibility
+                             : Icons.visibility_off,
+                       ),
+                       onPressed: () {
+                         ref.read(loginProvider.notifier)
+                             .togglePasswordVisibility();
+                       },
+                     ),
+                   );
+                 }),
+                  SizedBox(height: 24.h,),
+                  Consumer(builder: (context,ref,child){
+                    final isLoading = ref.watch(loginProvider.select((s)=>s.isLoading));
+              
+                    return CustomPrimaryButton(title: AppLocalizations.of(context)!.signIn,
+                      isLoading: isLoading,
+                      onPressed: () async {
+
+                      if(loginFormKey.currentState!.validate()){
+                        final result = await ref.read(loginProvider.notifier).login(context: context);
+                        if(result){
+                          await TokenStorage.setLogin(true);
+                          context.go(RouteNames.homeNavBarScreen);
+                        }
+
+                      }
+
+              
+              
+              
+              
+                    },);
+              
+                  }),
+                  SizedBox(height: 24.h,),
+              
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Consumer(builder: (context, ref, child) {
+                            final isRemember = ref.watch(loginProvider.select((s)=>s.isRemember));
+                            return CustomSwitchWidget(
+                              value: isRemember,
+                              onChanged: (value) {
+                                ref.read(loginProvider.notifier)
+                                    .toggleRemember(value );
+              
+              
+                              },
+                            );
+                          },),
+                          SizedBox(width: 10.w,),
+                          CustomText(text: AppLocalizations.of(context)!.rememberMe,color: AppColors.textGrey,fontSize: 16.sp,fontWeight: FontWeight.w400,),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                         context.go( RouteNames.forgetPasswordScreen);
+                        },
+                        child: CustomText(
+                          text: AppLocalizations.of(context)!.forgetPassword,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+              
+                  SizedBox(height: 24.h,),
+                  SvgPicture.asset(ImagePath.orImage),
+                  SizedBox(height: 32.h,),
+                  CustomSocialLogin(),
+              
+              
+                  SizedBox(height: 60.h,),
+              
+                  CustomAccountWidget(firstTitle: AppLocalizations.of(context)!.donNotHaveAnAccount,buttonTitle: " ${AppLocalizations.of(context)!.signUp}",onTap: (){
+                    context.go(RouteNames.signUpScreen);
+                  },),
+              
+              
+              
+                ],
+              ),
             ),
           ),
         ),

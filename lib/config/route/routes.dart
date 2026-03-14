@@ -8,6 +8,7 @@ import 'package:swim_metrics/feature/auth/sign_up_section/verify_email/presentat
 
 import '../../feature/auth/login_section/create_new_password/presentation/screens/create_new_password_screen.dart';
 import '../../feature/auth/login_section/login/presentation/screens/login_screen.dart';
+import '../../feature/auth/sign_up_section/payment/presentation/screen/payment_screen.dart';
 import '../../feature/auth/sign_up_section/sign_up/presentation/screens/sign_up_screen.dart';
 import '../../feature/auth/sign_up_section/verify_email_success/presentation/screens/verify_email_success.dart';
 import '../../feature/home_section/calculator_section/setting_section/edit_profile/screen/edit_profile_screen.dart';
@@ -82,6 +83,13 @@ class Routes {
         builder: (context, state) => ForgetPasswordScreen(),
       ),
       GoRoute(
+        path: "${RouteNames.paymentScreen}/:token",
+        builder: (context, state) {
+          String token = state.pathParameters['token']??'';
+          return PaymentScreen(token: token,);
+        },
+      ),
+      GoRoute(
         path: "${RouteNames.verifyEmailScreen}/:email/:isSignUp",
         builder: (context, state) {
           String email = state.pathParameters['email']??'';
@@ -91,12 +99,13 @@ class Routes {
       ),
 
       GoRoute(
-        path: "${RouteNames.verifyEmailSuccessScreen}/:title/:subTitle/:isSignUp",
+        path: "${RouteNames.verifyEmailSuccessScreen}/:title/:subTitle/:isSignUp/:token",
         builder: (context, state) {
           String title = state.pathParameters['title']??'';
           String subTitle = state.pathParameters['subTitle']??'';
           String isSignUp = state.pathParameters['isSignUp']??'';
-          return VerifyEmailSuccess (title: title, subTitle: subTitle,isSignUp: isSignUp,);
+          String token = state.pathParameters['token']??'';
+          return VerifyEmailSuccess (title: title, subTitle: subTitle,isSignUp: isSignUp,token: token,);
         } ,
       ),
       GoRoute(

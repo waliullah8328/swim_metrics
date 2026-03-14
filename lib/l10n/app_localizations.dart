@@ -929,6 +929,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Purchase plan to continue'**
   String get purchasePlanToContinue;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
 }
 
 class _AppLocalizationsDelegate
