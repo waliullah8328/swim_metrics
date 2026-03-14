@@ -13,10 +13,11 @@ import '../../../../../../core/utils/constants/app_sizer.dart';
 import '../../../payment/presentation/screen/payment_screen.dart';
 
 class VerifyEmailSuccess extends ConsumerWidget {
-  const VerifyEmailSuccess({super.key, required this.title, required this.subTitle, this.isSignUp= "true"});
+  const VerifyEmailSuccess( {super.key, required this.title, required this.subTitle, this.isSignUp= "true",this.token,});
   final String title;
   final String subTitle;
   final String? isSignUp;
+  final String? token;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,7 +40,9 @@ class VerifyEmailSuccess extends ConsumerWidget {
               CustomText(text: subTitle,fontSize: 15.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
               SizedBox(height: 150.h,),
               isSignUp == "true"?CustomPrimaryButton(title: AppLocalizations.of(context)!.continue1,onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder:  (context) => PaymentScreen(),));
+
+                context.push("${RouteNames.paymentScreen}/$token");
+
 
 
               },):CustomPrimaryButton(title: AppLocalizations.of(context)!.backToLogin,onPressed: (){

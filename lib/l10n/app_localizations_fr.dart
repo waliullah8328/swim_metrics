@@ -432,4 +432,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get purchasePlanToContinue => 'Achetez un plan pour continuer';
+
+  @override
+  String get submit => 'Submit';
 }

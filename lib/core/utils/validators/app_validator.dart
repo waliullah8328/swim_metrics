@@ -99,5 +99,25 @@ class AppValidator {
     return null;
   }
 
+  static String? validateSubjectOfProblem(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Subject of problem is required.';
+    }
+
+
+
+    return null;
+  }
+
+  static String? validateProblemOrSuggestion(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Problem or suggestion is required.';
+    }
+
+
+
+    return null;
+  }
+
 
 }

@@ -427,4 +427,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get purchasePlanToContinue => 'Purchase plan to continue';
+
+  @override
+  String get submit => 'Submit';
 }

@@ -4,12 +4,15 @@ import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/premium_plan_card_widget.dart';
 
+import '../../../../auth/sign_up_section/payment/river_pod/payment_controller.dart';
+
 
 class PlanPage extends ConsumerWidget {
   const PlanPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
 
 
     return SingleChildScrollView(

@@ -21,7 +21,7 @@ class VerifyEmailNotifier extends StateNotifier<VerifyEmailState> {
   }
 
 
-  Future<bool> verifyOtp({required BuildContext context,required String email}) async {
+  Future<bool> verifyOtp({required BuildContext context,required String email,required String title,required String subTitle, required String isSignUp}) async {
 
 
 
@@ -41,6 +41,9 @@ class VerifyEmailNotifier extends StateNotifier<VerifyEmailState> {
       if (response['success'] == true) {
         state = state.copyWith(isLoading: false );
         AppSnackBar.showSuccess(context, response['message']);
+        final token = response['access'];
+        debugPrint("Token : $token");
+        context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/$isSignUp/$token");
 
 
 

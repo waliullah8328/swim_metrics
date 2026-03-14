@@ -803,10 +803,12 @@ class AuthenticationRepository{
           : response.data;
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+
+        print("token : ${data['access']}");
         return {
           'success': true,
           'message': data['message'] ?? 'OTP verified successfully',
-          'data': null,
+          'access': data['access'],
         };
       }
 

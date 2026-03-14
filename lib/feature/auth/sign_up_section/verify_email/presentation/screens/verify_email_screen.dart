@@ -33,6 +33,7 @@ class VerifyEmailScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
+  final _verifyEmailFormKey = GlobalKey<FormState>();
 
 
   @override
@@ -103,11 +104,13 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
 
                     final String title = AppLocalizations.of(context)!.verifiedEmail;
                     final String subTitle = AppLocalizations.of(context)!.yourAccountHasBeenCreatedSuccessfully;
-                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp(context: context,email: widget.email);
-                      if(result){
 
-                        context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/${widget.isSignUp}");
-                      }
+                    if(_verifyEmailFormKey.currentState!.validate()){
+                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp(context: context,email: widget.email,title: title,subTitle: subTitle,isSignUp: widget.isSignUp.toString());
+
+                    }
+
+
 
 
 
@@ -121,8 +124,12 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
                   return CustomPrimaryButton(title: AppLocalizations.of(context)!.verify,
                     isLoading: isLoading,
                     onPressed: () async {
+                      if(_verifyEmailFormKey.currentState!.validate()){
+                        ref.read(verifyEmailProvider.notifier). verifyForgetOtp(context: context,email: widget.email,code: ref.read(verifyEmailProvider.select((s)=>s.code)),isSignUp: widget.isSignUp!);
 
-                       ref.read(verifyEmailProvider.notifier). verifyForgetOtp(context: context,email: widget.email,code: ref.read(verifyEmailProvider.select((s)=>s.code)),isSignUp: widget.isSignUp!);
+                      }
+
+
 
 
 
