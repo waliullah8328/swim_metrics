@@ -5,25 +5,49 @@ import 'package:flutter_svg/svg.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
-import 'package:swim_metrics/feature/home_section/converter_section/presentation/screen/widget/vertical_selector_widget.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../core/utils/constants/icon_path.dart';
+import '../../../../../core/utils/utils/print_utils.dart';
 import '../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import '../../riverpod/converter_controller.dart';
+import '../../riverpod/converter_controller1.dart';
 
 final showCourseSectionConverter = StateProvider<bool>((ref) => true);
 
-class ConverterScreen extends ConsumerWidget {
-   ConverterScreen({super.key});
-
-  final timeController = TextEditingController(text: "01 : 00.00");
+class ConverterScreen extends ConsumerStatefulWidget {
+  const ConverterScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConverterScreen> createState() => _ConverterScreenState();
+}
+
+class _ConverterScreenState extends ConsumerState<ConverterScreen> {
+  late final TextEditingController timeController;
+  late FocusNode timeFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    final state1 = ref.read(converterProvider1);
+    timeController = TextEditingController(text: state1.timeText);
+    timeFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    timeController.dispose();
+    timeFocusNode.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+
     final state = ref.watch(converterProvider);
-    final controller = ref.read(converterProvider.notifier);
+    final state1 = ref.watch(converterProvider1);
+    //final controller = ref.read(converterProvider.notifier);
+    final controller1 = ref.read(converterProvider1.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionConverter);
@@ -86,12 +110,7 @@ class ConverterScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                // child: IconButton(
-                //   icon: const Icon(Icons.keyboard_arrow_down, size: 32),
-                //   onPressed: () {
-                //     ref.read(showCourseSectionProvider.notifier).state = true;
-                //   },
-                // ),
+
               ),
 
             Container(
@@ -113,145 +132,321 @@ class ConverterScreen extends ConsumerWidget {
                   if(showCourse)
                     Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
 
                             CustomText(text:
-                            AppLocalizations.of(context)!.multipleCourses,
+                            AppLocalizations.of(context)!.from,
 
-                              color: Colors.grey,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
 
                             ),
 
-                            Checkbox(
-                              value: state.multiple,
-                              onChanged: (v) =>
-                                  controller.toggleMultiple(v!),
+                            SizedBox(height: 10.h),
+
+                            SizedBox(
+                              width: double.infinity,
+                              child: PopupMenuButton<String>(
+                                onSelected: controller1.setCourse,
+                                color: Colors.white,
+
+                                /// move dropdown to the right
+                                offset: const Offset(100, 45),
+
+                                itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                    value: AppLocalizations.of(context)!.scm,
+                                    child: Text(AppLocalizations.of(context)!.scm),
+                                  ),
+                                  PopupMenuItem(
+                                    value: AppLocalizations.of(context)!.scy,
+                                    child: Text(AppLocalizations.of(context)!.scy),
+                                  ),
+                                  PopupMenuItem(
+                                    value: AppLocalizations.of(context)!.lcm,
+                                    child: Text(AppLocalizations.of(context)!.lcm),
+                                  ),
+                                ],
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: Colors.grey),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        state1.course.toString(),
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      const Icon(Icons.arrow_drop_down),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             )
                           ],
                         ),
 
-                        SizedBox(height: 10.h),
 
-                        /// FROM / TO
-                        Row(
+
+
+                        SizedBox(height: 20.h,),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(
+                              text: AppLocalizations.of(context)!.to,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
+                            ),
+                            Row(
+                              children: [
+                                // SCY
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Checkbox(
+                                      value: state1.targets.contains('scy'),
+                                      onChanged: state.from.isNotEmpty && state.from.first == 'SCY'
+                                          ? null
+                                          : (val) => controller1.toggleTarget('scy', val ?? false),
+                                    ),
+                                    const Text('SCY'),
+                                  ],
+                                ),
+                                const SizedBox(width: 12),
+
+                                // SCM
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Checkbox(
+                                      value: state1.targets.contains('scm'),
+                                      onChanged: state.from.isNotEmpty && state.from.first == 'SCM'
+                                          ? null
+                                          : (val) => controller1.toggleTarget('scm', val ?? false),
+                                    ),
+                                    const Text('SCM'),
+                                  ],
+                                ),
+                                const SizedBox(width: 12),
+
+                                // LCM
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Checkbox(
+                                      value: state1.targets.contains('lcm'),
+                                      onChanged: state.from.isNotEmpty && state.from.first == 'LCM'
+                                          ? null
+                                          : (val) => controller1.toggleTarget('lcm', val ?? false),
+                                    ),
+                                    const Text('LCM'),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20.h,),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
 
-                            Expanded(
-                              child: Column(
-                                children: [
+                            CustomText(text:
+                            AppLocalizations.of(context)!.gender,
 
-                                  CustomText(text:
-                                  AppLocalizations.of(context)!.from,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
 
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
-
-                                  ),
-
-                                  SizedBox(height: 10.h),
-
-                                  VerticalSelector(
-                                    items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
-                                    selected: state.from,
-                                    onTap: controller.selectFrom,
-                                  )
-                                ],
-                              ),
                             ),
 
-                            SizedBox(width: 12.w),
+                            SizedBox(height: 10.h),
 
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  CustomText(text:
-                                  AppLocalizations.of(context)!.to,
-
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
-
-                                  ),
-
-                                  SizedBox(height: 10.h),
-
-
-
-                                  VerticalSelector(
-                                    items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
-                                    selected: state.to,
-                                    onTap: controller.selectTo,
-                                  )
-                                ],
+                            PopupMenuButton<String>(
+                              onSelected: (v) => controller1.setGender(v),
+                              itemBuilder: (context) => const [
+                                PopupMenuItem(value: 'men', child: Text('Men')),
+                                PopupMenuItem(value: 'women', child: Text('Women')),
+                              ],
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.grey),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(state1.gender, style: const TextStyle(fontSize: 16, color: Colors.black)),
+                                    const Icon(Icons.arrow_drop_down),
+                                  ],
+                                ),
                               ),
-                            ),
-
+                            )
                           ],
                         ),
 
                         SizedBox(height: 20.h),
 
-                        /// STROKE / DISTANCE
 
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
 
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  CustomText(text:
-                                  AppLocalizations.of(context)!.stroke,
+                            CustomText(text:
+                            AppLocalizations.of(context)!.stroke,
 
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
 
-                                  ),
-
-                                  SizedBox(height: 10.h),
-
-
-
-
-                                  VerticalSelector(
-                                    items:  [AppLocalizations.of(context)!.fly,AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.free, AppLocalizations.of(context)!.im,AppLocalizations.of(context)!.breast],
-                                    selected: [state.stroke],
-                                    onTap: controller.selectStroke,
-                                  )
-                                ],
-                              ),
                             ),
 
-                            SizedBox(width: 12.w),
+                            SizedBox(height: 10.h),
 
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  CustomText(text:
-                                  AppLocalizations.of(context)!.distance,
+                            SizedBox(
+                              width: double.infinity,
+                              child: Consumer(builder: (context, ref, _) {
+                                final state = ref.watch(converterProvider);
+                                final controller1 = ref.read(converterProvider.notifier);
 
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
+                                final mapping = {
+                                  AppLocalizations.of(context)!.fly: 'fly',
+                                  AppLocalizations.of(context)!.back: 'back',
+                                  AppLocalizations.of(context)!.free: 'free',
+                                  AppLocalizations.of(context)!.im: 'im',
+                                  AppLocalizations.of(context)!.breast: 'breast',
+                                };
 
-                                  ),
+                                final mappingReverse = {
+                                  'fly': AppLocalizations.of(context)!.fly,
+                                  'back': AppLocalizations.of(context)!.back,
+                                  'free': AppLocalizations.of(context)!.free,
+                                  'im': AppLocalizations.of(context)!.im,
+                                  'breast': AppLocalizations.of(context)!.breast,
+                                };
 
-                                  SizedBox(height: 10.h),
-
-
-
-                                  VerticalSelector(
-                                    items: const ["50", "100", "150","200","250"],
-                                    selected: [state.distance],
-                                    onTap: controller.selectDistance,
+                                return PopupMenuButton<String>(
+                                  color: Colors.white,
+                                  /// move dropdown to the right
+                                  offset: const Offset(100, 45),
+                                  onSelected: (selected) {
+                                    final internalValue = mapping[selected] ?? selected;
+                                    controller1.selectStroke(internalValue);
+                                  },
+                                  itemBuilder: (context) => mapping.keys
+                                      .map(
+                                        (key) => PopupMenuItem(
+                                      value: key,
+                                      child: Text(key),
+                                    ),
                                   )
-                                ],
-                              ),
+                                      .toList(),
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: Colors.grey),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          mappingReverse[state.stroke] ?? state.stroke,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const Icon(Icons.arrow_drop_down),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 20.h),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(text:
+                            AppLocalizations.of(context)!.distance,
+
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
+
                             ),
 
+                            SizedBox(height: 10.h),
+
+
+
+                            SizedBox(
+                              width: double.infinity,
+                              child: Consumer(builder: (context, ref, _) {
+                                final state1 = ref.watch(converterProvider1);
+                                final controller1 = ref.read(converterProvider1.notifier);
+
+                                const distanceItems = ["50", "100", "150", "200", "250","500"];
+
+                                return PopupMenuButton<String>(
+                                  color: Colors.white,
+                                  onSelected: controller1.setDistance,
+                                  itemBuilder: (context) => distanceItems
+                                      .map(
+                                        (distance) => PopupMenuItem(
+                                      value: distance,
+                                      child: Text(distance),
+                                    ),
+                                  )
+                                      .toList(),
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: Colors.grey),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          state1.distance,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const Icon(Icons.arrow_drop_down),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+                            )
                           ],
                         ),
                         SizedBox(height: 25.h),
@@ -263,16 +458,77 @@ class ConverterScreen extends ConsumerWidget {
 
 
                   /// TIME INPUT
-                  CustomTextField(hintText: "",controller: timeController,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(text:"Time (mm:ss or ss.ss)",
+
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14.sp,
+
+                      ),
+                      SizedBox(height: 10.h,),
+
+                      CustomTextField(
+                          hintText:"mm:ss or ss.ss",
+                          focusNode: timeFocusNode,
+                          onChanged: (value){
+                            ref.read(converterProvider1.notifier).setTimeText(value);
+                            if (!timeFocusNode.hasFocus) {
+                              timeFocusNode.requestFocus();
+                            }
+                          },
+                          controller: timeController,
+                          suffixIcon: GestureDetector(
+                            onTap: (){
+
+
+                            },
+                            child: SizedBox(
+                              height: 24.h,
+                              width: 24.w,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SvgPicture.asset(
+                                  IconPath.voiceIcon,
+                                  fit: BoxFit.contain,
+
+                                ),
+                              ),
+                            ),
+                          )),
+
+
+                    ],
+                  ),
 
 
 
                   SizedBox(height: 20.h),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CustomText(text:
+                      'Show splits',
+                      ),
+
+                      Checkbox(
+                        value: state1.showSplits,
+                        onChanged: (v) =>
+                            controller1.setShowSplits(v ?? false),
+                        activeColor: Colors.white,
+                        checkColor: const Color(0xFF1e90ff),
+                      ),
+
+                    ],
+                  ),
 
                   /// CONVERT BUTTON
 
                   GestureDetector(
                     onTap: (){
+                      controller1.convert();
                       ref.read(showCourseSectionConverter.notifier).state = false;
                     },
                     child: Container(
@@ -291,8 +547,8 @@ class ConverterScreen extends ConsumerWidget {
                           Text(
                             AppLocalizations.of(context)!.convertTime,
                             style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600
 
                             ),
                           ),
@@ -306,7 +562,7 @@ class ConverterScreen extends ConsumerWidget {
             ),
             SizedBox(height: 24.h,),
 
-            Container(
+            state1.output.isEmpty?SizedBox():Container(
               padding: const EdgeInsets.all(16),
 
               decoration: BoxDecoration(
@@ -320,69 +576,62 @@ class ConverterScreen extends ConsumerWidget {
                   )
                 ],
               ),
-              child: Column(
-                children: [
-                  CustomText(text: AppLocalizations.of(context)!.convertedTime,fontSize: 16.sp,fontWeight: FontWeight.w500,color: Color(0xff368ABB),),
-                  SizedBox(height: 10.h,),
-                  CustomText(text: AppLocalizations.of(context)!.tapTimeToShowSplits,fontSize: 12.sp,fontWeight: FontWeight.w400,color:AppColors.textGrey,),
-                  CustomText(text: "01 : 06.54",fontSize:36.sp,fontWeight: FontWeight.w600,),
-                SizedBox(height: 16.h,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomText(text: AppLocalizations.of(context)!.scm,fontSize:13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
-                  SizedBox(width: 10.w,),
-                  SvgPicture.asset(IconPath.rightArrowIcon),
-                  SizedBox(width: 10.w,),
-                  CustomText(text: AppLocalizations.of(context)!.lcm,fontSize:13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,),
 
-                ],
+              child: SingleChildScrollView(
+                child: Text(
+                  state1.output,
+                  style: const TextStyle(fontFamily: 'monospace'),
+                ),
               ),
-                ]
-
-              ),
-
             ),
-            SizedBox(height: 24.h,),
-            Row(
+
+            state1.output.isEmpty?SizedBox():Column(
               children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor:Color(0xff234B6E),
-                        side: BorderSide(color: Color(0xff234B6E))
-                    ),
-                    onPressed: () {
-                      //notifier.clear();
-                    },
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(IconPath.clearIcon),
-                          SizedBox(width: 6.w,),
-                          CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
-                        ],
+                SizedBox(height: 24.h,),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:Color(0xff234B6E),
+                            side: BorderSide(color: Color(0xff234B6E))
+                        ),
+                        onPressed: () {
+                          controller1.reset();
+                        },
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(IconPath.clearIcon),
+                              SizedBox(width: 6.w,),
+                              CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:AppColors.primary,
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:AppColors.primary,
+                        ),
+                        onPressed: () => printTextDoc(
+                          title: 'Swim Time Converter',
+                          body: state1.output.isEmpty ? 'No output yet.' : state1.output,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                            SizedBox(width: 6.w,),
+                            CustomText(text: AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                          ],
+                        ),
+                      ),
                     ),
-                    onPressed: () {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-                        SizedBox(width: 6.w,),
-                        CustomText(text: AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),
