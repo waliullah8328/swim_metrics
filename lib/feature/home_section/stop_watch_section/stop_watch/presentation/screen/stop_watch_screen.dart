@@ -160,11 +160,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       child: GestureDetector(
                         onTap: () {
                           ref.read(stopwatchProvider2.notifier).setMode(mode);
-                          ref
-                              .read(
-                            stopwatchProvider1.notifier,
-                          )
-                              .clear();
+                          ref.read(stopwatchProvider1.notifier).clear();
                           ref.read(stopwatchProvider2.notifier).stop();
                         },
                         child: Container(
@@ -193,7 +189,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               ),
 
               SizedBox(height: 20.h),
-              if (!showCourse && activeMode == 'Predictor')
+              if (!showCourse && activeMode == 'Converter')
                 Center(
                   child: GestureDetector(
                     onTap: () {
@@ -230,7 +226,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                   // ),
                 ),
 
-              if (!showCourse2 && activeMode == 'Converter')
+              if (!showCourse2 && activeMode == 'Predictor')
                 Center(
                   child: GestureDetector(
                     onTap: () {
@@ -261,42 +257,37 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       ],
                     ),
                   ),
-                  // child: IconButton(
-                  //   icon: const Icon(Icons.keyboard_arrow_down, size: 32),
-                  //   onPressed: () {
-                  //     ref.read(showCourseSectionProvider.notifier).state = true;
-                  //   },
-                  // ),
+
                 ),
 
               /// Main Content
               activeMode == 'Stopwatch'
                   ? Column(
                       children: [
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              CustomText(
-                                text: "WATCHES",
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              SizedBox(width: 16.w),
-                              Padding(
-                                padding: EdgeInsets.only(left: 16.w),
-                                child: SvgPicture.asset(IconPath.minusIcon),
-                              ),
-
-                              Padding(
-                                padding: EdgeInsets.only(left: 16.w),
-                                child: SvgPicture.asset(IconPath.plusIcon),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10.h),
+                        // Align(
+                        //   alignment: Alignment.centerRight,
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.end,
+                        //     children: [
+                        //       CustomText(
+                        //         text: "WATCHES",
+                        //         fontSize: 14.sp,
+                        //         fontWeight: FontWeight.w500,
+                        //       ),
+                        //       SizedBox(width: 16.w),
+                        //       Padding(
+                        //         padding: EdgeInsets.only(left: 16.w),
+                        //         child: SvgPicture.asset(IconPath.minusIcon),
+                        //       ),
+                        //
+                        //       Padding(
+                        //         padding: EdgeInsets.only(left: 16.w),
+                        //         child: SvgPicture.asset(IconPath.plusIcon),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // SizedBox(height: 10.h),
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -356,6 +347,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ref
                                         .read(stopwatchProvider1.notifier)
                                         .start();
+
+
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -786,25 +779,33 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                   child: Column(
                                     children: [
                                       CustomText(
-                                        text: AppLocalizations.of(context)!.from,
+                                        text: AppLocalizations.of(
+                                          context,
+                                        )!.from,
 
                                         color: AppColors.primary,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 14.sp,
                                       ),
-                                      SizedBox(height: 8.h,),
+                                      SizedBox(height: 8.h),
                                       Consumer(
                                         builder: (context, ref, child) {
-
-                                          final state = ref.watch(stopwatchProvider2);
+                                          final state = ref.watch(
+                                            stopwatchProvider2,
+                                          );
 
                                           return SplitCalculatorSelectorOne(
                                             items: const ["SCM", "SCY", "LCM"],
-                                            selectedValue: state.fromCourse,   // ✅ keep selected after refresh
+                                            selectedValue: state
+                                                .fromCourse, // ✅ keep selected after refresh
                                             onChanged: (value) {
                                               ref
-                                                  .read(stopwatchProvider2.notifier)
-                                                  .setConverterCourses(from: value);
+                                                  .read(
+                                                    stopwatchProvider2.notifier,
+                                                  )
+                                                  .setConverterCourses(
+                                                    from: value,
+                                                  );
                                             },
                                           );
                                         },
@@ -823,19 +824,25 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         fontWeight: FontWeight.w600,
                                         fontSize: 14.sp,
                                       ),
-                                      SizedBox(height: 8.h,),
+                                      SizedBox(height: 8.h),
                                       Consumer(
                                         builder: (context, ref, child) {
-
-                                          final state = ref.watch(stopwatchProvider2);
+                                          final state = ref.watch(
+                                            stopwatchProvider2,
+                                          );
 
                                           return SplitCalculatorSelectorOne(
                                             items: const ["SCM", "SCY", "LCM"],
-                                            selectedValue: state.toCourse,   // ✅ keep selected after refresh
+                                            selectedValue: state
+                                                .toCourse, // ✅ keep selected after refresh
                                             onChanged: (value) {
                                               ref
-                                                  .read(stopwatchProvider2.notifier)
-                                                  .setConverterCourses(to: value);
+                                                  .read(
+                                                    stopwatchProvider2.notifier,
+                                                  )
+                                                  .setConverterCourses(
+                                                    to: value,
+                                                  );
                                             },
                                           );
                                         },
@@ -846,7 +853,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               ],
                             ),
 
-                          SizedBox(height: 20.h),
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -907,6 +913,11 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                       ref
                                           .read(stopwatchProvider1.notifier)
                                           .start();
+
+                                      ref
+                                          .read(showCourseSectionStopWatchProvider.notifier)
+                                          .state =
+                                      false;
                                     },
                                     child: Row(
                                       mainAxisAlignment:
@@ -1352,617 +1363,275 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           if (showCourse2)
                             Column(
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                Row(
                                   children: [
-                                    CustomText(
-                                      text: AppLocalizations.of(
-                                        context,
-                                      )!.gender,
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(
+                                              context,
+                                            )!.gender,
 
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14.sp,
-                                    ),
-
-                                    SizedBox(height: 10.h),
-                                    Consumer(
-                                      builder: (context, ref, child) {
-                                        final gender = ref.watch(
-                                          stopwatchProvider2.select(
-                                            (s) => s.gender,
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14.sp,
                                           ),
-                                        );
-                                        return PopupMenuButton<String>(
-                                          color: isDark
-                                              ? Color(0xff153250)
-                                              : Colors.white,
-                                          onSelected: (v) => ref
-                                              .read(stopwatchProvider2.notifier)
-                                              .setPredictorParams(g: v),
-                                          itemBuilder: (context) => const [
-                                            PopupMenuItem(
-                                              value: 'men',
-                                              child: Text('Men'),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 'women',
-                                              child: Text('Women'),
-                                            ),
-                                          ],
-                                          offset: const Offset(100, 45),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 14,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: isDark
-                                                  ? Color(0xff153250)
-                                                  : Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                              border: Border.all(
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  gender.toString(),
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                const Icon(
-                                                  Icons.arrow_drop_down,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
+                                          SizedBox(height: 8.h),
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(
+                                                stopwatchProvider2,
+                                              );
 
-                                SizedBox(height: 12.h),
-
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: AppLocalizations.of(
-                                        context,
-                                      )!.course,
-
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14.sp,
-                                    ),
-
-                                    SizedBox(height: 10.h),
-                                    Consumer(
-                                      builder: (context, ref, child) {
-                                        final course = ref.watch(
-                                          stopwatchProvider2.select(
-                                            (s) => s.course,
-                                          ),
-                                        );
-                                        return SizedBox(
-                                          width: double.infinity,
-                                          child: PopupMenuButton<String>(
-                                            onSelected: (v) => ref
-                                                .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .setPredictorParams(
-                                                  c: v.toLowerCase(),
-                                                ),
-                                            color: isDark
-                                                ? Color(0xff153250)
-                                                : Colors.white,
-
-                                            /// move dropdown to the right
-                                            offset: const Offset(100, 45),
-
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.scm,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.scm,
-                                                ),
-                                              ),
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.scy,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.scy,
-                                                ),
-                                              ),
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.lcm,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.lcm,
-                                                ),
-                                              ),
-                                            ],
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? Color(0xff153250)
-                                                    : Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    course.toString(),
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                    ),
-                                                  ),
-                                                  const Icon(
-                                                    Icons.arrow_drop_down,
-                                                  ),
+                                              return SplitCalculatorSelectorOne(
+                                                items: const [
+                                                  "men",
+                                                  "women",
                                                 ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-
-                                SizedBox(height: 20.h),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: AppLocalizations.of(
-                                        context,
-                                      )!.stroke,
-
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14.sp,
-                                    ),
-
-                                    SizedBox(height: 10.h),
-
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: Consumer(
-                                        builder: (context, ref, _) {
-                                          final stroke = ref.watch(
-                                            stopwatchProvider2.select(
-                                              (s) => s.stroke,
-                                            ),
-                                          );
-
-                                          final mapping = {
-                                            AppLocalizations.of(context)!.fly:
-                                                'fly',
-                                            AppLocalizations.of(context)!.back:
-                                                'back',
-                                            AppLocalizations.of(context)!.free:
-                                                'free',
-                                            AppLocalizations.of(context)!.im:
-                                                'im',
-                                            AppLocalizations.of(
-                                              context,
-                                            )!.breast: 'breast',
-                                          };
-
-                                          final mappingReverse = {
-                                            'fly': AppLocalizations.of(
-                                              context,
-                                            )!.fly,
-                                            'back': AppLocalizations.of(
-                                              context,
-                                            )!.back,
-                                            'free': AppLocalizations.of(
-                                              context,
-                                            )!.free,
-                                            'im': AppLocalizations.of(
-                                              context,
-                                            )!.im,
-                                            'breast': AppLocalizations.of(
-                                              context,
-                                            )!.breast,
-                                          };
-
-                                          return PopupMenuButton<String>(
-                                            color: isDark
-                                                ? Color(0xff153250)
-                                                : Colors.white,
-
-                                            /// move dropdown to the right
-                                            offset: const Offset(100, 45),
-                                            onSelected: (v) => ref
-                                                .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .setPredictorParams(s: v),
-                                            itemBuilder: (context) => mapping
-                                                .keys
-                                                .map(
-                                                  (key) => PopupMenuItem(
-                                                    value: key,
-                                                    child: Text(key),
-                                                  ),
-                                                )
-                                                .toList(),
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? Color(0xff153250)
-                                                    : Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    stroke,
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                    ),
-                                                  ),
-                                                  const Icon(
-                                                    Icons.arrow_drop_down,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 20.h),
-
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: AppLocalizations.of(
-                                        context,
-                                      )!.distance,
-
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14.sp,
-                                    ),
-
-                                    SizedBox(height: 10.h),
-
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: Consumer(
-                                        builder: (context, ref, _) {
-                                          final state1 = ref.watch(
-                                            stopwatchProvider2.select(
-                                              (s) => s.distance,
-                                            ),
-                                          );
-
-                                          const distanceItems = [
-                                            "50",
-                                            "100",
-                                            "150",
-                                            "200",
-                                            "250",
-                                            "500",
-                                          ];
-
-                                          return PopupMenuButton<String>(
-                                            color: isDark
-                                                ? Color(0xff153250)
-                                                : Colors.white,
-                                            onSelected: (v) => ref
-                                                .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .setPredictorParams(d: v),
-                                            itemBuilder: (context) =>
-                                                distanceItems
-                                                    .map(
-                                                      (distance) =>
-                                                          PopupMenuItem(
-                                                            value: distance,
-                                                            child: Text(
-                                                              distance,
-                                                            ),
-                                                          ),
+                                                selectedValue: state
+                                                    .gender, // ✅ keep selected after refresh
+                                                onChanged: (v) => ref
+                                                    .read(
+                                                      stopwatchProvider2
+                                                          .notifier,
                                                     )
-                                                    .toList(),
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? Color(0xff153250)
-                                                    : Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    state1,
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                    ),
-                                                  ),
-                                                  const Icon(
-                                                    Icons.arrow_drop_down,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                SizedBox(height: 20.h),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: AppLocalizations.of(
-                                        context,
-                                      )!.splitSize,
-
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14.sp,
-                                    ),
-
-                                    SizedBox(height: 10.h),
-
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: Consumer(
-                                        builder: (context, ref, _) {
-                                          final state1 = ref.watch(
-                                            stopwatchProvider2.select(
-                                              (s) => s.splitSize,
-                                            ),
-                                          );
-
-                                          const distanceItems = [
-                                            "50",
-                                            "100",
-                                            "150",
-                                            "200",
-                                            "250",
-                                            "500",
-                                          ];
-
-                                          return PopupMenuButton<String>(
-                                            color: isDark
-                                                ? Color(0xff153250)
-                                                : Colors.white,
-                                            onSelected: (v) => ref
-                                                .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .setPredictorParams(split: v),
-                                            itemBuilder: (context) =>
-                                                distanceItems
-                                                    .map(
-                                                      (distance) =>
-                                                          PopupMenuItem(
-                                                            value: distance,
-                                                            child: Text(
-                                                              distance,
-                                                            ),
-                                                          ),
-                                                    )
-                                                    .toList(),
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? Color(0xff153250)
-                                                    : Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    state1,
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                    ),
-                                                  ),
-                                                  const Icon(
-                                                    Icons.arrow_drop_down,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                SizedBox(height: 12.h),
-
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: AppLocalizations.of(
-                                        context,
-                                      )!.startType,
-
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14.sp,
-                                    ),
-
-                                    SizedBox(height: 10.h),
-
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: PopupMenuButton<String>(
-                                        onSelected: (v) => ref
-                                            .read(stopwatchProvider2.notifier)
-                                            .setPredictorParams(start: v),
-                                        color: isDark
-                                            ? Color(0xff153250)
-                                            : Colors.white,
-
-                                        /// move dropdown to the right
-                                        offset: const Offset(100, 45),
-
-                                        itemBuilder: (context) => [
-                                          PopupMenuItem(
-                                            value: AppLocalizations.of(
-                                              context,
-                                            )!.fromStart,
-                                            child: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.fromStart,
-                                            ),
-                                          ),
-                                          PopupMenuItem(
-                                            value: AppLocalizations.of(
-                                              context,
-                                            )!.fromMiddle,
-                                            child: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.fromMiddle,
-                                            ),
-                                          ),
-                                          PopupMenuItem(
-                                            value: AppLocalizations.of(
-                                              context,
-                                            )!.fromLast,
-                                            child: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.fromLast,
-                                            ),
+                                                    .setPredictorParams(g: v),
+                                              );
+                                            },
                                           ),
                                         ],
-                                        child: Container(
-                                          width: double.infinity,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 14,
+                                      ),
+                                    ),
+
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(
+                                              context,
+                                            )!.course,
+
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14.sp,
                                           ),
-                                          decoration: BoxDecoration(
-                                            color: isDark
-                                                ? Color(0xff153250)
-                                                : Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.grey,
-                                            ),
+                                          SizedBox(height: 8.h),
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(
+                                                stopwatchProvider2,
+                                              );
+
+                                              return SplitCalculatorSelectorOne(
+                                                items: const [
+                                                  "scy",
+                                                  "scm",
+                                                  "lcm",
+                                                ],
+                                                selectedValue: state
+                                                    .course, // ✅ keep selected after refresh
+                                                onChanged: (v) => ref
+        .read(
+    stopwatchProvider2.notifier,
+    )
+        .setPredictorParams(
+    c: v.toLowerCase(),
+    ),
+
+                                              );
+                                            },
                                           ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                ref.read(
-                                                  stopwatchProvider2.select(
-                                                    (s) => s.startType,
-                                                  ),
-                                                ),
-                                                style: TextStyle(
-                                                  fontSize: 16.sp,
-                                                ),
-                                              ),
-                                              const Icon(Icons.arrow_drop_down),
-                                            ],
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10.h,),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(
+                                              context,
+                                            )!.stroke,
+
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14.sp,
                                           ),
-                                        ),
+                                          SizedBox(height: 8.h),
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(
+                                                stopwatchProvider2,
+                                              );
+
+                                              return SplitCalculatorSelectorOne(
+                                                items: const [
+                                                  "fly",
+                                                  "back",
+                                                  "free",
+                                                  "im",
+                                                  "breast",
+                                                ],
+                                                selectedValue: state
+                                                    .stroke, // ✅ keep selected after refresh
+                                                onChanged: (v) => ref
+                                                    .read(
+                                                  stopwatchProvider2.notifier,
+                                                )
+                                                    .setPredictorParams(s: v),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(
+                                              context,
+                                            )!.distance,
+
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14.sp,
+                                          ),
+                                          SizedBox(height: 8.h),
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(
+                                                stopwatchProvider2,
+                                              );
+
+                                              return SplitCalculatorSelectorOne(
+                                                items: const [
+                                                  "50",
+                                                  "100",
+                                                  "150",
+                                                  "200",
+                                                  "250",
+                                                  "300",
+                                                  "350",
+                                                  "400",
+                                                  "450",
+                                                  "500",
+                                                ],
+                                                selectedValue: state
+                                                    .distance, // ✅ keep selected after refresh
+                                                onChanged: (v) => ref
+                                                    .read(
+                                                  stopwatchProvider2.notifier,
+                                                )
+                                                    .setPredictorParams(d: v),
+
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10.h,),
+
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(
+                                              context,
+                                            )!.splitSize,
+
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14.sp,
+                                          ),
+                                          SizedBox(height: 8.h),
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(
+                                                stopwatchProvider2,
+                                              );
+
+                                              return SplitCalculatorSelectorOne(
+                                                items: const [
+                                                  "50",
+                                                  "100",
+                                                  "150",
+                                                  "200",
+                                                  "250",
+                                                  "500",
+                                                ],
+                                                selectedValue: state
+                                                    .splitSize, // ✅ keep selected after refresh
+                                                onChanged: (v) => ref
+                                                    .read(
+                                                  stopwatchProvider2.notifier,
+                                                )
+                                                    .setPredictorParams(split: v),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(
+                                              context,
+                                            )!.startType,
+
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14.sp,
+                                          ),
+                                          SizedBox(height: 8.h),
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(
+                                                stopwatchProvider2,
+                                              );
+
+                                              return SplitCalculatorSelectorOne(
+                                                items: const [
+                                                  "From Start",
+                                                  "From Middle",
+                                                  "From Last",
+
+                                                ],
+                                                selectedValue: state
+                                                    .startType, // ✅ keep selected after refresh
+                                                onChanged: (v) => ref
+                                                    .read(stopwatchProvider2.notifier)
+                                                    .setPredictorParams(start: v),
+
+                                              );
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
 
-                                SizedBox(height: 20.h),
+
+
                               ],
                             ),
 
-                          SizedBox(height: 20.h),
+
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -2022,6 +1691,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                       ref
                                           .read(stopwatchProvider1.notifier)
                                           .start();
+                                      ref
+                                          .read(showCourseSectionStopWatchProvider2.notifier)
+                                          .state =
+                                      false;
                                     },
                                     child: Row(
                                       mainAxisAlignment:

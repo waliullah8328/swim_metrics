@@ -49,7 +49,7 @@ class _SplitCalculatorSelectorOneState
 
   @override
   Widget build(BuildContext context) {
-    const double itemHeight = 70;
+    const double itemHeight = 55;
 
     return Card(
       shape: RoundedRectangleBorder(
