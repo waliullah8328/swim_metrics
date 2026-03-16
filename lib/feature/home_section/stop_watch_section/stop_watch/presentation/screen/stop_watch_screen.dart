@@ -11,10 +11,7 @@ import '../../../../../../core/utils/constants/icon_path.dart';
 
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import '../../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
-import '../../../../converter_section/presentation/screen/widget/vertical_selector_widget.dart';
 
-import '../../../../converter_section/riverpod/converter_controller.dart';
-import '../../../../converter_section/riverpod/converter_controller1.dart';
 import '../../riverpod/stop_watch_controller.dart';
 import '../../riverpod/stop_watch_controller_2.dart';
 
@@ -62,8 +59,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(stopwatchProvider);
-    final controller = ref.read(stopwatchProvider.notifier);
+
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final status = ref.watch(stopwatchProvider1);
@@ -139,7 +135,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark?Color(0xff153250):Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
                     BoxShadow(
@@ -810,7 +806,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   .setConverterCourses(from: v);
                                             },
 
-                                            color: Colors.white,
+                                            color: isDark?Color(0xff153250):Colors.white,
 
                                             /// move dropdown to the right
                                             offset: const Offset(100, 45),
@@ -855,7 +851,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: Colors.white,
+                                                color: isDark?Color(0xff153250):Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -871,7 +867,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     fromCource.toString(),
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-                                                      color: Colors.black,
+
                                                     ),
                                                   ),
                                                   const Icon(
@@ -917,7 +913,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   .setConverterCourses(to: v);
                                             },
 
-                                            color: Colors.white,
+                                            color: isDark?Color(0xff153250):Colors.white,
 
                                             /// move dropdown to the right
                                             offset: const Offset(100, 45),
@@ -962,7 +958,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: Colors.white,
+                                                color: isDark?Color(0xff153250):Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -978,7 +974,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     fromCource.toString(),
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-                                                      color: Colors.black,
+
                                                     ),
                                                   ),
                                                   const Icon(
@@ -993,40 +989,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ),
                                   ],
                                 ),
-                                // Row(
-                                //   children: [
-                                //
-                                //
-                                //
-                                //     SizedBox(width: 12.w),
-                                //
-                                //     Expanded(
-                                //       child: Column(
-                                //         children: [
-                                //           CustomText(text:
-                                //           AppLocalizations.of(context)!.to,
-                                //
-                                //             color: AppColors.primary,
-                                //             fontWeight: FontWeight.w600,
-                                //             fontSize: 14.sp,
-                                //
-                                //           ),
-                                //
-                                //           SizedBox(height: 10.h),
-                                //
-                                //
-                                //
-                                //           VerticalSelector(
-                                //             items: [AppLocalizations.of(context)!.scm, AppLocalizations.of(context)!.scy, AppLocalizations.of(context)!.lcm],
-                                //             selected: state.to,
-                                //             onTap: controller.selectTo,
-                                //           )
-                                //         ],
-                                //       ),
-                                //     ),
-                                //
-                                //   ],
-                                // ),
+
                               ],
                             ),
 
@@ -1555,6 +1518,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ),
                                         );
                                         return PopupMenuButton<String>(
+                                          color: isDark?Color(0xff153250):Colors.white,
                                           onSelected: (v) => ref
                                               .read(stopwatchProvider2.notifier)
                                               .setPredictorParams(g: v),
@@ -1575,7 +1539,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               vertical: 14,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Colors.white,
+                                              color: isDark?Color(0xff153250):Colors.white,
                                               borderRadius:
                                                   BorderRadius.circular(6),
                                               border: Border.all(
@@ -1591,7 +1555,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   gender.toString(),
                                                   style: const TextStyle(
                                                     fontSize: 16,
-                                                    color: Colors.black,
+
                                                   ),
                                                 ),
                                                 const Icon(
@@ -1639,7 +1603,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 .setPredictorParams(
                                                   c: v.toLowerCase(),
                                                 ),
-                                            color: Colors.white,
+                                            color: isDark?Color(0xff153250):Colors.white,
 
                                             /// move dropdown to the right
                                             offset: const Offset(100, 45),
@@ -1684,7 +1648,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: Colors.white,
+                                                color: isDark?Color(0xff153250):Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -1700,7 +1664,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     course.toString(),
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-                                                      color: Colors.black,
+
                                                     ),
                                                   ),
                                                   const Icon(
@@ -1775,7 +1739,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           };
 
                                           return PopupMenuButton<String>(
-                                            color: Colors.white,
+                                            color: isDark?Color(0xff153250):Colors.white,
 
                                             /// move dropdown to the right
                                             offset: const Offset(100, 45),
@@ -1801,7 +1765,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: Colors.white,
+                                                color: isDark?Color(0xff153250):Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -1817,7 +1781,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     stroke,
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-                                                      color: Colors.black,
+
                                                     ),
                                                   ),
                                                   const Icon(
@@ -1869,7 +1833,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ];
 
                                           return PopupMenuButton<String>(
-                                            color: Colors.white,
+                                            color: isDark?Color(0xff153250):Colors.white,
                                             onSelected: (v) => ref
                                                 .read(
                                                   stopwatchProvider2.notifier,
@@ -1895,7 +1859,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: Colors.white,
+                                                color: isDark?Color(0xff153250):Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -1911,7 +1875,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     state1,
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-                                                      color: Colors.black,
+
                                                     ),
                                                   ),
                                                   const Icon(
@@ -1927,65 +1891,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                   ],
                                 ),
 
-                                // SizedBox(height: 25.h),
-                                // Row(
-                                //   children: [
-                                //
-                                //     Expanded(
-                                //       child: Column(
-                                //         children: [
-                                //           CustomText(text:
-                                //           AppLocalizations.of(context)!.stroke,
-                                //
-                                //             color: AppColors.primary,
-                                //             fontWeight: FontWeight.w600,
-                                //             fontSize: 14.sp,
-                                //
-                                //           ),
-                                //
-                                //           SizedBox(height: 10.h),
-                                //
-                                //
-                                //
-                                //
-                                //           VerticalSelector(
-                                //             items:  [AppLocalizations.of(context)!.fly,AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.free, AppLocalizations.of(context)!.im,AppLocalizations.of(context)!.breast],
-                                //             selected: [state.stroke],
-                                //             onTap: controller.selectStroke,
-                                //           )
-                                //         ],
-                                //       ),
-                                //     ),
-                                //
-                                //     SizedBox(width: 12.w),
-                                //
-                                //     Expanded(
-                                //       child: Column(
-                                //         children: [
-                                //           CustomText(text:
-                                //           AppLocalizations.of(context)!.distance,
-                                //
-                                //             color: AppColors.primary,
-                                //             fontWeight: FontWeight.w600,
-                                //             fontSize: 14.sp,
-                                //
-                                //           ),
-                                //
-                                //           SizedBox(height: 10.h),
-                                //
-                                //
-                                //
-                                //           VerticalSelector(
-                                //             items: const ["50", "100", "150","200","250"],
-                                //             selected: [state.distance],
-                                //             onTap: controller.selectDistance,
-                                //           )
-                                //         ],
-                                //       ),
-                                //     ),
-                                //
-                                //   ],
-                                // ),
+
                                 SizedBox(height: 20.h),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -2022,7 +1928,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ];
 
                                           return PopupMenuButton<String>(
-                                            color: Colors.white,
+                                            color: isDark?Color(0xff153250):Colors.white,
                                             onSelected: (v) => ref
                                                 .read(
                                                   stopwatchProvider2.notifier,
@@ -2048,7 +1954,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: Colors.white,
+                                                color: isDark?Color(0xff153250):Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -2064,7 +1970,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     state1,
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-                                                      color: Colors.black,
+
                                                     ),
                                                   ),
                                                   const Icon(
@@ -2103,7 +2009,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         onSelected: (v) => ref
                                             .read(stopwatchProvider2.notifier)
                                             .setPredictorParams(start: v),
-                                        color: Colors.white,
+                                        color: isDark?Color(0xff153250):Colors.white,
 
                                         /// move dropdown to the right
                                         offset: const Offset(100, 45),
@@ -2147,7 +2053,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             vertical: 14,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color: isDark?Color(0xff153250):Colors.white,
                                             borderRadius: BorderRadius.circular(
                                               6,
                                             ),
@@ -2167,7 +2073,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 ),
                                                 style: TextStyle(
                                                   fontSize: 16.sp,
-                                                  color: Colors.black,
+
                                                 ),
                                               ),
                                               const Icon(Icons.arrow_drop_down),

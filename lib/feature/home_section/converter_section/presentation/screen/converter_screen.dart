@@ -44,6 +44,9 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
   @override
   Widget build(BuildContext context) {
 
+    debugPrint("build");
+
+
     final state = ref.watch(converterProvider);
     final state1 = ref.watch(converterProvider1);
     //final controller = ref.read(converterProvider.notifier);
@@ -152,7 +155,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                               width: double.infinity,
                               child: PopupMenuButton<String>(
                                 onSelected: controller1.setCourse,
-                                color: Colors.white,
+                                color: isDark?Color(0xff153250):Colors.white,
 
                                 /// move dropdown to the right
                                 offset: const Offset(100, 45),
@@ -175,7 +178,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                   width: double.infinity,
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: isDark?Color(0xff153250):Colors.white,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(color: Colors.grey),
                                   ),
@@ -186,7 +189,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                         state1.course.toString(),
                                         style: TextStyle(
                                           fontSize: 16.sp,
-                                          color: Colors.black,
+
                                         ),
                                       ),
                                       const Icon(Icons.arrow_drop_down),
@@ -286,14 +289,14 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: isDark?Color(0xff153250):Colors.white,
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(color: Colors.grey),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(state1.gender, style: const TextStyle(fontSize: 16, color: Colors.black)),
+                                    Text(state1.gender, style:  TextStyle(fontSize: 16.sp,)),
                                     const Icon(Icons.arrow_drop_down),
                                   ],
                                 ),
@@ -343,7 +346,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                 };
 
                                 return PopupMenuButton<String>(
-                                  color: Colors.white,
+                                  color: isDark?Color(0xff153250):Colors.white,
                                   /// move dropdown to the right
                                   offset: const Offset(100, 45),
                                   onSelected: (selected) {
@@ -362,7 +365,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: isDark?Color(0xff153250):Colors.white,
                                       borderRadius: BorderRadius.circular(6),
                                       border: Border.all(color: Colors.grey),
                                     ),
@@ -373,7 +376,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                           mappingReverse[state.stroke] ?? state.stroke,
                                           style: TextStyle(
                                             fontSize: 16.sp,
-                                            color: Colors.black,
+
                                           ),
                                         ),
                                         const Icon(Icons.arrow_drop_down),
@@ -412,7 +415,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                 const distanceItems = ["50", "100", "150", "200", "250","500"];
 
                                 return PopupMenuButton<String>(
-                                  color: Colors.white,
+                                  color: isDark?Color(0xff153250):Colors.white,
                                   onSelected: controller1.setDistance,
                                   itemBuilder: (context) => distanceItems
                                       .map(
@@ -426,7 +429,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: isDark?Color(0xff153250):Colors.white,
                                       borderRadius: BorderRadius.circular(6),
                                       border: Border.all(color: Colors.grey),
                                     ),
@@ -437,7 +440,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                           state1.distance,
                                           style: TextStyle(
                                             fontSize: 16.sp,
-                                            color: Colors.black,
+
                                           ),
                                         ),
                                         const Icon(Icons.arrow_drop_down),
@@ -471,33 +474,27 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                       SizedBox(height: 10.h,),
 
                       CustomTextField(
-                          hintText:"mm:ss or ss.ss",
-                          focusNode: timeFocusNode,
-                          onChanged: (value){
-                            ref.read(converterProvider1.notifier).setTimeText(value);
-                            if (!timeFocusNode.hasFocus) {
-                              timeFocusNode.requestFocus();
-                            }
-                          },
-                          controller: timeController,
-                          suffixIcon: GestureDetector(
-                            onTap: (){
-
-
-                            },
-                            child: SizedBox(
-                              height: 24.h,
-                              width: 24.w,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SvgPicture.asset(
-                                  IconPath.voiceIcon,
-                                  fit: BoxFit.contain,
-
-                                ),
+                        hintText: "mm:ss or ss.ss",
+                        focusNode: timeFocusNode,
+                        controller: timeController,
+                        onChanged: (value) {
+                          ref.read(converterProvider1.notifier).setTimeText(value);
+                        },
+                        suffixIcon: GestureDetector(
+                          onTap: () {},
+                          child: SizedBox(
+                            height: 24.h,
+                            width: 24.w,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SvgPicture.asset(
+                                IconPath.voiceIcon,
+                                fit: BoxFit.contain,
                               ),
                             ),
-                          )),
+                          ),
+                        ),
+                      )
 
 
                     ],
@@ -548,7 +545,8 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             AppLocalizations.of(context)!.convertTime,
                             style: TextStyle(
                                 fontSize: 16.sp,
-                                fontWeight: FontWeight.w600
+                                fontWeight: FontWeight.w600,
+                              color: AppColors.backgroundDark
 
                             ),
                           ),
