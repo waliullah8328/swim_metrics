@@ -12,6 +12,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../core/common/widgets/new_custon_widgets/custom_check_box_widget.dart';
+import '../../../../../core/common/widgets/new_custon_widgets/split_calculator_selector_one.dart';
 import '../../../../../core/utils/constants/icon_path.dart';
 
 import '../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
@@ -113,7 +114,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
 
 
-    final state1 = ref.watch(converterProvider1);
+   
 
     final controller1 = ref.read(converterProvider1.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -201,74 +202,173 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     Column(
                       children: [
 
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+
+
+
+
+
+
+                        Row(
                           children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomText(
+                                    text: AppLocalizations.of(
+                                      context,
+                                    )!.gender,
 
-                            CustomText(text:
-                            AppLocalizations.of(context)!.from,
-
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
-
-                            ),
-
-                            SizedBox(height: 10.h),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: PopupMenuButton<String>(
-                                onSelected: controller1.setCourse,
-                                color: isDark?Color(0xff153250):Colors.white,
-
-                                /// move dropdown to the right
-                                offset: const Offset(100, 45),
-
-                                itemBuilder: (context) => [
-                                  PopupMenuItem(
-                                    value: "scm",
-                                    child: Text(AppLocalizations.of(context)!.scm),
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
                                   ),
-                                  PopupMenuItem(
-                                    value: 'scy',
-                                    child: Text(AppLocalizations.of(context)!.scy),
-                                  ),
-                                  PopupMenuItem(
-                                    value: "lcm",
-                                    child: Text(AppLocalizations.of(context)!.lcm),
+                                  SizedBox(height: 8.h),
+                                  Consumer(
+                                    builder: (context, ref, child) {
+
+                                      final state1 = ref.watch(converterProvider1);
+                                      final controller1 = ref.read(converterProvider1.notifier);
+
+
+                                      return SplitCalculatorSelectorOne(
+                                        items: const [
+                                          "men",
+                                          "women",
+                                        ],
+                                        selectedValue: state1.gender, // ✅ keep selected after refresh
+                                        onChanged: (v) => controller1.setGender(v),
+                                      );
+                                    },
                                   ),
                                 ],
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                                  decoration: BoxDecoration(
-                                    color: isDark?Color(0xff153250):Colors.white,
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: Colors.grey),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        state1.course.toString(),
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-
-                                        ),
-                                      ),
-                                      const Icon(Icons.arrow_drop_down),
-                                    ],
-                                  ),
-                                ),
                               ),
-                            )
+                            ),
+
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomText(
+                                    text: AppLocalizations.of(
+                                      context,
+                                    )!.stroke,
+
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Consumer(
+                                    builder: (context, ref, child) {
+                                      final state = ref.watch(converterProvider);
+                                      final controller1 = ref.read(converterProvider.notifier);
+
+                                      return SplitCalculatorSelectorOne(
+                                        items: const [
+                                          "fly",
+                                          "back",
+                                          "free",
+                                          "im",
+                                          "breast",
+                                        ],
+                                        selectedValue: state
+                                            .stroke, // ✅ keep selected after refresh
+                                        onChanged: (selected) {
+                                          //final internalValue = mapping[selected] ?? selected;
+                                          controller1.selectStroke(selected);
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
+                        SizedBox(height: 10.h,),
+
+                        Row(
+                          children: [
+
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomText(
+                                    text: AppLocalizations.of(
+                                      context,
+                                    )!.distance,
+
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Consumer(
+                                    builder: (context, ref, child) {
+                                      final state = ref.watch(converterProvider1);
+                                      final controller1 = ref.read(converterProvider1.notifier);
+
+                                      return SplitCalculatorSelectorOne(
+                                        items: const [
+                                          "50",
+                                          "100",
+                                          "150",
+                                          "200",
+                                          "250",
+                                          "300",
+                                          "350",
+                                          "400",
+                                          "450",
+                                          "500",
+                                        ],
+                                        selectedValue: state
+                                            .distance, // ✅ keep selected after refresh
+                                        onChanged: controller1.setDistance,
+
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomText(
+                                    text: AppLocalizations.of(
+                                      context,
+                                    )!.from,
+
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Consumer(
+                                    builder: (context, ref, child) {
+                                      final state1 = ref.watch(converterProvider1);
+                                    
+
+                                      return SplitCalculatorSelectorOne(
+                                        items: const [
+                                          "scy",
+                                          "scm",
+                                          "lcm",
+                                        ],
+                                        selectedValue: state1
+                                            .course, // ✅ keep selected after refresh
+                                        onChanged: controller1.setCourse,
+                                        
+
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
 
 
-
-
+                          ],
+                        ),
                         SizedBox(height: 20.h,),
 
                         Column(
@@ -278,251 +378,129 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                               text: AppLocalizations.of(context)!.to,
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
+                              fontSize: 16.sp,
                             ),
-                            Row(
-                              children: [
-                                // SCY
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Checkbox(
-                                      value: state1.targets.contains('scy'),
-                                      onChanged: state1.course.isNotEmpty && state1.course == 'scy'
-                                          ? null
-                                          : (val) => controller1.toggleTarget('scy', val ?? false),
-                                    ),
-                                    const Text('SCY'),
-                                  ],
-                                ),
-                                const SizedBox(width: 12),
+                            Consumer(builder: (context,ref,child){
 
-                                // SCM
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Checkbox(
-                                      value: state1.targets.contains('scm'),
-                                      onChanged: state1.course.isNotEmpty && state1.course == 'scm'
-                                          ? null
-                                          : (val) => controller1.toggleTarget('scm', val ?? false),
-                                    ),
-                                    const Text('SCM'),
-                                  ],
-                                ),
-                                const SizedBox(width: 12),
+                              final state = ref.watch(converterProvider1);
+                              final controller1 = ref.read(converterProvider1.notifier);
+                              return Row(
+                                children: [
+                                  // SCY
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Checkbox(
+                                        value: state.targets.contains('scy'),
+                                        onChanged: state.course.isNotEmpty && state.course == 'scy'
+                                            ? null
+                                            : (val) => controller1.toggleTarget('scy', val ?? false),
+                                      ),
+                                      const Text('SCY'),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 12),
 
-                                // LCM
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Checkbox(
-                                      value: state1.targets.contains('lcm'),
-                                      onChanged: state1.course.isNotEmpty && state1.course == 'lcm'
-                                          ? null
-                                          : (val) => controller1.toggleTarget('lcm', val ?? false),
-                                    ),
-                                    Text('LCM'),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  // SCM
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Checkbox(
+                                        value: state.targets.contains('scm'),
+                                        onChanged: state.course.isNotEmpty && state.course == 'scm'
+                                            ? null
+                                            : (val) => controller1.toggleTarget('scm', val ?? false),
+                                      ),
+                                      const Text('SCM'),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 12),
+
+                                  // LCM
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Checkbox(
+                                        value: state.targets.contains('lcm'),
+                                        onChanged: state.course.isNotEmpty && state.course == 'lcm'
+                                            ? null
+                                            : (val) => controller1.toggleTarget('lcm', val ?? false),
+                                      ),
+                                      Text('LCM'),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            })
                           ],
                         ),
                         SizedBox(height: 20.h,),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
 
-                            CustomText(text:
-                            AppLocalizations.of(context)!.gender,
-
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
-
-                            ),
-
-                            SizedBox(height: 10.h),
-
-                            PopupMenuButton<String>(
-                              color: isDark?Color(0xff153250):Colors.white,
-                              onSelected: (v) => controller1.setGender(v),
-                              /// move dropdown to the right
-                              offset: const Offset(100, 45),
-                              itemBuilder: (context) =>  [
-                                PopupMenuItem(value: 'men', child: Text(AppLocalizations.of(context)!.men)),
-                                PopupMenuItem(value: 'women', child: Text(AppLocalizations.of(context)!.women)),
-                              ],
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                                decoration: BoxDecoration(
-                                  color: isDark?Color(0xff153250):Colors.white,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.grey),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(state1.gender, style:  TextStyle(fontSize: 16.sp,)),
-                                    const Icon(Icons.arrow_drop_down),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-
-                        SizedBox(height: 20.h),
-
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            CustomText(text:
-                            AppLocalizations.of(context)!.stroke,
-
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
-
-                            ),
-
-                            SizedBox(height: 10.h),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: Consumer(builder: (context, ref, _) {
-                                final state = ref.watch(converterProvider);
-                                final controller1 = ref.read(converterProvider.notifier);
-
-                                final mapping = {
-                                  AppLocalizations.of(context)!.fly: 'fly',
-                                  AppLocalizations.of(context)!.back: 'back',
-                                  AppLocalizations.of(context)!.free: 'free',
-                                  AppLocalizations.of(context)!.im: 'im',
-                                  AppLocalizations.of(context)!.breast: 'breast',
-                                };
-
-                                final mappingReverse = {
-                                  'fly': AppLocalizations.of(context)!.fly,
-                                  'back': AppLocalizations.of(context)!.back,
-                                  'free': AppLocalizations.of(context)!.free,
-                                  'im': AppLocalizations.of(context)!.im,
-                                  'breast': AppLocalizations.of(context)!.breast,
-                                };
-
-                                return PopupMenuButton<String>(
-                                  color: isDark?Color(0xff153250):Colors.white,
-                                  /// move dropdown to the right
-                                  offset: const Offset(100, 45),
-                                  onSelected: (selected) {
-                                    final internalValue = mapping[selected] ?? selected;
-                                    controller1.selectStroke(internalValue);
-                                  },
-                                  itemBuilder: (context) => mapping.keys
-                                      .map(
-                                        (key) => PopupMenuItem(
-                                      value: key,
-                                      child: Text(key),
-                                    ),
-                                  )
-                                      .toList(),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                                    decoration: BoxDecoration(
-                                      color: isDark?Color(0xff153250):Colors.white,
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: Colors.grey),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          mappingReverse[state.stroke] ?? state.stroke,
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-
-                                          ),
-                                        ),
-                                        const Icon(Icons.arrow_drop_down),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 20.h),
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(text:
-                            AppLocalizations.of(context)!.distance,
-
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
-
-                            ),
-
-                            SizedBox(height: 10.h),
-
-
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: Consumer(builder: (context, ref, _) {
-                                final state1 = ref.watch(converterProvider1);
-                                final controller1 = ref.read(converterProvider1.notifier);
-
-                                const distanceItems = ["50", "100", "150", "200", "250","500"];
-
-                                return PopupMenuButton<String>(
-                                  color: isDark?Color(0xff153250):Colors.white,
-                                  /// move dropdown to the right
-                                  offset: const Offset(100, 45),
-                                  onSelected: controller1.setDistance,
-                                  itemBuilder: (context) => distanceItems
-                                      .map(
-                                        (distance) => PopupMenuItem(
-                                      value: distance,
-                                      child: Text(distance),
-                                    ),
-                                  )
-                                      .toList(),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                                    decoration: BoxDecoration(
-                                      color: isDark?Color(0xff153250):Colors.white,
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: Colors.grey),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          state1.distance,
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-
-                                          ),
-                                        ),
-                                        const Icon(Icons.arrow_drop_down),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 25.h),
+                        // Column(
+                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                        //   children: [
+                        //     CustomText(text:
+                        //     AppLocalizations.of(context)!.distance,
+                        //
+                        //       color: AppColors.primary,
+                        //       fontWeight: FontWeight.w600,
+                        //       fontSize: 14.sp,
+                        //
+                        //     ),
+                        //
+                        //     SizedBox(height: 10.h),
+                        //
+                        //
+                        //
+                        //     SizedBox(
+                        //       width: double.infinity,
+                        //       child: Consumer(builder: (context, ref, _) {
+                        //         final state1 = ref.watch(converterProvider1);
+                        //         final controller1 = ref.read(converterProvider1.notifier);
+                        //
+                        //         const distanceItems = ["50", "100", "150", "200", "250","500"];
+                        //
+                        //         return PopupMenuButton<String>(
+                        //           color: isDark?Color(0xff153250):Colors.white,
+                        //           /// move dropdown to the right
+                        //           offset: const Offset(100, 45),
+                        //           onSelected: controller1.setDistance,
+                        //           itemBuilder: (context) => distanceItems
+                        //               .map(
+                        //                 (distance) => PopupMenuItem(
+                        //               value: distance,
+                        //               child: Text(distance),
+                        //             ),
+                        //           )
+                        //               .toList(),
+                        //           child: Container(
+                        //             width: double.infinity,
+                        //             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                        //             decoration: BoxDecoration(
+                        //               color: isDark?Color(0xff153250):Colors.white,
+                        //               borderRadius: BorderRadius.circular(6),
+                        //               border: Border.all(color: Colors.grey),
+                        //             ),
+                        //             child: Row(
+                        //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //               children: [
+                        //                 Text(
+                        //                   state1.distance,
+                        //                   style: TextStyle(
+                        //                     fontSize: 16.sp,
+                        //
+                        //                   ),
+                        //                 ),
+                        //                 const Icon(Icons.arrow_drop_down),
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         );
+                        //       }),
+                        //     )
+                        //   ],
+                        // ),
+                        // SizedBox(height: 25.h),
                       ],
                     ),
 
@@ -637,79 +615,93 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
             ),
             SizedBox(height: 24.h,),
 
-            state1.output.isEmpty?SizedBox():Container(
-              padding: const EdgeInsets.all(16),
+            Consumer(builder: (context,ref,child){
+              final output = ref.watch(converterProvider1.select((s)=>s.output));
 
-              decoration: BoxDecoration(
-                color: isDark?Color(0xff0C3156):Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(width: 1,color:Color (0xff2DA8F0)),
-                boxShadow: const [
-                  BoxShadow(
-                    blurRadius: 12,
-                    color: Colors.black12,
-                  )
-                ],
-              ),
+              return output .isEmpty?SizedBox():Container(
+                padding: const EdgeInsets.all(16),
 
-              child: SingleChildScrollView(
-                child: Text(
-                  state1.output,
-                  style: const TextStyle(fontFamily: 'monospace'),
+                decoration: BoxDecoration(
+                  color: isDark?Color(0xff0C3156):Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(width: 1,color:Color (0xff2DA8F0)),
+                  boxShadow: const [
+                    BoxShadow(
+                      blurRadius: 12,
+                      color: Colors.black12,
+                    )
+                  ],
                 ),
-              ),
-            ),
 
-            state1.output.isEmpty?SizedBox():Column(
-              children: [
-                SizedBox(height: 24.h,),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor:Color(0xff234B6E),
-                            side: BorderSide(color: Color(0xff234B6E))
+                child: SingleChildScrollView(
+                  child: Text(
+                    output ,
+                    style: const TextStyle(fontFamily: 'monospace'),
+                  ),
+                ),
+              );
+
+            }),
+
+            Consumer(builder: (context,ref,child){
+              final output = ref.watch(converterProvider1.select((s)=>s.output));
+
+              return output.isEmpty?SizedBox():Column(
+                children: [
+                  SizedBox(height: 24.h,),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor:Color(0xff234B6E),
+                              side: BorderSide(color: Color(0xff234B6E))
+                          ),
+                          onPressed: () {
+                            controller1.reset();
+                          },
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(IconPath.clearIcon),
+                                SizedBox(width: 6.w,),
+                                CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                              ],
+                            ),
+                          ),
                         ),
-                        onPressed: () {
-                          controller1.reset();
-                        },
-                        child: Center(
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:AppColors.primary,
+                          ),
+                          onPressed: (){
+                            final output = ref.read(converterProvider1).output;
+                            exportOutputAsPdf(context, output);
+                          },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SvgPicture.asset(IconPath.clearIcon),
+                              SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
                               SizedBox(width: 6.w,),
-                              CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                              CustomText(text: AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
                             ],
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:AppColors.primary,
-                        ),
-                        onPressed: (){
-    final output = ref.read(converterProvider1).output;
-    exportOutputAsPdf(context, output);
-    },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-                            SizedBox(width: 6.w,),
-                            CustomText(text: AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                    ],
+                  ),
+                ],
+              );
+
+            }),
+
+
+
+
 
           ],
         ),
