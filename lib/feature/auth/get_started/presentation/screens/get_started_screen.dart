@@ -12,6 +12,7 @@ import '../../../../../core/common/widgets/new_custon_widgets/social_login.dart'
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../core/utils/constants/app_sizer.dart';
 import '../../../../../core/utils/constants/image_path.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 class GetStartedScreen extends ConsumerWidget {
   const GetStartedScreen({super.key});
@@ -28,20 +29,20 @@ class GetStartedScreen extends ConsumerWidget {
             children: [
               Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
               SizedBox(height: 24.h,),
-              CustomText(text: "Get Started",fontSize: 23.sp,fontWeight: FontWeight.w700),
+              CustomText(text: AppLocalizations.of(context)!.getStarted,fontSize: 23.sp,fontWeight: FontWeight.w700),
               SizedBox(height: 14.h,),
-              CustomText(text: "Joined by thousands of elite users who trust us to maximize their efforts and results.",fontSize: 13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,textAlign: TextAlign.center,),
+              CustomText(text: AppLocalizations.of(context)!.joinedByThousandsOfElite,fontSize: 13.sp,fontWeight: FontWeight.w400,color: AppColors.primary,textAlign: TextAlign.center,),
               SizedBox(height: 32.h,),
               CustomSocialLogin(),
               SizedBox(height: 24.h,),
               SvgPicture.asset(ImagePath.orImage),
               SizedBox(height: 24.h,),
-              CustomPrimaryButton(title: "Create an Account",onPressed: (){
+              CustomPrimaryButton(title: AppLocalizations.of(context)!.createAnAccount,onPressed: (){
                 context.go(RouteNames.signUpScreen);
               },),
               SizedBox(height: 60.h,),
 
-              CustomAccountWidget(firstTitle: "Already have an account?",buttonTitle: " Sign In",onTap: (){
+              CustomAccountWidget(firstTitle: AppLocalizations.of(context)!.alreadyHaveAnAccount,buttonTitle: " ${AppLocalizations.of(context)!.signIn}",onTap: (){
                 context.push(RouteNames.loginScreen);              },),
 
 

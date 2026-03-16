@@ -149,6 +149,32 @@
 "enterPromoCode": "Inserisci il codice promozionale",
 "apply": "Applica",
 "purchaseNow": "Acquista ora",
-"purchasePlanToContinue": "Acquista un piano per continuare"
+"purchasePlanToContinue": "Acquista un piano per continuare",
+
+"submit": "Invia",
+"selectYourCourses": "Seleziona i tuoi corsi",
+"dragToReorder": "Trascina per riordinare secondo la preferenza",
+"theCoreTools": "Gli strumenti principali",
+"splitCalculator": "Calcolatore degli split",
+"calculateTargetSplitsFor": "Calcola gli split target per qualsiasi gara. Seleziona la distanza, inserisci il tempo obiettivo e ottieni subito split precisi.",
+"courseConversion": "Conversione del corso",
+"seamlesslyConvertTimesBetweenSCY": "Converti facilmente i tempi tra i corsi SCY, LCM e SCM. Essenziale per il reclutamento universitario e le competizioni internazionali.",
+"timeSwimsWithPrecision": "Cronometra le nuotate con precisione. Pulsanti grandi e facili da premere progettati specificamente per l'uso a bordo piscina.",
+
+"getStarted": "Inizia",
+"joinedByThousandsOfElite": "Unisciti a migliaia di utenti d'élite che si affidano a noi per massimizzare i loro sforzi e risultati.",
+"emailIsRequired": "L'email è obbligatoria.",
+"invalidEmailAddress": "Indirizzo email non valido.",
+"passwordIsRequired": "La password è obbligatoria.",
+"passwordMustBe": "La password deve contenere almeno 6 caratteri.",
+"passwordMustContainUpperCaseLetter": "La password deve contenere almeno una lettera maiuscola.",
+"passwordMustContainOneNumber": "La password deve contenere almeno un numero.",
+"passwordMustContainSpacialCharacter": "La password deve contenere almeno un carattere speciale.",
+"passwordDoesNotMatch": "La password non corrisponde.",
+"phoneNumberIsRequired": "Il numero di telefono è obbligatorio.",
+"invalidPhoneNumber": "Formato del numero di telefono non valido (sono richieste 10 cifre).",
+"nameIsRequired": "Il nome è obbligatorio.",
+"subjectOfProblemIsRequired": "L'oggetto del problema è obbligatorio.",
+"problemOrSuggestionIsRequired": "Il problema o il suggerimento sono obbligatori."
 
 }

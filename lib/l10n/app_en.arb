@@ -161,7 +161,32 @@
 "purchaseNow": "Purchase Now",
 "purchasePlanToContinue": "Purchase plan to continue",
 
-"submit": "Submit"
+"submit": "Submit",
+"selectYourCourses": "Select Your Courses",
+"dragToReorder": "Drag to reorder by preference",
+"theCoreTools": "The Core Tools",
+"splitCalculator": "Split Calculator",
+"calculateTargetSplitsFor": "Calculate target splits for any event. Select your distance, input your goal time, and get precise splits instantly.",
+"courseConversion": "Course Conversion",
+"seamlesslyConvertTimesBetweenSCY": "Seamlessly convert times between SCY, LCM, and SCM courses. Essential for college recruiting and international meets.",
+"timeSwimsWithPrecision": "Time swims with precision. Large, easy-to-hit buttons designed specifically for poolside use.",
+
+"getStarted": "Get Started",
+"joinedByThousandsOfElite": "Joined by thousands of elite users who trust us to maximize their efforts and results.",
+"emailIsRequired": "Email is required.",
+"invalidEmailAddress": "Invalid email address.",
+"passwordIsRequired": "Password is required.",
+"passwordMustBe": "Password must be at least 6 characters long.",
+"passwordMustContainUpperCaseLetter": "Password must contain at least one uppercase letter.",
+"passwordMustContainOneNumber": "Password must contain at least one number.",
+"passwordMustContainSpacialCharacter": "Password must contain at least one special character.",
+"passwordDoesNotMatch": "Password doesn't match",
+"phoneNumberIsRequired": "Phone number is required.",
+"invalidPhoneNumber": "Invalid phone number format (10 digits required).",
+"nameIsRequired": "Name is required.",
+"subjectOfProblemIsRequired": "Subject of problem is required.",
+"problemOrSuggestionIsRequired": "Problem or suggestion is required."
+
 
 
 

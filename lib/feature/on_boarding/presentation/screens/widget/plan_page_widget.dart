@@ -4,7 +4,9 @@ import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/premium_plan_card_widget.dart';
 
-import '../../../../auth/sign_up_section/payment/river_pod/payment_controller.dart';
+import '../../../../../l10n/app_localizations.dart';
+
+
 
 
 class PlanPage extends ConsumerWidget {
@@ -26,7 +28,7 @@ class PlanPage extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: CustomText(
                 text:
-                "The Plan We Have",
+                AppLocalizations.of(context)!.thePlanWeHave,
 
                   color: Colors.white,
                   fontSize: 22.sp,

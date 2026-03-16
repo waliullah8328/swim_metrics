@@ -123,7 +123,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get splitCalculation => 'Calcul de division';
 
   @override
-  String get courseConversion => 'Conversion de parcours';
+  String get courseConversion => 'Conversion de bassin';
 
   @override
   String get stopWatch => 'Chronomètre';
@@ -434,5 +434,79 @@ class AppLocalizationsFr extends AppLocalizations {
   String get purchasePlanToContinue => 'Achetez un plan pour continuer';
 
   @override
-  String get submit => 'Submit';
+  String get submit => 'Soumettre';
+
+  @override
+  String get selectYourCourses => 'Sélectionnez vos courses';
+
+  @override
+  String get dragToReorder =>
+      'Faites glisser pour réorganiser selon vos préférences';
+
+  @override
+  String get theCoreTools => 'Les outils principaux';
+
+  @override
+  String get calculateTargetSplitsFor =>
+      'Calculez les splits cibles pour n\'importe quelle épreuve. Sélectionnez votre distance, saisissez votre temps objectif et obtenez instantanément des splits précis.';
+
+  @override
+  String get seamlesslyConvertTimesBetweenSCY =>
+      'Convertissez facilement les temps entre les bassins SCY, LCM et SCM. Essentiel pour le recrutement universitaire et les compétitions internationales.';
+
+  @override
+  String get timeSwimsWithPrecision =>
+      'Chronométrez les nages avec précision. De grands boutons faciles à utiliser spécialement conçus pour une utilisation au bord de la piscine.';
+
+  @override
+  String get getStarted => 'Commencer';
+
+  @override
+  String get joinedByThousandsOfElite =>
+      'Rejoignez des milliers d\'utilisateurs d\'élite qui nous font confiance pour maximiser leurs efforts et leurs résultats.';
+
+  @override
+  String get emailIsRequired => 'L\'email est requis.';
+
+  @override
+  String get invalidEmailAddress => 'Adresse e-mail invalide.';
+
+  @override
+  String get passwordIsRequired => 'Le mot de passe est requis.';
+
+  @override
+  String get passwordMustBe =>
+      'Le mot de passe doit contenir au moins 6 caractères.';
+
+  @override
+  String get passwordMustContainUpperCaseLetter =>
+      'Le mot de passe doit contenir au moins une lettre majuscule.';
+
+  @override
+  String get passwordMustContainOneNumber =>
+      'Le mot de passe doit contenir au moins un chiffre.';
+
+  @override
+  String get passwordMustContainSpacialCharacter =>
+      'Le mot de passe doit contenir au moins un caractère spécial.';
+
+  @override
+  String get passwordDoesNotMatch => 'Le mot de passe ne correspond pas.';
+
+  @override
+  String get phoneNumberIsRequired => 'Le numéro de téléphone est requis.';
+
+  @override
+  String get invalidPhoneNumber =>
+      'Format de numéro de téléphone invalide (10 chiffres requis).';
+
+  @override
+  String get nameIsRequired => 'Le nom est requis.';
+
+  @override
+  String get subjectOfProblemIsRequired => 'Le sujet du problème est requis.';
+
+  @override
+  String get problemOrSuggestionIsRequired =>
+      'Le problème ou la suggestion sont requis.';
 }

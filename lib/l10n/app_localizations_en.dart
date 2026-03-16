@@ -122,7 +122,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splitCalculation => 'Split calculation';
 
   @override
-  String get courseConversion => 'Course conversion';
+  String get courseConversion => 'Course Conversion';
 
   @override
   String get stopWatch => 'Stopwatch';
@@ -430,4 +430,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get submit => 'Submit';
+
+  @override
+  String get selectYourCourses => 'Select Your Courses';
+
+  @override
+  String get dragToReorder => 'Drag to reorder by preference';
+
+  @override
+  String get theCoreTools => 'The Core Tools';
+
+  @override
+  String get calculateTargetSplitsFor =>
+      'Calculate target splits for any event. Select your distance, input your goal time, and get precise splits instantly.';
+
+  @override
+  String get seamlesslyConvertTimesBetweenSCY =>
+      'Seamlessly convert times between SCY, LCM, and SCM courses. Essential for college recruiting and international meets.';
+
+  @override
+  String get timeSwimsWithPrecision =>
+      'Time swims with precision. Large, easy-to-hit buttons designed specifically for poolside use.';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get joinedByThousandsOfElite =>
+      'Joined by thousands of elite users who trust us to maximize their efforts and results.';
+
+  @override
+  String get emailIsRequired => 'Email is required.';
+
+  @override
+  String get invalidEmailAddress => 'Invalid email address.';
+
+  @override
+  String get passwordIsRequired => 'Password is required.';
+
+  @override
+  String get passwordMustBe => 'Password must be at least 6 characters long.';
+
+  @override
+  String get passwordMustContainUpperCaseLetter =>
+      'Password must contain at least one uppercase letter.';
+
+  @override
+  String get passwordMustContainOneNumber =>
+      'Password must contain at least one number.';
+
+  @override
+  String get passwordMustContainSpacialCharacter =>
+      'Password must contain at least one special character.';
+
+  @override
+  String get passwordDoesNotMatch => 'Password doesn\'t match';
+
+  @override
+  String get phoneNumberIsRequired => 'Phone number is required.';
+
+  @override
+  String get invalidPhoneNumber =>
+      'Invalid phone number format (10 digits required).';
+
+  @override
+  String get nameIsRequired => 'Name is required.';
+
+  @override
+  String get subjectOfProblemIsRequired => 'Subject of problem is required.';
+
+  @override
+  String get problemOrSuggestionIsRequired =>
+      'Problem or suggestion is required.';
 }

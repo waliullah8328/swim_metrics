@@ -16,6 +16,7 @@ import '../../../../core/common/widgets/new_custon_widgets/custom_screen_back_gr
 import '../../../../core/services/token_storage.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../riverpod/on_boarding_view_model.dart';
 
 
@@ -97,7 +98,7 @@ class _OnboardingScreenState
                 child: CustomPrimaryButton(onPressed: (){
                   TokenStorage.setOnboardingSeen(true);
                   context.go(RouteNames.getStartedScreen);
-                },title: "Continue",),
+                },title: AppLocalizations.of(context)!.continue1,),
               ),
 
             

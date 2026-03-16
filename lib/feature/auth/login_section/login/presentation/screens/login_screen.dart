@@ -92,7 +92,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     controller: emailController,
                     hintText: AppLocalizations.of(context)!.enterYourEmail,
               
-                    validator: AppValidator.validateEmail,
+                    validator: (value){
+
+                      return  AppValidator.validateEmail(value,context);
+                    },
               
                     onChanged: (value) {
                       ref.read(loginProvider.notifier).setEmail(value);
@@ -116,7 +119,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                      controller: passwordController,
                      hintText: AppLocalizations.of(context)!.enterYourPassword,
                      obscureText: !isRemember ,
-                     validator: AppValidator.validatePassword,
+                     validator: (value){
+
+                       return  AppValidator.validatePassword(value,context);
+                     },
                      onChanged: (password) {
                        ref.read(loginProvider.notifier).
                        setPassword(password);

@@ -20,17 +20,14 @@ class CourseWheelSelector extends StatefulWidget {
 
 class _CourseWheelSelectorState extends State<CourseWheelSelector> {
   late FixedExtentScrollController _controller;
-
   int selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
 
-    /// start from first item
     _controller = FixedExtentScrollController(initialItem: selectedIndex);
 
-    /// return first value
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onChanged(widget.items[selectedIndex]);
     });
@@ -51,7 +48,7 @@ class _CourseWheelSelectorState extends State<CourseWheelSelector> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          /// Wheel List
+          /// Wheel
           ListWheelScrollView.useDelegate(
             controller: _controller,
             itemExtent: itemHeight,
@@ -67,31 +64,23 @@ class _CourseWheelSelectorState extends State<CourseWheelSelector> {
             },
             childDelegate: ListWheelChildBuilderDelegate(
               builder: (context, index) {
-                if (index < 0 || index >= widget.items.length) {
-                  return null;
-                }
+                if (index < 0 || index >= widget.items.length) return null;
 
                 final isSelected = index == selectedIndex;
 
-                /// Dynamic numbering based on selected index
-                int displayNumber = (index - selectedIndex).abs() + 1;
-
                 return Center(
                   child: Padding(
-                    padding: EdgeInsets.only(left: 24.w, right: 24.w),
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        /// Number
+                        /// Number only for selected
                         Text(
-                          "$displayNumber.",
+                          (index+1).toString(),
                           style: TextStyle(
                             fontSize: 19.sp,
-                            color:
-                            isSelected ? Colors.amber : Colors.white70,
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
+                            color:  isSelected ? Colors.amber : Colors.white70,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
 
@@ -112,6 +101,9 @@ class _CourseWheelSelectorState extends State<CourseWheelSelector> {
                         SvgPicture.asset(
                           IconPath.courseIcon,
                           height: 20.h,
+                          color: isSelected
+                              ? Colors.amber
+                              : Colors.white70,
                         ),
                       ],
                     ),
@@ -122,20 +114,14 @@ class _CourseWheelSelectorState extends State<CourseWheelSelector> {
             ),
           ),
 
-          /// Center highlight
+          /// Center Highlight
           IgnorePointer(
             child: Container(
               height: itemHeight,
               decoration: const BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: AppColors.primary,
-                    width: 0.5,
-                  ),
-                  bottom: BorderSide(
-                    color: AppColors.primary,
-                    width: 0.5,
-                  ),
+                  top: BorderSide(color: AppColors.primary, width: 0.5),
+                  bottom: BorderSide(color: AppColors.primary, width: 0.5),
                 ),
               ),
             ),

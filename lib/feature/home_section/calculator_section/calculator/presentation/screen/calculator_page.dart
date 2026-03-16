@@ -204,7 +204,8 @@ class SplitCalculatorPage extends ConsumerWidget {
                                           ),
                                           SizedBox(height: 6.h),
                                           SplitCalculatorSelector(
-                                            items:  [AppLocalizations.of(context)!.men, AppLocalizations.of(context)!.women],
+                                            items:  ["Men", "Women"],
+                                            selectedValue: ref.watch(splitCalcProvider).gender,
                                             onChanged: (value) {
                                               ref.read(splitCalcProvider.notifier).setGender((value ).toLowerCase());
                                             },
@@ -223,7 +224,8 @@ class SplitCalculatorPage extends ConsumerWidget {
                                           ),
                                           SizedBox(height: 6.h),
                                           SplitCalculatorSelector(
-                                            items: [AppLocalizations.of(context)!.fly, AppLocalizations.of(context)!.back,AppLocalizations.of(context)!.breast,AppLocalizations.of(context)!.free,AppLocalizations.of(context)!.im],
+                                            items: ["Fly", "Back","Breast","Free","IM"],
+                                             selectedValue: ref.watch(splitCalcProvider).stroke,
                                             onChanged: (value) {
                                               ref.read(splitCalcProvider.notifier).setStroke((value ?? 'SCY').toLowerCase());
                                             },

@@ -9,6 +9,7 @@ import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/sign_up_section/payment/presentation/screen/widget/premium_card_shimmer_widget.dart';
 import '../../../../auth/sign_up_section/payment/river_pod/payment_controller.dart';
 
@@ -55,7 +56,7 @@ class PremiumPlanCard extends ConsumerWidget {
                   children: [
                     CustomText(
                       text:
-                      "Premium",
+                      AppLocalizations.of(context)!.premium,
 
                       fontSize: 22.h,
                       fontWeight: FontWeight.w600,
@@ -78,7 +79,7 @@ class PremiumPlanCard extends ConsumerWidget {
                         SizedBox(height: 2.h),
                         CustomText(
                           text:
-                          "One Time Pay",
+                          AppLocalizations.of(context)!.oneTimePay,
 
                           fontSize: 12.sp,
                           color: Colors.white70,
@@ -128,7 +129,7 @@ class PremiumPlanCard extends ConsumerWidget {
                           ref.read(promoCodeProvider.notifier).state = value,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
-                            hintText: "Enter promo code",
+                            hintText: AppLocalizations.of(context)!.enterPromoCode,
                             filled: true,
                             fillColor: const Color(0xff153250),
                             hintStyle: const TextStyle(color:Color(0xffE3D99B),),
@@ -187,7 +188,7 @@ class PremiumPlanCard extends ConsumerWidget {
                         )
                             : CustomText(
                           text:
-                          "Apply",
+                          AppLocalizations.of(context)!.apply,
 
                           color: Colors.white,
                           fontWeight: FontWeight.w600,

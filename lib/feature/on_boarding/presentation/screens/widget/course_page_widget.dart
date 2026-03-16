@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../core/utils/constants/app_colors.dart';
@@ -32,7 +33,7 @@ class CoursePage extends ConsumerWidget {
                     SvgPicture.asset(IconPath.rankCourseIcon),
                     SizedBox(width: 10.w),
                     CustomText(
-                      text: "Rank Your Courses",
+                      text: AppLocalizations.of(context)!.selectYourCourses,
                       fontSize: 24.sp,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textWhite,
@@ -41,7 +42,7 @@ class CoursePage extends ConsumerWidget {
                 ),
               ),
               CustomText(
-                text: "Drag to reorder by preference",
+                text: AppLocalizations.of(context)!.dragToReorder,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 color: AppColors.textGrey,

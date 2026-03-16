@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
 
-class SplitCalculatorSelector extends StatefulWidget {
+class SplitCalculatorSelectorOne extends StatefulWidget {
   final List<String> items;
   final String selectedValue;
   final ValueChanged<String> onChanged;
 
-  const SplitCalculatorSelector({
+  const SplitCalculatorSelectorOne({
     super.key,
     required this.items,
     required this.selectedValue,
@@ -15,12 +15,12 @@ class SplitCalculatorSelector extends StatefulWidget {
   });
 
   @override
-  State<SplitCalculatorSelector> createState() =>
-      _SplitCalculatorSelectorState();
+  State<SplitCalculatorSelectorOne> createState() =>
+      _SplitCalculatorSelectorOneState();
 }
 
-class _SplitCalculatorSelectorState
-    extends State<SplitCalculatorSelector> {
+class _SplitCalculatorSelectorOneState
+    extends State<SplitCalculatorSelectorOne> {
 
   late FixedExtentScrollController _controller;
   late int selectedIndex;
@@ -36,7 +36,7 @@ class _SplitCalculatorSelectorState
   }
 
   @override
-  void didUpdateWidget(covariant SplitCalculatorSelector oldWidget) {
+  void didUpdateWidget(covariant SplitCalculatorSelectorOne oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     final newIndex = widget.items.indexOf(widget.selectedValue);
@@ -54,6 +54,10 @@ class _SplitCalculatorSelectorState
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
+        side: const BorderSide( // ✅ Card grey border
+          color: Colors.grey,
+          width: 1,
+        ),
       ),
       child: SizedBox(
         width: double.infinity,
@@ -84,14 +88,19 @@ class _SplitCalculatorSelectorState
                   final isSelected = index == selectedIndex;
 
                   return Center(
-                    child: Text(
-                      widget.items[index],
-                      style: TextStyle(
-                        fontSize: 19.sp,
-                        color: isSelected ? Colors.amber : null,
-                        fontWeight: isSelected
-                            ? FontWeight.w500
-                            : FontWeight.normal,
+                    child: Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+
+                      child: Text(
+                        widget.items[index],
+                        style: TextStyle(
+                          fontSize: 19.sp,
+                          color: isSelected ? Colors.amber : null,
+                          fontWeight: isSelected
+                              ? FontWeight.w500
+                              : FontWeight.normal,
+                        ),
                       ),
                     ),
                   );
@@ -106,11 +115,11 @@ class _SplitCalculatorSelectorState
                 decoration: const BoxDecoration(
                   border: Border(
                     top: BorderSide(
-                      color: AppColors.primary,
+                      color: AppColors.textGrey,
                       width: 0.5,
                     ),
                     bottom: BorderSide(
-                      color: AppColors.primary,
+                      color: AppColors.textGrey,
                       width: 0.5,
                     ),
                   ),

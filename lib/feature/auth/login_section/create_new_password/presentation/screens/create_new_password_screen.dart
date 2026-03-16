@@ -85,7 +85,10 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                       focusNode: _passwordFocusNode,
                       hintText: AppLocalizations.of(context)!.enterYourPassword,
                       obscureText: !isRemember ,
-                      validator: AppValidator.validatePassword,
+                      validator: (value){
+
+                        return  AppValidator.validatePassword(value,context);
+                      },
                       onChanged: (password) {
                         ref.read(createNewPasswordProvider.notifier).
                         setPassword(password);
@@ -125,7 +128,7 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                       obscureText: !isPasswordVisible ,
                       validator: (value){
                         final password = ref.watch(createNewPasswordProvider.select((s)=>s.password));
-                        return AppValidator.validateConfirmPassword(value,password );
+                        return AppValidator.validateConfirmPassword(value,password ,context);
 
                       },
                       onChanged: (confirmPassword) {

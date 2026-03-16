@@ -106,7 +106,10 @@ class _HelpSupportScreenState extends ConsumerState<HelpSupportScreen> {
                     SizedBox(height: 6.h),
                     TextFormField(
                       controller: emailController,
-                      validator: AppValidator.validateEmail,
+                      validator: (value){
+
+                        return  AppValidator.validateEmail(value,context);
+                      },
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       onChanged: (value){
                         ref.read(helpSupportProvider.notifier).setEmail(value);
@@ -123,7 +126,10 @@ class _HelpSupportScreenState extends ConsumerState<HelpSupportScreen> {
                     TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       controller: subjectController,
-                      validator: AppValidator.validateSubjectOfProblem,
+                      validator: (value){
+
+                        return  AppValidator.validateSubjectOfProblem(value,context);
+                      },
                       onChanged: (value){
                         ref.read(helpSupportProvider.notifier).setSubjectOfProblem(value);
                       },
@@ -138,7 +144,10 @@ class _HelpSupportScreenState extends ConsumerState<HelpSupportScreen> {
                     TextFormField(
                       controller: problemController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: AppValidator.validateProblemOrSuggestion,
+                      validator: (value){
+
+                        return  AppValidator.validateProblemOrSuggestion(value,context);
+                      },
                       onChanged: (value){
                         ref.read(helpSupportProvider.notifier).setProblemOfSuggestion(value);
                       },
