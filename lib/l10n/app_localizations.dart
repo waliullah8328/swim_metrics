@@ -327,7 +327,7 @@ abstract class AppLocalizations {
   /// No description provided for @courseConversion.
   ///
   /// In en, this message translates to:
-  /// **'Course conversion'**
+  /// **'Course Conversion'**
   String get courseConversion;
 
   /// No description provided for @stopWatch.
@@ -935,6 +935,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submit'**
   String get submit;
+
+  /// No description provided for @selectYourCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Your Courses'**
+  String get selectYourCourses;
+
+  /// No description provided for @dragToReorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reorder by preference'**
+  String get dragToReorder;
+
+  /// No description provided for @theCoreTools.
+  ///
+  /// In en, this message translates to:
+  /// **'The Core Tools'**
+  String get theCoreTools;
+
+  /// No description provided for @calculateTargetSplitsFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate target splits for any event. Select your distance, input your goal time, and get precise splits instantly.'**
+  String get calculateTargetSplitsFor;
+
+  /// No description provided for @seamlesslyConvertTimesBetweenSCY.
+  ///
+  /// In en, this message translates to:
+  /// **'Seamlessly convert times between SCY, LCM, and SCM courses. Essential for college recruiting and international meets.'**
+  String get seamlesslyConvertTimesBetweenSCY;
+
+  /// No description provided for @timeSwimsWithPrecision.
+  ///
+  /// In en, this message translates to:
+  /// **'Time swims with precision. Large, easy-to-hit buttons designed specifically for poolside use.'**
+  String get timeSwimsWithPrecision;
+
+  /// No description provided for @getStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// No description provided for @joinedByThousandsOfElite.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined by thousands of elite users who trust us to maximize their efforts and results.'**
+  String get joinedByThousandsOfElite;
+
+  /// No description provided for @emailIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required.'**
+  String get emailIsRequired;
+
+  /// No description provided for @invalidEmailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email address.'**
+  String get invalidEmailAddress;
+
+  /// No description provided for @passwordIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required.'**
+  String get passwordIsRequired;
+
+  /// No description provided for @passwordMustBe.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters long.'**
+  String get passwordMustBe;
+
+  /// No description provided for @passwordMustContainUpperCaseLetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must contain at least one uppercase letter.'**
+  String get passwordMustContainUpperCaseLetter;
+
+  /// No description provided for @passwordMustContainOneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must contain at least one number.'**
+  String get passwordMustContainOneNumber;
+
+  /// No description provided for @passwordMustContainSpacialCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must contain at least one special character.'**
+  String get passwordMustContainSpacialCharacter;
+
+  /// No description provided for @passwordDoesNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Password doesn\'t match'**
+  String get passwordDoesNotMatch;
+
+  /// No description provided for @phoneNumberIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number is required.'**
+  String get phoneNumberIsRequired;
+
+  /// No description provided for @invalidPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid phone number format (10 digits required).'**
+  String get invalidPhoneNumber;
+
+  /// No description provided for @nameIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required.'**
+  String get nameIsRequired;
+
+  /// No description provided for @subjectOfProblemIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject of problem is required.'**
+  String get subjectOfProblemIsRequired;
+
+  /// No description provided for @problemOrSuggestionIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem or suggestion is required.'**
+  String get problemOrSuggestionIsRequired;
 }
 
 class _AppLocalizationsDelegate

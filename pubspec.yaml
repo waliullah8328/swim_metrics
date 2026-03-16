@@ -37,6 +37,9 @@ dependencies:
   printing: ^5.13.0
   pdf: ^3.11.0
   collection: ^1.18.0
+  open_file: ^3.2.1
+  speech_to_text: ^7.3.0
+
   shimmer:
 
 

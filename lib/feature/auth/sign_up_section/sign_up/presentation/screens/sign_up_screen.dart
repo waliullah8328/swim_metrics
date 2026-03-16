@@ -83,7 +83,10 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
 
                     hintText: AppLocalizations.of(context)!.enterYourName,
 
-                    validator: AppValidator.validateName,
+                    validator: (value){
+
+                      return  AppValidator.validateName(value,context);
+                    },
 
                     onChanged: (value) {
                       ref.read(signUpProvider.notifier).setName(value);
@@ -106,7 +109,10 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
 
                     hintText: AppLocalizations.of(context)!.enterYourEmail,
 
-                    validator: AppValidator.validateEmail,
+                    validator: (value){
+
+                      return  AppValidator.validateEmail(value,context);
+                    },
 
                     onChanged: (value) {
                       ref.read(signUpProvider.notifier).setEmail(value);
@@ -130,7 +136,10 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                       focusNode: _passwordFocusNode,
                       hintText: AppLocalizations.of(context)!.enterYourPassword,
                       obscureText: !isRemember ,
-                      validator: AppValidator.validatePassword,
+                      validator: (value){
+
+                        return  AppValidator.validatePassword(value,context);
+                      },
                       onChanged: (password) {
                         ref.read(signUpProvider.notifier).
                         setPassword(password);
@@ -170,7 +179,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                       obscureText: !isPasswordVisible ,
                       validator: (value){
                         final password = ref.watch(signUpProvider.select((s)=>s.password));
-                        return AppValidator.validateConfirmPassword(value,password );
+                        return AppValidator.validateConfirmPassword(value,password,context );
 
                       },
                       onChanged: (confirmPassword) {

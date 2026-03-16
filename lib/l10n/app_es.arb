@@ -153,7 +153,33 @@
 "enterPromoCode": "Ingresa el código promocional",
 "apply": "Aplicar",
 "purchaseNow": "Comprar ahora",
-"purchasePlanToContinue": "Compra un plan para continuar"
+"purchasePlanToContinue": "Compra un plan para continuar",
+
+"submit": "Enviar",
+"selectYourCourses": "Selecciona tus cursos",
+"dragToReorder": "Arrastra para reorganizar por preferencia",
+"theCoreTools": "Las herramientas principales",
+"splitCalculator": "Calculadora de splits",
+"calculateTargetSplitsFor": "Calcula los splits objetivo para cualquier evento. Selecciona tu distancia, ingresa tu tiempo objetivo y obtén splits precisos al instante.",
+"courseConversion": "Conversión de curso",
+"seamlesslyConvertTimesBetweenSCY": "Convierte tiempos fácilmente entre cursos SCY, LCM y SCM. Esencial para el reclutamiento universitario y competiciones internacionales.",
+"timeSwimsWithPrecision": "Cronometra las pruebas con precisión. Botones grandes y fáciles de presionar diseñados específicamente para usar junto a la piscina.",
+
+"getStarted": "Comenzar",
+"joinedByThousandsOfElite": "Únete a miles de usuarios de élite que confían en nosotros para maximizar sus esfuerzos y resultados.",
+"emailIsRequired": "El correo electrónico es obligatorio.",
+"invalidEmailAddress": "Dirección de correo electrónico no válida.",
+"passwordIsRequired": "La contraseña es obligatoria.",
+"passwordMustBe": "La contraseña debe tener al menos 6 caracteres.",
+"passwordMustContainUpperCaseLetter": "La contraseña debe contener al menos una letra mayúscula.",
+"passwordMustContainOneNumber": "La contraseña debe contener al menos un número.",
+"passwordMustContainSpacialCharacter": "La contraseña debe contener al menos un carácter especial.",
+"passwordDoesNotMatch": "La contraseña no coincide.",
+"phoneNumberIsRequired": "El número de teléfono es obligatorio.",
+"invalidPhoneNumber": "Formato de número de teléfono no válido (se requieren 10 dígitos).",
+"nameIsRequired": "El nombre es obligatorio.",
+"subjectOfProblemIsRequired": "El asunto del problema es obligatorio.",
+"problemOrSuggestionIsRequired": "El problema o la sugerencia son obligatorios."
 
 
 

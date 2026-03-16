@@ -232,6 +232,6 @@ class ConverterController extends Notifier<ConverterState> {
   }
 
   void reset() {
-    state = const ConverterState();
+    state = state.copyWith(output: '');
   }
 }

@@ -63,7 +63,10 @@ class _LoginScreenState extends ConsumerState<ForgetPasswordScreen> {
                   focusNode: _emailFocusNode,
                   hintText: AppLocalizations.of(context)!.enterYourEmail,
             
-                  validator: AppValidator.validateEmail,
+                  validator: (value){
+
+                    return  AppValidator.validateEmail(value,context);
+                  },
             
                   onChanged: (value) {
                     ref.read(forgetPasswordProvider.notifier).setEmail(value);

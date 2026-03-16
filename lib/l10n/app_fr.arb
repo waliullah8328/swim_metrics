@@ -150,6 +150,31 @@
 "enterPromoCode": "Entrez le code promo",
 "apply": "Appliquer",
 "purchaseNow": "Acheter maintenant",
-"purchasePlanToContinue": "Achetez un plan pour continuer"
+"purchasePlanToContinue": "Achetez un plan pour continuer",
+"submit": "Soumettre",
+"selectYourCourses": "Sélectionnez vos courses",
+"dragToReorder": "Faites glisser pour réorganiser selon vos préférences",
+"theCoreTools": "Les outils principaux",
+"splitCalculator": "Calculateur de splits",
+"calculateTargetSplitsFor": "Calculez les splits cibles pour n'importe quelle épreuve. Sélectionnez votre distance, saisissez votre temps objectif et obtenez instantanément des splits précis.",
+"courseConversion": "Conversion de bassin",
+"seamlesslyConvertTimesBetweenSCY": "Convertissez facilement les temps entre les bassins SCY, LCM et SCM. Essentiel pour le recrutement universitaire et les compétitions internationales.",
+"timeSwimsWithPrecision": "Chronométrez les nages avec précision. De grands boutons faciles à utiliser spécialement conçus pour une utilisation au bord de la piscine.",
+
+"getStarted": "Commencer",
+"joinedByThousandsOfElite": "Rejoignez des milliers d'utilisateurs d'élite qui nous font confiance pour maximiser leurs efforts et leurs résultats.",
+"emailIsRequired": "L'email est requis.",
+"invalidEmailAddress": "Adresse e-mail invalide.",
+"passwordIsRequired": "Le mot de passe est requis.",
+"passwordMustBe": "Le mot de passe doit contenir au moins 6 caractères.",
+"passwordMustContainUpperCaseLetter": "Le mot de passe doit contenir au moins une lettre majuscule.",
+"passwordMustContainOneNumber": "Le mot de passe doit contenir au moins un chiffre.",
+"passwordMustContainSpacialCharacter": "Le mot de passe doit contenir au moins un caractère spécial.",
+"passwordDoesNotMatch": "Le mot de passe ne correspond pas.",
+"phoneNumberIsRequired": "Le numéro de téléphone est requis.",
+"invalidPhoneNumber": "Format de numéro de téléphone invalide (10 chiffres requis).",
+"nameIsRequired": "Le nom est requis.",
+"subjectOfProblemIsRequired": "Le sujet du problème est requis.",
+"problemOrSuggestionIsRequired": "Le problème ou la suggestion sont requis."
 
 }

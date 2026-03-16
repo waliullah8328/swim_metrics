@@ -6,13 +6,14 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
+import '../../../../../../core/common/widgets/new_custon_widgets/split_calculator_selector_one.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
 
+import '../../../../calculator_section/calculator/presentation/screen/splict_custom_widget.dart';
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import '../../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 
-import '../../riverpod/stop_watch_controller.dart';
 import '../../riverpod/stop_watch_controller_2.dart';
 
 enum StopwatchStatus { initial, running, stopped }
@@ -59,7 +60,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final status = ref.watch(stopwatchProvider1);
@@ -135,7 +135,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isDark?Color(0xff153250):Colors.white,
+                  color: isDark ? Color(0xff153250) : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
                     BoxShadow(
@@ -160,6 +160,12 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       child: GestureDetector(
                         onTap: () {
                           ref.read(stopwatchProvider2.notifier).setMode(mode);
+                          ref
+                              .read(
+                            stopwatchProvider1.notifier,
+                          )
+                              .clear();
+                          ref.read(stopwatchProvider2.notifier).stop();
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -774,222 +780,69 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       child: Column(
                         children: [
                           if (showCourse)
-                            Column(
+                            Row(
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: AppLocalizations.of(context)!.from,
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      CustomText(
+                                        text: AppLocalizations.of(context)!.from,
 
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14.sp,
-                                    ),
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14.sp,
+                                      ),
+                                      SizedBox(height: 8.h,),
+                                      Consumer(
+                                        builder: (context, ref, child) {
 
-                                    SizedBox(height: 10.h),
-                                    Consumer(
-                                      builder: (context, ref, child) {
-                                        final fromCource = ref.watch(
-                                          stopwatchProvider2.select(
-                                            (s) => s.fromCourse,
-                                          ),
-                                        );
-                                        return SizedBox(
-                                          width: double.infinity,
-                                          child: PopupMenuButton<String>(
-                                            onSelected: (v) {
+                                          final state = ref.watch(stopwatchProvider2);
+
+                                          return SplitCalculatorSelectorOne(
+                                            items: const ["SCM", "SCY", "LCM"],
+                                            selectedValue: state.fromCourse,   // ✅ keep selected after refresh
+                                            onChanged: (value) {
                                               ref
-                                                  .read(
-                                                    stopwatchProvider2.notifier,
-                                                  )
-                                                  .setConverterCourses(from: v);
+                                                  .read(stopwatchProvider2.notifier)
+                                                  .setConverterCourses(from: value);
                                             },
-
-                                            color: isDark?Color(0xff153250):Colors.white,
-
-                                            /// move dropdown to the right
-                                            offset: const Offset(100, 45),
-
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.scm,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.scm,
-                                                ),
-                                              ),
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.scy,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.scy,
-                                                ),
-                                              ),
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.lcm,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.lcm,
-                                                ),
-                                              ),
-                                            ],
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: isDark?Color(0xff153250):Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    fromCource.toString(),
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-
-                                                    ),
-                                                  ),
-                                                  const Icon(
-                                                    Icons.arrow_drop_down,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 20.h),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: AppLocalizations.of(context)!.to,
-
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14.sp,
-                                    ),
-
-                                    SizedBox(height: 10.h),
-                                    Consumer(
-                                      builder: (context, ref, child) {
-                                        final fromCource = ref.watch(
-                                          stopwatchProvider2.select(
-                                            (s) => s.toCourse,
-                                          ),
-                                        );
-                                        return SizedBox(
-                                          width: double.infinity,
-                                          child: PopupMenuButton<String>(
-                                            onSelected: (v) {
-                                              ref
-                                                  .read(
-                                                    stopwatchProvider2.notifier,
-                                                  )
-                                                  .setConverterCourses(to: v);
-                                            },
-
-                                            color: isDark?Color(0xff153250):Colors.white,
-
-                                            /// move dropdown to the right
-                                            offset: const Offset(100, 45),
-
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.scm,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.scm,
-                                                ),
-                                              ),
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.scy,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.scy,
-                                                ),
-                                              ),
-                                              PopupMenuItem(
-                                                value: AppLocalizations.of(
-                                                  context,
-                                                )!.lcm,
-                                                child: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  )!.lcm,
-                                                ),
-                                              ),
-                                            ],
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: isDark?Color(0xff153250):Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    fromCource.toString(),
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-
-                                                    ),
-                                                  ),
-                                                  const Icon(
-                                                    Icons.arrow_drop_down,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
 
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      CustomText(
+                                        text: AppLocalizations.of(context)!.to,
+
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14.sp,
+                                      ),
+                                      SizedBox(height: 8.h,),
+                                      Consumer(
+                                        builder: (context, ref, child) {
+
+                                          final state = ref.watch(stopwatchProvider2);
+
+                                          return SplitCalculatorSelectorOne(
+                                            items: const ["SCM", "SCY", "LCM"],
+                                            selectedValue: state.toCourse,   // ✅ keep selected after refresh
+                                            onChanged: (value) {
+                                              ref
+                                                  .read(stopwatchProvider2.notifier)
+                                                  .setConverterCourses(to: value);
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
 
@@ -1038,7 +891,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                 SizedBox(height: 20.h),
 
                                 /// INITIAL STATE
-                                if (status == StopwatchStatus.initial)
+                                if (status == StopwatchStatus.initial &&
+                                    activeMode == 'Converter')
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       fixedSize: Size(double.infinity, 52.h),
@@ -1078,7 +932,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                   ),
 
                                 /// RUNNING STATE
-                                if (status == StopwatchStatus.running)
+                                if (status == StopwatchStatus.running &&
+                                    activeMode == 'Converter')
                                   Column(
                                     children: [
                                       ElevatedButton(
@@ -1242,7 +1097,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                   ),
 
                                 /// STOPPED STATE
-                                if (status == StopwatchStatus.stopped)
+                                if (status == StopwatchStatus.stopped &&
+                                    activeMode == 'Converter')
                                   Row(
                                     children: [
                                       Expanded(
@@ -1518,7 +1374,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ),
                                         );
                                         return PopupMenuButton<String>(
-                                          color: isDark?Color(0xff153250):Colors.white,
+                                          color: isDark
+                                              ? Color(0xff153250)
+                                              : Colors.white,
                                           onSelected: (v) => ref
                                               .read(stopwatchProvider2.notifier)
                                               .setPredictorParams(g: v),
@@ -1539,7 +1397,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               vertical: 14,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: isDark?Color(0xff153250):Colors.white,
+                                              color: isDark
+                                                  ? Color(0xff153250)
+                                                  : Colors.white,
                                               borderRadius:
                                                   BorderRadius.circular(6),
                                               border: Border.all(
@@ -1555,7 +1415,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   gender.toString(),
                                                   style: const TextStyle(
                                                     fontSize: 16,
-
                                                   ),
                                                 ),
                                                 const Icon(
@@ -1603,7 +1462,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 .setPredictorParams(
                                                   c: v.toLowerCase(),
                                                 ),
-                                            color: isDark?Color(0xff153250):Colors.white,
+                                            color: isDark
+                                                ? Color(0xff153250)
+                                                : Colors.white,
 
                                             /// move dropdown to the right
                                             offset: const Offset(100, 45),
@@ -1648,7 +1509,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: isDark?Color(0xff153250):Colors.white,
+                                                color: isDark
+                                                    ? Color(0xff153250)
+                                                    : Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -1664,7 +1527,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     course.toString(),
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-
                                                     ),
                                                   ),
                                                   const Icon(
@@ -1739,7 +1601,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           };
 
                                           return PopupMenuButton<String>(
-                                            color: isDark?Color(0xff153250):Colors.white,
+                                            color: isDark
+                                                ? Color(0xff153250)
+                                                : Colors.white,
 
                                             /// move dropdown to the right
                                             offset: const Offset(100, 45),
@@ -1765,7 +1629,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: isDark?Color(0xff153250):Colors.white,
+                                                color: isDark
+                                                    ? Color(0xff153250)
+                                                    : Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -1781,7 +1647,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     stroke,
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-
                                                     ),
                                                   ),
                                                   const Icon(
@@ -1833,7 +1698,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ];
 
                                           return PopupMenuButton<String>(
-                                            color: isDark?Color(0xff153250):Colors.white,
+                                            color: isDark
+                                                ? Color(0xff153250)
+                                                : Colors.white,
                                             onSelected: (v) => ref
                                                 .read(
                                                   stopwatchProvider2.notifier,
@@ -1859,7 +1726,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: isDark?Color(0xff153250):Colors.white,
+                                                color: isDark
+                                                    ? Color(0xff153250)
+                                                    : Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -1875,7 +1744,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     state1,
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-
                                                     ),
                                                   ),
                                                   const Icon(
@@ -1890,7 +1758,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ),
                                   ],
                                 ),
-
 
                                 SizedBox(height: 20.h),
                                 Column(
@@ -1928,7 +1795,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ];
 
                                           return PopupMenuButton<String>(
-                                            color: isDark?Color(0xff153250):Colors.white,
+                                            color: isDark
+                                                ? Color(0xff153250)
+                                                : Colors.white,
                                             onSelected: (v) => ref
                                                 .read(
                                                   stopwatchProvider2.notifier,
@@ -1954,7 +1823,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     vertical: 14,
                                                   ),
                                               decoration: BoxDecoration(
-                                                color: isDark?Color(0xff153250):Colors.white,
+                                                color: isDark
+                                                    ? Color(0xff153250)
+                                                    : Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
@@ -1970,7 +1841,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     state1,
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
-
                                                     ),
                                                   ),
                                                   const Icon(
@@ -2009,7 +1879,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         onSelected: (v) => ref
                                             .read(stopwatchProvider2.notifier)
                                             .setPredictorParams(start: v),
-                                        color: isDark?Color(0xff153250):Colors.white,
+                                        color: isDark
+                                            ? Color(0xff153250)
+                                            : Colors.white,
 
                                         /// move dropdown to the right
                                         offset: const Offset(100, 45),
@@ -2053,7 +1925,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             vertical: 14,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: isDark?Color(0xff153250):Colors.white,
+                                            color: isDark
+                                                ? Color(0xff153250)
+                                                : Colors.white,
                                             borderRadius: BorderRadius.circular(
                                               6,
                                             ),
@@ -2073,7 +1947,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 ),
                                                 style: TextStyle(
                                                   fontSize: 16.sp,
-
                                                 ),
                                               ),
                                               const Icon(Icons.arrow_drop_down),
@@ -2577,126 +2450,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                         ],
                       ),
                     ),
-              // SizedBox(height: 20.h,),
-              // Container(
-              //   padding: EdgeInsets.all(16),
-              //   decoration: BoxDecoration(
-              //       color: isDark?Color(0xff234B6E):Color(0xffEAEDF1),
-              //       borderRadius:BorderRadius.only(
-              //           topRight: Radius.circular(10),
-              //           topLeft: Radius.circular(10)
-              //       )
-              //   ),
-              //   child:Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       CustomText(text: AppLocalizations.of(context)!.split,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-              //       CustomText(text: AppLocalizations.of(context)!.splitTime,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-              //       CustomText(text: AppLocalizations.of(context)!.total,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-              //
-              //     ],
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: 300.h, // fixed height for scrollable area
-              //   child: Container(
-              //     decoration: BoxDecoration(
-              //       color: isDark?Color(0xff1B3A5C):Color(0xffFFFFFF),
-              //
-              //
-              //     ),
-              //     child: state.splits.isEmpty
-              //         ?  Center(
-              //       child: Text(
-              //         AppLocalizations.of(context)!.noSplitsYet,
-              //         style: TextStyle(color: Colors.grey),
-              //       ),
-              //     )
-              //         : ListView.builder(
-              //       itemCount: state.splits.length,
-              //       itemBuilder: (context, index) {
-              //         final split = state.splits[index];
-              //
-              //         // alternate colors: even -> E3F0FF, odd -> FFFFFF
-              //         final bgColor = index % 2 == 0 ? Color(0xFFE3F0FF) : Color(0xFFFFFFFF);
-              //
-              //         return Container(
-              //           color: bgColor,
-              //           padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
-              //           child: Row(
-              //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //             children: [
-              //               CustomText(
-              //                 text: split.distance.toString(),
-              //                 fontSize: 14.sp,
-              //                 fontWeight: FontWeight.w600,
-              //                 color: AppColors.primary,
-              //               ),
-              //               CustomText(
-              //                 text: split.splitTime.toStringAsFixed(2),
-              //                 fontSize: 14.sp,
-              //                 fontWeight: FontWeight.w600,
-              //                 color: AppColors.primary,
-              //               ),
-              //               CustomText(
-              //                 text: split.total.toStringAsFixed(2),
-              //                 fontSize: 14.sp,
-              //                 fontWeight: FontWeight.w600,
-              //                 color: AppColors.primary,
-              //               ),
-              //             ],
-              //           ),
-              //         );
-              //       },
-              //     ),
-              //   ),
-              // ),
-
-              // SizedBox(height: 16.h),
-              //
-              // /// ACTION BUTTONS
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: ElevatedButton(
-              //         style: ElevatedButton.styleFrom(
-              //             backgroundColor:Color(0xff234B6E),
-              //             side: BorderSide(color: Color(0xff234B6E))
-              //         ),
-              //         onPressed: () {
-              //           //notifier.clear();
-              //         },
-              //         child: Center(
-              //           child: Row(
-              //             mainAxisAlignment: MainAxisAlignment.center,
-              //             children: [
-              //               SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
-              //               SizedBox(width: 6.w,),
-              //               CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //     SizedBox(width: 12.w),
-              //     Expanded(
-              //       child: ElevatedButton(
-              //         style: ElevatedButton.styleFrom(
-              //           backgroundColor:AppColors.primary,
-              //         ),
-              //         onPressed: () {},
-              //         child: Row(
-              //           mainAxisAlignment: MainAxisAlignment.center,
-              //           children: [
-              //             SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-              //             SizedBox(width: 6.w,),
-              //             CustomText(text: AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
-              //           ],
-              //         ),
-              //       ),
-              //     ),
-              //   ],
-              // ),
             ],
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import 'core_tool_card_widget.dart';
 
 class ToolsPage extends StatelessWidget {
@@ -16,29 +17,29 @@ class ToolsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CustomText(text: "The Core Tools",fontSize: 22.sp,fontWeight: FontWeight.w600,color: AppColors.textWhite,),
+          CustomText(text: AppLocalizations.of(context)!.theCoreTools,fontSize: 22.sp,fontWeight: FontWeight.w600,color: AppColors.textWhite,),
           SizedBox(height: 8.h,),
           CoreToolCard(
-            title: "Split Calculator",
+            title: AppLocalizations.of(context)!.splitCalculator,
             description:
-            "Calculate target splits for any event. Select your distance, input your goal time, and get precise splits instantly.",
+            AppLocalizations.of(context)!.calculateTargetSplitsFor,
             icon: IconPath.calculatorIcon,
             onTap: () {},
           ),
           CoreToolCard(
             isLeft: false,
-            title: "Course Conversion",
+            title: AppLocalizations.of(context)!.courseConversion,
             description:
-            "Seamlessly convert times between SCY, LCM, and SCM courses. Essential for college recruiting and international meets.",
+            AppLocalizations.of(context)!.seamlesslyConvertTimesBetweenSCY,
             icon: IconPath.conversionIcon,
             onTap: () {},
           ),
 
 
           CoreToolCard(
-            title: "Stopwatch",
+            title: AppLocalizations.of(context)!.stopWatch,
             description:
-            "Time swims with precision. Large, easy-to-hit buttons designed specifically for poolside use.",
+            AppLocalizations.of(context)!.timeSwimsWithPrecision,
             icon: IconPath.stopWatchIcon,
             onTap: () {},
           ),

@@ -6,15 +6,20 @@ import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
-import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/wheel_selector_widget.dart';
+import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/wheel_selector_widget.dart' hide LanguageWheelSelector;
 
+import '../../../../../config/language/language.dart';
+import '../../../../home_section/calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/on_boarding_view_model.dart';
+import 'language_wheel_selector.dart';
 
 class LanguagePage extends ConsumerWidget {
   const LanguagePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    final controller = ref.read(settingsProvider.notifier);
 
 
     return Column(
@@ -35,15 +40,17 @@ class LanguagePage extends ConsumerWidget {
         SizedBox(height: 24.h),
 
         LanguageWheelSelector(
-          items: const ["English", "Spanish", "Italian","French"],
-          onChanged: (value) {
-            ref.read(onboardingProvider.notifier)
-                .selectLanguage(value);
+          items: AppLanguage.values,
+          selectedLanguage: settings.language,
+          onChanged: (AppLanguage lang) async {
+            // Save selection in Riverpod + SharedPreferences
+            await controller.changeLanguage(lang);
+
             if (kDebugMode) {
-              print(ref.read(onboardingProvider.select((s)=>s.selectedLanguage)));
+              print('Selected language: ${ref.read(settingsProvider).language.name}');
             }
           },
-        ),
+        )
 
       ],
     );

@@ -1,18 +1,26 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
+import 'package:open_file/open_file.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../core/common/widgets/custom_text.dart';
+import '../../../../../core/common/widgets/new_custon_widgets/custom_check_box_widget.dart';
 import '../../../../../core/utils/constants/icon_path.dart';
-import '../../../../../core/utils/utils/print_utils.dart';
+
 import '../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import '../../riverpod/converter_controller.dart';
 import '../../riverpod/converter_controller1.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
+
+
 
 final showCourseSectionConverter = StateProvider<bool>((ref) => true);
 
@@ -24,32 +32,89 @@ class ConverterScreen extends ConsumerStatefulWidget {
 }
 
 class _ConverterScreenState extends ConsumerState<ConverterScreen> {
-  late final TextEditingController timeController;
-  late FocusNode timeFocusNode;
+   final TextEditingController timeController = TextEditingController();
+  final FocusNode timeFocusNode = FocusNode();
 
-  @override
-  void initState() {
-    super.initState();
-    final state1 = ref.read(converterProvider1);
-    timeController = TextEditingController(text: state1.timeText);
-    timeFocusNode = FocusNode();
-  }
+   late stt.SpeechToText _speech;
+   bool _isListening = false;
 
-  @override
-  void dispose() {
-    timeController.dispose();
-    timeFocusNode.dispose();
-    super.dispose();
-  }
+   @override
+   void initState() {
+     super.initState();
+     _speech = stt.SpeechToText();
+
+     final state1 = ref.read(converterProvider1);
+     timeController.text = state1.timeText;
+   }
+
+   /// Start listening and update TextFormField
+   Future<void> startListening() async {
+     bool available = await _speech.initialize();
+     if (available) {
+       _isListening = true;
+       _speech.listen(
+         onResult: (result) {
+           if (result.finalResult) {
+             String spoken = result.recognizedWords;
+             String time = convertSpeechToTime(spoken);
+             timeController.text = time;
+             ref.read(converterProvider1.notifier).setTimeText(time);
+             _isListening = false;
+           }
+         },
+       );
+     }
+   }
+
+   /// Convert speech to mm:ss.ss format
+   String convertSpeechToTime(String spoken) {
+     // Map words to numbers
+     final wordToNumber = {
+       'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+       'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+       'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14,
+       'fifteen': 15, 'sixteen': 16, 'seventeen': 17, 'eighteen': 18,
+       'nineteen': 19, 'twenty': 20
+     };
+
+     int hours = 0;
+     int minutes = 0;
+     double seconds = 0.0;
+
+     final words = spoken.toLowerCase().split(' ');
+
+     for (int i = 0; i < words.length; i++) {
+       final word = words[i];
+       final value = wordToNumber[word] ?? int.tryParse(word) ?? 0;
+
+       if (i + 1 < words.length) {
+         final next = words[i + 1];
+         if (next.startsWith('hour')) {
+           hours = value;
+         } else if (next.startsWith('minute')) {
+           minutes = value;
+         } else if (next.startsWith('second')) {
+           seconds = value.toDouble();
+         }
+       }
+     }
+
+     final totalMinutes = hours * 60 + minutes;
+     final minStr = totalMinutes.toString().padLeft(2, '0');
+     final secStr = seconds.toStringAsFixed(2).padLeft(5, '0'); // ss.ss
+
+     return '$minStr:$secStr';
+   }
+
   @override
   Widget build(BuildContext context) {
 
     debugPrint("build");
 
 
-    final state = ref.watch(converterProvider);
+
     final state1 = ref.watch(converterProvider1);
-    //final controller = ref.read(converterProvider.notifier);
+
     final controller1 = ref.read(converterProvider1.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -162,15 +227,15 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                 itemBuilder: (context) => [
                                   PopupMenuItem(
-                                    value: AppLocalizations.of(context)!.scm,
+                                    value: "scm",
                                     child: Text(AppLocalizations.of(context)!.scm),
                                   ),
                                   PopupMenuItem(
-                                    value: AppLocalizations.of(context)!.scy,
+                                    value: 'scy',
                                     child: Text(AppLocalizations.of(context)!.scy),
                                   ),
                                   PopupMenuItem(
-                                    value: AppLocalizations.of(context)!.lcm,
+                                    value: "lcm",
                                     child: Text(AppLocalizations.of(context)!.lcm),
                                   ),
                                 ],
@@ -223,7 +288,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                   children: [
                                     Checkbox(
                                       value: state1.targets.contains('scy'),
-                                      onChanged: state.from.isNotEmpty && state.from.first == 'SCY'
+                                      onChanged: state1.course.isNotEmpty && state1.course == 'scy'
                                           ? null
                                           : (val) => controller1.toggleTarget('scy', val ?? false),
                                     ),
@@ -238,7 +303,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                   children: [
                                     Checkbox(
                                       value: state1.targets.contains('scm'),
-                                      onChanged: state.from.isNotEmpty && state.from.first == 'SCM'
+                                      onChanged: state1.course.isNotEmpty && state1.course == 'scm'
                                           ? null
                                           : (val) => controller1.toggleTarget('scm', val ?? false),
                                     ),
@@ -253,11 +318,11 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                   children: [
                                     Checkbox(
                                       value: state1.targets.contains('lcm'),
-                                      onChanged: state.from.isNotEmpty && state.from.first == 'LCM'
+                                      onChanged: state1.course.isNotEmpty && state1.course == 'lcm'
                                           ? null
                                           : (val) => controller1.toggleTarget('lcm', val ?? false),
                                     ),
-                                    const Text('LCM'),
+                                    Text('LCM'),
                                   ],
                                 ),
                               ],
@@ -281,10 +346,13 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             SizedBox(height: 10.h),
 
                             PopupMenuButton<String>(
+                              color: isDark?Color(0xff153250):Colors.white,
                               onSelected: (v) => controller1.setGender(v),
-                              itemBuilder: (context) => const [
-                                PopupMenuItem(value: 'men', child: Text('Men')),
-                                PopupMenuItem(value: 'women', child: Text('Women')),
+                              /// move dropdown to the right
+                              offset: const Offset(100, 45),
+                              itemBuilder: (context) =>  [
+                                PopupMenuItem(value: 'men', child: Text(AppLocalizations.of(context)!.men)),
+                                PopupMenuItem(value: 'women', child: Text(AppLocalizations.of(context)!.women)),
                               ],
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -416,6 +484,8 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                 return PopupMenuButton<String>(
                                   color: isDark?Color(0xff153250):Colors.white,
+                                  /// move dropdown to the right
+                                  offset: const Offset(100, 45),
                                   onSelected: controller1.setDistance,
                                   itemBuilder: (context) => distanceItems
                                       .map(
@@ -461,42 +531,47 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
 
                   /// TIME INPUT
+                  /// TIME INPUT
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomText(text:"Time (mm:ss or ss.ss)",
-
+                      CustomText(
+                        text: "Time (mm:ss or ss.ss)",
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
                         fontSize: 14.sp,
-
                       ),
-                      SizedBox(height: 10.h,),
+                      SizedBox(height: 10.h),
 
-                      CustomTextField(
-                        hintText: "mm:ss or ss.ss",
+                      TextFormField(
+                        controller: timeController, // ✅ use controller
                         focusNode: timeFocusNode,
-                        controller: timeController,
-                        onChanged: (value) {
-                          ref.read(converterProvider1.notifier).setTimeText(value);
-                        },
-                        suffixIcon: GestureDetector(
-                          onTap: () {},
-                          child: SizedBox(
-                            height: 24.h,
-                            width: 24.w,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: SvgPicture.asset(
-                                IconPath.voiceIcon,
-                                fit: BoxFit.contain,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          hintText: "mm:ss or ss.ss",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: startListening, // 🔊 Start listening on tap
+                            child: SizedBox(
+                              height: 24.h,
+                              width: 24.w,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SvgPicture.asset(
+                                  IconPath.voiceIcon,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      )
-
-
+                        onChanged: (value) {
+                          ref.read(converterProvider1.notifier).setTimeText(value);
+                        },
+                      ),
                     ],
                   ),
 
@@ -510,13 +585,15 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                       'Show splits',
                       ),
 
-                      Checkbox(
-                        value: state1.showSplits,
-                        onChanged: (v) =>
-                            controller1.setShowSplits(v ?? false),
-                        activeColor: Colors.white,
-                        checkColor: const Color(0xFF1e90ff),
-                      ),
+                      Consumer(builder: (context, ref, child) {
+                        final isRemember = ref.watch(converterProvider1.select((s)=>s.showSplits));
+                        return CustomCheckBoxWidget(
+                          value: isRemember,
+                          onChanged: (v) => controller1.setShowSplits(v ?? false),
+                        );
+                      },)
+
+
 
                     ],
                   ),
@@ -615,10 +692,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor:AppColors.primary,
                         ),
-                        onPressed: () => printTextDoc(
-                          title: 'Swim Time Converter',
-                          body: state1.output.isEmpty ? 'No output yet.' : state1.output,
-                        ),
+                        onPressed: (){
+    final output = ref.read(converterProvider1).output;
+    exportOutputAsPdf(context, output);
+    },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -639,4 +716,47 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       ),
     );
   }
+
+   Future<void> exportOutputAsPdf(BuildContext context, String output) async {
+     if (output.isEmpty) {
+       ScaffoldMessenger.of(context).showSnackBar(
+         const SnackBar(content: Text('No output to export!')),
+       );
+       return;
+     }
+
+     final pdf = pw.Document();
+
+     pdf.addPage(
+       pw.Page(
+         build: (pw.Context context) {
+           return pw.Container(
+             padding: const pw.EdgeInsets.all(16),
+             child: pw.Text(
+               output,
+               style: pw.TextStyle(font: pw.Font.courier()),
+             ),
+           );
+         },
+       ),
+     );
+
+     try {
+       final dir = await getTemporaryDirectory();
+       final file = File('${dir.path}/swim_converter_output.pdf');
+       await file.writeAsBytes(await pdf.save());
+
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(content: Text('PDF saved at: ${file.path}')),
+       );
+
+       // Open the PDF
+       await OpenFile.open(file.path);
+     } catch (e) {
+       debugPrint("PDF export error: $e");
+       ScaffoldMessenger.of(context).showSnackBar(
+         const SnackBar(content: Text('Failed to export PDF')),
+       );
+     }
+   }
 }
