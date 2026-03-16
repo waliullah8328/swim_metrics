@@ -12,7 +12,9 @@ import 'package:swim_metrics/feature/home_section/calculator_section/calculator/
 import 'package:swim_metrics/feature/home_section/calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/calculator/presentation/screen/widget/distance_wheel_selector_widget.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
-import '../../../../../../core/utils/utils/print_utils.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import '../../riverpod/calculator_split_state.dart';
 import '../../riverpod/split_calculator_controller.dart';
 final currencyProvider = StateProvider<String>((ref) => "SCY");
@@ -25,8 +27,7 @@ class SplitCalculatorPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(splitProvider);
-    final notifier = ref.read(splitProvider.notifier);
+
     final selected = ref.watch(currencyProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionProvider);
@@ -90,12 +91,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    // child: IconButton(
-                    //   icon: const Icon(Icons.keyboard_arrow_down, size: 32),
-                    //   onPressed: () {
-                    //     ref.read(showCourseSectionProvider.notifier).state = true;
-                    //   },
-                    // ),
+
                   ),
 
                 /// COURSE CARD
@@ -129,46 +125,65 @@ class SplitCalculatorPage extends ConsumerWidget {
                                   ),
 
 
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: isDark?Color(0xff033A5E):Color(0xFFD9D9D9),
-                                      borderRadius: BorderRadius.circular(40),
-                                    ),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<String>(
-                                        value: selected,
-                                        isDense: true, // removes extra height
-                                        itemHeight: null, // removes default 48 height
-                                        icon: const Icon(
-                                          Icons.keyboard_arrow_down,
-                                          color: Color(0xFFB8892D),
+                                  Consumer(
+                                    builder: (context, ref, child) {
+
+                                      final state = ref.watch(splitCalcProvider);
+                                      final selected = state.course.toUpperCase(); // get updated value
+
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
+                                          borderRadius: BorderRadius.circular(40),
                                         ),
-                                        dropdownColor: Colors.white,
-                                        style: TextStyle(
-                                          color: const Color(0xFFB8892D),
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w500,
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            value: selected,
+                                            isDense: true,
+                                            itemHeight: null,
+                                            icon: const Icon(
+                                              Icons.keyboard_arrow_down,
+                                              color: Color(0xFFB8892D),
+                                            ),
+                                            dropdownColor: isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
+                                            style: TextStyle(
+                                              color: const Color(0xFFB8892D),
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            items: [
+                                              DropdownMenuItem(
+                                                value: "SCY",
+                                                child: CustomText(
+                                                  text: AppLocalizations.of(context)!.scy,
+                                                  fontSize: 12.sp,
+                                                ),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: "SCM",
+                                                child: CustomText(
+                                                  text: AppLocalizations.of(context)!.scm,
+                                                  fontSize: 12.sp,
+                                                ),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: "LCM",
+                                                child: CustomText(
+                                                  text: AppLocalizations.of(context)!.lcm,
+                                                  fontSize: 12.sp,
+                                                ),
+                                              ),
+                                            ],
+                                            onChanged: (value) {
+                                              ref
+                                                  .read(splitCalcProvider.notifier)
+                                                  .setCourse((value ?? 'SCY').toLowerCase());
+                                            },
+                                          ),
                                         ),
-                                        items: [
-                                          DropdownMenuItem(
-                                            value: "SCY",
-                                            child: CustomText(text: AppLocalizations.of(context)!.scy, fontSize: 12.sp),
-                                          ),
-                                          DropdownMenuItem(
-                                            value: "SCM",
-                                            child: CustomText(text: AppLocalizations.of(context)!.scm, fontSize: 12.sp),
-                                          ),
-                                          DropdownMenuItem(
-                                            value: "LCM",
-                                            child: CustomText(text: AppLocalizations.of(context)!.lcm, fontSize: 12.sp),
-                                          ),
-                                        ],
-                                        onChanged: (value) {
-                                          ref.read(splitCalcProvider.notifier).setCourse((value ?? 'SCY').toLowerCase());
-                                        },
-                                      ),
-                                    ),
+                                      );
+                                    },
                                   )
                                 ],
                               ),
@@ -252,6 +267,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                         ),
                         SizedBox(height: 16.h),
                         CustomTextField(
+                          keyboardType: TextInputType.number,
                           hintText: AppLocalizations.of(context)!.enterYourTime,
                           onChanged: (value){
                             ref.read(splitCalcProvider.notifier).setGoalTime(value);
@@ -278,27 +294,7 @@ class SplitCalculatorPage extends ConsumerWidget {
 
                         SizedBox(height: 16.h),
 
-                        // Row(
-                        //   children: [
-                        //     ElevatedButton(onPressed: () =>ref.read(splitCalcProvider.notifier).project(), child: const Text('Project')),
-                        //     const SizedBox(width: 8),
-                        //     ElevatedButton(
-                        //       onPressed: () => printTextDoc(
-                        //         title: 'Split Calculator',
-                        //         body: ref.read(splitCalcProvider).output.isEmpty ? 'No output yet.' : ref.read(splitCalcProvider).output,
-                        //       ),
-                        //       child: const Text('Print'),
-                        //     ),
-                        //   ],
-                        // ),
-                        // const SizedBox(height: 8),
-                        // Container(
-                        //     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
-                        //     padding: const EdgeInsets.all(8),
-                        //     child: SingleChildScrollView(
-                        //       child: Text(ref.watch(splitCalcProvider).output, style: const TextStyle(fontFamily: 'monospace')),
-                        //     ),
-                        //   ),
+
 
 
 
@@ -310,6 +306,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                           onPressed: (){
 
                             ref.read(splitCalcProvider.notifier).project1();
+                            ref.read(showCourseSectionProvider.notifier).state = false;
                           },
                           child: Center(child:  Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -351,6 +348,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                   ),
                 ),
                  Container(
+                   height: 200.h,
                     decoration: BoxDecoration(
                       color: isDark?Color(0xff1B3A5C):Color(0xffFFFFFF),
 
@@ -408,52 +406,129 @@ class SplitCalculatorPage extends ConsumerWidget {
                 SizedBox(height: 16.h),
 
                 /// ACTION BUTTONS
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:Color(0xff234B6E),
-                          side: BorderSide(color: Color(0xff234B6E))
-                        ),
-                        onPressed: () {
-                          ref.watch(splitCalcProvider.notifier).clear();
-                        },
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
-                              SizedBox(width: 6.w,),
-                              CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:AppColors.primary,
-                        ),
-                        onPressed: () {},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-                            SizedBox(width: 6.w,),
-                            CustomText(text:  AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                 if(ref.watch(splitCalcProvider).splits.isNotEmpty)
+                   Row(
+                     children: [
+                       Expanded(
+                         child: ElevatedButton(
+                           style: ElevatedButton.styleFrom(
+                               backgroundColor:Color(0xff234B6E),
+                               side: BorderSide(color: Color(0xff234B6E))
+                           ),
+                           onPressed: () {
+                             ref.watch(splitCalcProvider.notifier).clear();
+                           },
+                           child: Center(
+                             child: Row(
+                               mainAxisAlignment: MainAxisAlignment.center,
+                               children: [
+                                 SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
+                                 SizedBox(width: 6.w,),
+                                 CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                               ],
+                             ),
+                           ),
+                         ),
+                       ),
+                       SizedBox(width: 12.w),
+                       Expanded(
+                         child: ElevatedButton(
+                           style: ElevatedButton.styleFrom(
+                             backgroundColor:AppColors.primary,
+                           ),
+                           onPressed: () {
+                             exportSplitPdf(context, ref);
+                           },
+                           child: Row(
+                             mainAxisAlignment: MainAxisAlignment.center,
+                             children: [
+                               SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                               SizedBox(width: 6.w,),
+                               CustomText(text:  AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                             ],
+                           ),
+                         ),
+                       ),
+                     ],
+                   ),
+
               ],
             ),
           ),
         )
+    );
+  }
+
+  Future<void> exportSplitPdf(BuildContext context, WidgetRef ref) async {
+    final pdf = pw.Document();
+
+    final splits = ref.read(splitCalcProvider).splits;
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                "Swim Split Calculator",
+                style: pw.TextStyle(
+                  fontSize: 24,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 20),
+
+              pw.Table(
+                border: pw.TableBorder.all(),
+                children: [
+                  pw.TableRow(
+                    decoration: const pw.BoxDecoration(color: PdfColors.grey300),
+                    children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text("Split"),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text("Split Time"),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text("Total"),
+                      ),
+                    ],
+                  ),
+
+                  ...splits.map(
+                        (e) => pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8),
+                          child: pw.Text(e.distance.toString()),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8),
+                          child: pw.Text(e.splitTime.toStringAsFixed(2)),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8),
+                          child: pw.Text(e.total.toStringAsFixed(2)),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
     );
   }
 }
