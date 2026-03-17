@@ -1061,6 +1061,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Problem or suggestion is required.'**
   String get problemOrSuggestionIsRequired;
+
+  /// No description provided for @timeMmSs.
+  ///
+  /// In en, this message translates to:
+  /// **'Time (mm:ss or ss.ss)'**
+  String get timeMmSs;
+
+  /// No description provided for @showSplits.
+  ///
+  /// In en, this message translates to:
+  /// **'Show splits'**
+  String get showSplits;
+
+  /// No description provided for @noOutputToExport.
+  ///
+  /// In en, this message translates to:
+  /// **'No output to export!'**
+  String get noOutputToExport;
+
+  /// No description provided for @failedToExportPDF.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export PDF'**
+  String get failedToExportPDF;
+
+  /// No description provided for @pDFSavedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF saved at'**
+  String get pDFSavedAt;
+
+  /// No description provided for @pleaseFillAllFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill all fields.'**
+  String get pleaseFillAllFields;
+
+  /// No description provided for @invalidTimeFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid time format. Use mm:ss or ss.ss.'**
+  String get invalidTimeFormat;
 }
 
 class _AppLocalizationsDelegate

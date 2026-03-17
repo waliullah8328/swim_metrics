@@ -502,4 +502,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get problemOrSuggestionIsRequired =>
       'Problem or suggestion is required.';
+
+  @override
+  String get timeMmSs => 'Time (mm:ss or ss.ss)';
+
+  @override
+  String get showSplits => 'Show splits';
+
+  @override
+  String get noOutputToExport => 'No output to export!';
+
+  @override
+  String get failedToExportPDF => 'Failed to export PDF';
+
+  @override
+  String get pDFSavedAt => 'PDF saved at';
+
+  @override
+  String get pleaseFillAllFields => 'Please fill all fields.';
+
+  @override
+  String get invalidTimeFormat => 'Invalid time format. Use mm:ss or ss.ss.';
 }

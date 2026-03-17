@@ -5,6 +5,7 @@ import '../../../../core/utils/utils/ratios_1.dart';
 import '../../../../core/utils/utils/split_core_1.dart';
 
 import '../../../../core/utils/utils/time_utils_1.dart';
+import '../../../../l10n/app_localizations.dart';
 
 
 final converterProvider1 =
@@ -114,12 +115,12 @@ class ConverterController extends Notifier<ConverterState> {
         .toList();
   }
 
-  void convert() {
+  void convert({required context}) {
     final s = state;
 
     if ([s.course, s.gender, s.stroke, s.distance, s.timeText]
         .any((e) => e.isEmpty)) {
-      state = s.copyWith(output: 'Please fill all fields.');
+      state = s.copyWith(output: AppLocalizations.of(context)!.pleaseFillAllFields);
       return;
     }
 
@@ -129,7 +130,7 @@ class ConverterController extends Notifier<ConverterState> {
       total = TimeUtils1.parseToSeconds(s.timeText);
     } catch (_) {
       state = s.copyWith(
-        output: 'Invalid time format. Use mm:ss or ss.ss.',
+        output: AppLocalizations.of(context)!.invalidTimeFormat,
       );
       return;
     }
