@@ -33,6 +33,7 @@ class _SplitCalculatorSelectorOneState
     if (selectedIndex == -1) selectedIndex = 0;
 
     _controller = FixedExtentScrollController(initialItem: selectedIndex);
+    debugPrint(widget.selectedValue.toString());
   }
 
   @override

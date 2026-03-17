@@ -226,16 +226,23 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                   Consumer(
                                     builder: (context, ref, child) {
 
-                                      final state1 = ref.watch(converterProvider1);
+                                      final state1 = ref.watch(
+                                        converterProvider1.select((s) => s.gender),
+                                      );
+
+// convert to match UI
+                                      final selectedValue =
+                                      state1.isNotEmpty ? state1[0].toUpperCase() + state1.substring(1) : "";
                                       final controller1 = ref.read(converterProvider1.notifier);
+                                      debugPrint(state1.toString());
 
 
                                       return SplitCalculatorSelectorOne(
                                         items: const [
-                                          "men",
-                                          "women",
+                                          "Men",
+                                          "Women",
                                         ],
-                                        selectedValue: state1.gender, // ✅ keep selected after refresh
+                                        selectedValue: selectedValue, // ✅ keep selected after refresh
                                         onChanged: (v) => controller1.setGender(v),
                                       );
                                     },
@@ -259,22 +266,32 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                   SizedBox(height: 8.h),
                                   Consumer(
                                     builder: (context, ref, child) {
-                                      final state = ref.watch(converterProvider);
-                                      final controller1 = ref.read(converterProvider.notifier);
+
+                                      final items = const [
+                                        "Fly",
+                                        "Back",
+                                        "Breast",
+                                        "Free",
+                                        "IM",
+                                      ];
+
+                                      final state1 = ref.watch(
+                                        converterProvider1.select((s) => s.stroke),
+                                      );
+
+                                      // match lowercase state with UI list
+                                      final selectedValue = items.firstWhere(
+                                            (item) => item.toLowerCase() == state1,
+                                        orElse: () => "",
+                                      );
+
+                                      final controller1 = ref.read(converterProvider1.notifier);
 
                                       return SplitCalculatorSelectorOne(
-                                        items: const [
-                                          "fly",
-                                          "back",
-                                          "free",
-                                          "im",
-                                          "breast",
-                                        ],
-                                        selectedValue: state
-                                            .stroke, // ✅ keep selected after refresh
+                                        items: items,
+                                        selectedValue: selectedValue,
                                         onChanged: (selected) {
-                                          //final internalValue = mapping[selected] ?? selected;
-                                          controller1.selectStroke(selected);
+                                          controller1.setStroke(selected); // store lowercase inside
                                         },
                                       );
                                     },
@@ -288,6 +305,52 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                         Row(
                           children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomText(
+                                    text: AppLocalizations.of(
+                                      context,
+                                    )!.from,
+
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Consumer(
+                                    builder: (context, ref, child) {
+
+                                      final items = const [
+                                        "SCY",
+                                        "SCM",
+                                        "LCM",
+                                      ];
+
+                                      final state1 = ref.watch(
+                                        converterProvider1.select((s) => s.course),
+                                      );
+
+                                      // match lowercase state with UI list
+                                      final selectedValue = items.firstWhere(
+                                            (item) => item.toLowerCase() == state1,
+                                        orElse: () => "",
+                                      );
+
+                                      final controller1 = ref.read(converterProvider1.notifier);
+
+                                      return SplitCalculatorSelectorOne(
+                                        items: items,
+                                        selectedValue: selectedValue,
+                                        onChanged: (selected) {
+                                          controller1.setCourse(selected); // store lowercase
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
 
                             Expanded(
                               child: Column(
@@ -330,41 +393,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                 ],
                               ),
                             ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  CustomText(
-                                    text: AppLocalizations.of(
-                                      context,
-                                    )!.from,
 
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  Consumer(
-                                    builder: (context, ref, child) {
-                                      final state1 = ref.watch(converterProvider1);
-                                    
-
-                                      return SplitCalculatorSelectorOne(
-                                        items: const [
-                                          "scy",
-                                          "scm",
-                                          "lcm",
-                                        ],
-                                        selectedValue: state1
-                                            .course, // ✅ keep selected after refresh
-                                        onChanged: controller1.setCourse,
-                                        
-
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
 
 
                           ],

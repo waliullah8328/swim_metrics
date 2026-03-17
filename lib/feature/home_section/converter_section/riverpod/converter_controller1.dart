@@ -71,17 +71,17 @@ class ConverterController extends Notifier<ConverterState> {
     newTargets.remove(v);
 
     state = state.copyWith(
-      course: v,
+      course: v.toLowerCase(),
       targets: newTargets,
     );
   }
 
   void setGender(String v) {
-    state = state.copyWith(gender: v);
+    state = state.copyWith(gender: v.toLowerCase());
   }
 
   void setStroke(String v) {
-    state = state.copyWith(stroke: v);
+    state = state.copyWith(stroke: v.toLowerCase());
   }
 
   void setDistance(String v) {
