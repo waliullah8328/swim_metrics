@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:open_file/open_file.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
@@ -9,10 +12,10 @@ import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/split_calculator_selector_one.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
-
-import '../../../../calculator_section/calculator/presentation/screen/splict_custom_widget.dart';
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import '../../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 import '../../riverpod/stop_watch_controller_2.dart';
 
@@ -257,37 +260,12 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                       ],
                     ),
                   ),
-
                 ),
 
               /// Main Content
               activeMode == 'Stopwatch'
                   ? Column(
                       children: [
-                        // Align(
-                        //   alignment: Alignment.centerRight,
-                        //   child: Row(
-                        //     mainAxisAlignment: MainAxisAlignment.end,
-                        //     children: [
-                        //       CustomText(
-                        //         text: "WATCHES",
-                        //         fontSize: 14.sp,
-                        //         fontWeight: FontWeight.w500,
-                        //       ),
-                        //       SizedBox(width: 16.w),
-                        //       Padding(
-                        //         padding: EdgeInsets.only(left: 16.w),
-                        //         child: SvgPicture.asset(IconPath.minusIcon),
-                        //       ),
-                        //
-                        //       Padding(
-                        //         padding: EdgeInsets.only(left: 16.w),
-                        //         child: SvgPicture.asset(IconPath.plusIcon),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // SizedBox(height: 10.h),
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -347,8 +325,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ref
                                         .read(stopwatchProvider1.notifier)
                                         .start();
-
-
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -729,7 +705,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.primary,
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        exportOutputAsPdf1(context, ref);
+                                      },
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -915,9 +893,12 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           .start();
 
                                       ref
-                                          .read(showCourseSectionStopWatchProvider.notifier)
-                                          .state =
-                                      false;
+                                              .read(
+                                                showCourseSectionStopWatchProvider
+                                                    .notifier,
+                                              )
+                                              .state =
+                                          false;
                                     },
                                     child: Row(
                                       mainAxisAlignment:
@@ -1183,6 +1164,13 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ),
                                           onPressed: () {
                                             ref
+                                                    .watch(
+                                                      stopwatchProvider2
+                                                          .notifier,
+                                                    )
+                                                    .logConverter =
+                                                '';
+                                            ref
                                                 .read(
                                                   stopwatchProvider1.notifier,
                                                 )
@@ -1317,7 +1305,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: AppColors.primary,
                                         ),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          exportOutputAsPdf(context, ref);
+                                        },
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -1378,25 +1368,40 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             fontSize: 14.sp,
                                           ),
                                           SizedBox(height: 8.h),
+
                                           Consumer(
                                             builder: (context, ref, child) {
                                               final state = ref.watch(
                                                 stopwatchProvider2,
                                               );
 
+                                              // Define items
+                                              const items = ["men", "women"];
+                                              String capitalize(String s) =>
+                                                  s.isNotEmpty
+                                                  ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
+                                                  : s;
+
                                               return SplitCalculatorSelectorOne(
-                                                items: const [
-                                                  "men",
-                                                  "women",
-                                                ],
-                                                selectedValue: state
-                                                    .gender, // ✅ keep selected after refresh
-                                                onChanged: (v) => ref
-                                                    .read(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .setPredictorParams(g: v),
+                                                items: items
+                                                    .map(capitalize)
+                                                    .toList(), // display first letter uppercase
+                                                selectedValue: capitalize(
+                                                  state.gender,
+                                                ), // show selected value capitalized
+                                                onChanged: (v) {
+                                                  // Convert back to lowercase before storing
+                                                  final lowerCaseValue = v
+                                                      .toLowerCase();
+                                                  ref
+                                                      .read(
+                                                        stopwatchProvider2
+                                                            .notifier,
+                                                      )
+                                                      .setPredictorParams(
+                                                        g: lowerCaseValue,
+                                                      );
+                                                },
                                               );
                                             },
                                           ),
@@ -1422,23 +1427,40 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               final state = ref.watch(
                                                 stopwatchProvider2,
                                               );
+                                              const items = [
+                                                "scy",
+                                                "scm",
+                                                "lcm",
+                                              ];
 
                                               return SplitCalculatorSelectorOne(
-                                                items: const [
-                                                  "scy",
-                                                  "scm",
-                                                  "lcm",
-                                                ],
-                                                selectedValue: state
-                                                    .course, // ✅ keep selected after refresh
-                                                onChanged: (v) => ref
-        .read(
-    stopwatchProvider2.notifier,
-    )
-        .setPredictorParams(
-    c: v.toLowerCase(),
-    ),
+                                                items: items
+                                                    .map((e) => e.toUpperCase())
+                                                    .toList(),
+                                                selectedValue: state.course
+                                                    .toUpperCase(),
+                                                onChanged: (v) {
+                                                  // Convert back to lowercase before storing
+                                                  final lowerCaseValue = v
+                                                      .toLowerCase();
+                                                  ref
+                                                      .read(
+                                                        stopwatchProvider2
+                                                            .notifier,
+                                                      )
+                                                      .setPredictorParams(
+                                                        c: lowerCaseValue,
+                                                      );
+                                                },
 
+                                                // ✅ keep selected after refresh
+                                                //                                             onChanged: (v) => ref
+                                                //     .read(
+                                                // stopwatchProvider2.notifier,
+                                                // )
+                                                //     .setPredictorParams(
+                                                // c: v.toLowerCase(),
+                                                // ),
                                               );
                                             },
                                           ),
@@ -1447,7 +1469,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 10.h,),
+                                SizedBox(height: 10.h),
                                 Row(
                                   children: [
                                     Expanded(
@@ -1463,27 +1485,50 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             fontSize: 14.sp,
                                           ),
                                           SizedBox(height: 8.h),
+
                                           Consumer(
                                             builder: (context, ref, child) {
                                               final state = ref.watch(
                                                 stopwatchProvider2,
                                               );
 
+                                              const strokes = [
+                                                "fly",
+                                                "back",
+                                                "free",
+                                                "breast",
+                                                "im",
+
+                                              ];
+                                              String formatStroke(String s) {
+                                                if (s.toLowerCase() == 'im') {
+                                                  return 'IM';
+                                                }
+                                                return s.isNotEmpty
+                                                    ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
+                                                    : s;
+                                              }
+
                                               return SplitCalculatorSelectorOne(
-                                                items: const [
-                                                  "fly",
-                                                  "back",
-                                                  "free",
-                                                  "im",
-                                                  "breast",
-                                                ],
-                                                selectedValue: state
-                                                    .stroke, // ✅ keep selected after refresh
-                                                onChanged: (v) => ref
-                                                    .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                    .setPredictorParams(s: v),
+                                                items: strokes
+                                                    .map(formatStroke)
+                                                    .toList(), // display formatted strokes
+                                                selectedValue: formatStroke(
+                                                  state.stroke,
+                                                ), // display current selection formatted
+                                                onChanged: (v) {
+                                                  // Convert back to lowercase for storing
+                                                  final lowerCaseValue = v
+                                                      .toLowerCase();
+                                                  ref
+                                                      .read(
+                                                        stopwatchProvider2
+                                                            .notifier,
+                                                      )
+                                                      .setPredictorParams(
+                                                        s: lowerCaseValue,
+                                                      );
+                                                },
                                               );
                                             },
                                           ),
@@ -1527,10 +1572,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     .distance, // ✅ keep selected after refresh
                                                 onChanged: (v) => ref
                                                     .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
+                                                      stopwatchProvider2
+                                                          .notifier,
+                                                    )
                                                     .setPredictorParams(d: v),
-
                                               );
                                             },
                                           ),
@@ -1539,7 +1584,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 10.h,),
+                                SizedBox(height: 10.h),
 
                                 Row(
                                   children: [
@@ -1575,9 +1620,12 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     .splitSize, // ✅ keep selected after refresh
                                                 onChanged: (v) => ref
                                                     .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                    .setPredictorParams(split: v),
+                                                      stopwatchProvider2
+                                                          .notifier,
+                                                    )
+                                                    .setPredictorParams(
+                                                      split: v,
+                                                    ),
                                               );
                                             },
                                           ),
@@ -1609,14 +1657,17 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   "From Start",
                                                   "From Middle",
                                                   "From Last",
-
                                                 ],
                                                 selectedValue: state
                                                     .startType, // ✅ keep selected after refresh
                                                 onChanged: (v) => ref
-                                                    .read(stopwatchProvider2.notifier)
-                                                    .setPredictorParams(start: v),
-
+                                                    .read(
+                                                      stopwatchProvider2
+                                                          .notifier,
+                                                    )
+                                                    .setPredictorParams(
+                                                      start: v,
+                                                    ),
                                               );
                                             },
                                           ),
@@ -1625,12 +1676,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ),
                                   ],
                                 ),
-
-
-
                               ],
                             ),
-
 
                           Container(
                             padding: const EdgeInsets.all(10),
@@ -1692,9 +1739,12 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           .read(stopwatchProvider1.notifier)
                                           .start();
                                       ref
-                                          .read(showCourseSectionStopWatchProvider2.notifier)
-                                          .state =
-                                      false;
+                                              .read(
+                                                showCourseSectionStopWatchProvider2
+                                                    .notifier,
+                                              )
+                                              .state =
+                                          false;
                                     },
                                     child: Row(
                                       mainAxisAlignment:
@@ -2054,7 +2104,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   .watch(
                                                     stopwatchProvider2.notifier,
                                                   )
-                                                  .logStopwatch =
+                                                  .logPredictor =
                                               '';
                                           ref
                                               .read(stopwatchProvider2.notifier)
@@ -2092,7 +2142,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: AppColors.primary,
                                         ),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          exportOutputAsPdf3(context, ref);
+                                        },
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -2128,6 +2180,143 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> exportOutputAsPdf(BuildContext context, WidgetRef ref) async {
+    final log2 = ref.read(stopwatchProvider2).logConverter;
+
+    print(log2);
+
+    if (log2.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No output to export!')));
+      return;
+    }
+
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Container(
+            padding: const pw.EdgeInsets.all(16),
+            child: pw.Text(log2, style: pw.TextStyle(font: pw.Font.courier())),
+          );
+        },
+      ),
+    );
+
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/swim_converter_output.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('PDF saved at: ${file.path}')));
+
+      await OpenFile.open(file.path);
+
+      // ✅ Clear log after export
+    } catch (e) {
+      debugPrint("PDF export error: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to export PDF')));
+    }
+  }
+
+  Future<void> exportOutputAsPdf3(BuildContext context, WidgetRef ref) async {
+    final log3 = ref.read(stopwatchProvider2).logPredictor;
+
+    print(log3);
+
+    if (log3.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No output to export!')));
+      return;
+    }
+
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Container(
+            padding: const pw.EdgeInsets.all(16),
+            child: pw.Text(log3, style: pw.TextStyle(font: pw.Font.courier())),
+          );
+        },
+      ),
+    );
+
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/swim_predictor_output.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('PDF saved at: ${file.path}')));
+
+      await OpenFile.open(file.path);
+
+      // Clear logPredictor after export
+      //ref.read(stopwatchProvider2.notifier).clearLogPredictor();
+    } catch (e) {
+      debugPrint("PDF export error: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to export PDF')));
+    }
+  }
+
+  Future<void> exportOutputAsPdf1(BuildContext context, WidgetRef ref) async {
+    final log = ref.read(stopwatchProvider2).logStopwatch;
+
+    print(log);
+
+    if (log.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No output to export!')));
+      return;
+    }
+
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Container(
+            padding: const pw.EdgeInsets.all(16),
+            child: pw.Text(log, style: pw.TextStyle(font: pw.Font.courier())),
+          );
+        },
+      ),
+    );
+
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/swim_stopwatch_output.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('PDF saved at: ${file.path}')));
+
+      await OpenFile.open(file.path);
+
+      // clear log
+      //ref.read(stopwatchProvider2.notifier).clearLogStopwatch();
+    } catch (e) {
+      debugPrint("PDF export error: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to export PDF')));
+    }
   }
 
   static String _activeLog(StopwatchController2 c) {
