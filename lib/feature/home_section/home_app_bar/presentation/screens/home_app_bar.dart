@@ -5,10 +5,7 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 import 'package:swim_metrics/feature/home_section/home_app_bar/presentation/screens/widgets/custom_active_container_image_widget.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
-
 import '../../../calculator_section/calculator/presentation/screen/calculator_page.dart';
-
-import '../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import '../../../converter_section/presentation/screen/converter_screen.dart';
 import '../../../stop_watch_section/stop_watch/presentation/screen/stop_watch_screen.dart';
 import '../riverpod/home_controller.dart';
@@ -43,6 +40,7 @@ class HomeNavBarScreen extends ConsumerWidget {
           ),
         ),
         child: BottomNavigationBar(
+
           currentIndex: currentIndex,
           onTap: (index) {
             ref.read(bottomNavProvider.notifier).state = index;

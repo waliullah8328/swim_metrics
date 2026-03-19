@@ -8,7 +8,6 @@ import 'package:swim_metrics/config/route/routes_name.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/image_path.dart';
-import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/screen/widget/course_drop_down_widget.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/screen/widget/profile_shimmer_widget.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
@@ -219,6 +218,7 @@ class SettingsScreen extends ConsumerWidget {
                                             child: DropdownButton<FontSizeOption>(
                                               value: fontSize,
                                               isExpanded: true,
+                                              dropdownColor: isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
                                               isDense: true,
                                               icon: const SizedBox(), // removes default icon
                                               borderRadius: BorderRadius.circular(12),
@@ -323,6 +323,7 @@ class SettingsScreen extends ConsumerWidget {
                                               value: language,
                                               isExpanded: true,
                                               icon: const SizedBox(), // remove default arrow
+                                              dropdownColor: isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
                                               items: AppLanguage.values.map((lang) {
                                                 return DropdownMenuItem(
                                                   value: lang,
