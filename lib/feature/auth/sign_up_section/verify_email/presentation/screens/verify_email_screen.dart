@@ -50,82 +50,65 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
         child: Padding(
           padding:  EdgeInsets.only(left: 20.w,right: 20.w),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
-                SizedBox(height: 24.h,),
-                CustomText(text: AppLocalizations.of(context)!.verifyYourEmail,fontSize: 23.sp,fontWeight: FontWeight.w700),
-                SizedBox(height: 24.h,),
-                PinCodeTextField(
-                  appContext: context,
-                  length: 6,
-                  cursorColor: const Color(0xFF007AFF),
-                  keyboardType: TextInputType.number,
-                  enableActiveFill: true,
-                  backgroundColor: Colors.transparent,
+            child: Form(
+              key: _verifyEmailFormKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(ImagePath.appLogoImage,width: 80.w,height: 80.h,),
+                  SizedBox(height: 24.h,),
+                  CustomText(text: AppLocalizations.of(context)!.verifyYourEmail,fontSize: 23.sp,fontWeight: FontWeight.w700),
+                  SizedBox(height: 24.h,),
+                  PinCodeTextField(
+                    appContext: context,
+                    length: 6,
+                    cursorColor: const Color(0xFF007AFF),
+                    keyboardType: TextInputType.number,
+                    enableActiveFill: true,
+                    backgroundColor: Colors.transparent,
 
-                  pinTheme: PinTheme(
-                    shape: PinCodeFieldShape.box,
-                    borderRadius: BorderRadius.circular(8),
-                    fieldHeight: 60.h,
-                    fieldWidth: 55.w,
-                    borderWidth: 1.5,
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderRadius: BorderRadius.circular(8),
+                      fieldHeight: 60.h,
+                      fieldWidth: 55.w,
+                      borderWidth: 1.5,
 
-                    // Border Colors
-                    inactiveColor: isDark ? Colors.grey : Colors.grey.shade400,
-                    selectedColor: AppColors.primary,
-                    activeColor: AppColors.primary,
+                      // Border Colors
+                      inactiveColor: isDark ? Colors.grey : Colors.grey.shade400,
+                      selectedColor: AppColors.primary,
+                      activeColor: AppColors.primary,
 
-                    // Fill Colors
-                    inactiveFillColor:
-                    isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
-                    selectedFillColor:
-                    isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
-                    activeFillColor:
-                    isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
+                      // Fill Colors
+                      inactiveFillColor:
+                      isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
+                      selectedFillColor:
+                      isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
+                      activeFillColor:
+                      isDark ? const Color(0xff022740) : AppColors.textFormFieldFillColorLightMode,
+                    ),
+
+                    onChanged: (value) {
+                      ref.read(verifyEmailProvider.notifier).setCode(value);
+                    },
                   ),
+                  SizedBox(height: 16.h,),
+                  CustomText(text: AppLocalizations.of(context)!.tips,fontSize: 14.sp,color: AppColors.primary,fontWeight: FontWeight.w400,textAlign: TextAlign.center,),
 
-                  onChanged: (value) {
-                    ref.read(verifyEmailProvider.notifier).setCode(value);
-                  },
-                ),
-                SizedBox(height: 16.h,),
-                CustomText(text: AppLocalizations.of(context)!.tips,fontSize: 14.sp,color: AppColors.primary,fontWeight: FontWeight.w400,textAlign: TextAlign.center,),
+                  SizedBox(height: 230.h,),
+                  widget.isSignUp== 'true'?Consumer(builder: (context,ref,child){
+                    final isLoading = ref.watch(verifyEmailProvider.select((s)=>s.isLoading));
 
-                SizedBox(height: 230.h,),
-                widget.isSignUp== 'true'?Consumer(builder: (context,ref,child){
-                  final isLoading = ref.watch(verifyEmailProvider.select((s)=>s.isLoading));
+                    return CustomPrimaryButton(title: AppLocalizations.of(context)!.verify,
+                      isLoading: isLoading,
+                      onPressed: () async {
 
-                  return CustomPrimaryButton(title: AppLocalizations.of(context)!.verify,
-                    isLoading: isLoading,
-                    onPressed: () async {
+                      final String title = AppLocalizations.of(context)!.verifiedEmail;
+                      final String subTitle = AppLocalizations.of(context)!.yourAccountHasBeenCreatedSuccessfully;
 
-                    final String title = AppLocalizations.of(context)!.verifiedEmail;
-                    final String subTitle = AppLocalizations.of(context)!.yourAccountHasBeenCreatedSuccessfully;
-
-                    if(_verifyEmailFormKey.currentState!.validate()){
-                      final result = await ref.read(verifyEmailProvider.notifier).verifyOtp(context: context,email: widget.email,title: title,subTitle: subTitle,isSignUp: widget.isSignUp.toString());
-
-                    }
-
-
-
-
-
-
-                    },);
-
-                }):
-                Consumer(builder: (context,ref,child){
-                  final isLoading = ref.watch(verifyEmailProvider.select((s)=>s.isLoading));
-
-                  return CustomPrimaryButton(title: AppLocalizations.of(context)!.verify,
-                    isLoading: isLoading,
-                    onPressed: () async {
                       if(_verifyEmailFormKey.currentState!.validate()){
-                        ref.read(verifyEmailProvider.notifier). verifyForgetOtp(context: context,email: widget.email,code: ref.read(verifyEmailProvider.select((s)=>s.code)),isSignUp: widget.isSignUp!);
+                        final result = await ref.read(verifyEmailProvider.notifier).verifyOtp(context: context,email: widget.email,title: title,subTitle: subTitle,isSignUp: widget.isSignUp.toString());
 
                       }
 
@@ -134,15 +117,35 @@ class _LoginScreenState extends ConsumerState<VerifyEmailScreen> {
 
 
 
+                      },);
 
-                    },);
+                  }):
+                  Consumer(builder: (context,ref,child){
+                    final isLoading = ref.watch(verifyEmailProvider.select((s)=>s.isLoading));
 
-                }),
+                    return CustomPrimaryButton(title: AppLocalizations.of(context)!.verify,
+                      isLoading: isLoading,
+                      onPressed: () async {
+                        if(_verifyEmailFormKey.currentState!.validate()){
+                          ref.read(verifyEmailProvider.notifier). verifyForgetOtp(context: context,email: widget.email,code: ref.read(verifyEmailProvider.select((s)=>s.code)),isSignUp: widget.isSignUp!);
+
+                        }
 
 
 
 
-              ],
+
+
+
+                      },);
+
+                  }),
+
+
+
+
+                ],
+              ),
             ),
           ),
         ),

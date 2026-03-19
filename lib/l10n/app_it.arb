@@ -175,6 +175,14 @@
 "invalidPhoneNumber": "Formato del numero di telefono non valido (sono richieste 10 cifre).",
 "nameIsRequired": "Il nome è obbligatorio.",
 "subjectOfProblemIsRequired": "L'oggetto del problema è obbligatorio.",
-"problemOrSuggestionIsRequired": "Il problema o il suggerimento sono obbligatori."
+"problemOrSuggestionIsRequired": "Il problema o il suggerimento sono obbligatori.",
+
+"timeMmSs": "Tempo (mm:ss o ss.ss)",
+"showSplits": "Mostra split",
+"noOutputToExport": "Nessun risultato da esportare!",
+"failedToExportPDF": "Errore durante l'esportazione del PDF",
+"pDFSavedAt": "PDF salvato in",
+"pleaseFillAllFields": "Si prega di compilare tutti i campi.",
+"invalidTimeFormat": "Formato del tempo non valido. Usa mm:ss o ss.ss."
 
 }

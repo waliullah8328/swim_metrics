@@ -185,7 +185,17 @@
 "invalidPhoneNumber": "Invalid phone number format (10 digits required).",
 "nameIsRequired": "Name is required.",
 "subjectOfProblemIsRequired": "Subject of problem is required.",
-"problemOrSuggestionIsRequired": "Problem or suggestion is required."
+"problemOrSuggestionIsRequired": "Problem or suggestion is required.",
+
+"timeMmSs": "Time (mm:ss or ss.ss)",
+"showSplits": "Show splits",
+"noOutputToExport": "No output to export!",
+"failedToExportPDF": "Failed to export PDF",
+"pDFSavedAt": "PDF saved at",
+"pleaseFillAllFields": "Please fill all fields.",
+"invalidTimeFormat": "Invalid time format. Use mm:ss or ss.ss."
+
+
 
 
 

@@ -14,6 +14,8 @@ Future<void> main() async {
 
   await TokenStorage.init();
   await dotenv.load(fileName: ".env");
+
+
   runApp(ProviderScope(child: const MyApp()));
 }
 

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:open_file/open_file.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
@@ -16,7 +16,6 @@ import '../../../../../core/common/widgets/new_custon_widgets/split_calculator_s
 import '../../../../../core/utils/constants/icon_path.dart';
 
 import '../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
-import '../../riverpod/converter_controller.dart';
 import '../../riverpod/converter_controller1.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -36,76 +35,18 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
    final TextEditingController timeController = TextEditingController();
   final FocusNode timeFocusNode = FocusNode();
 
-   late stt.SpeechToText _speech;
-   bool _isListening = false;
+
 
    @override
    void initState() {
      super.initState();
-     _speech = stt.SpeechToText();
+
 
      final state1 = ref.read(converterProvider1);
      timeController.text = state1.timeText;
    }
 
-   /// Start listening and update TextFormField
-   Future<void> startListening() async {
-     bool available = await _speech.initialize();
-     if (available) {
-       _isListening = true;
-       _speech.listen(
-         onResult: (result) {
-           if (result.finalResult) {
-             String spoken = result.recognizedWords;
-             String time = convertSpeechToTime(spoken);
-             timeController.text = time;
-             ref.read(converterProvider1.notifier).setTimeText(time);
-             _isListening = false;
-           }
-         },
-       );
-     }
-   }
 
-   /// Convert speech to mm:ss.ss format
-   String convertSpeechToTime(String spoken) {
-     // Map words to numbers
-     final wordToNumber = {
-       'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
-       'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
-       'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14,
-       'fifteen': 15, 'sixteen': 16, 'seventeen': 17, 'eighteen': 18,
-       'nineteen': 19, 'twenty': 20
-     };
-
-     int hours = 0;
-     int minutes = 0;
-     double seconds = 0.0;
-
-     final words = spoken.toLowerCase().split(' ');
-
-     for (int i = 0; i < words.length; i++) {
-       final word = words[i];
-       final value = wordToNumber[word] ?? int.tryParse(word) ?? 0;
-
-       if (i + 1 < words.length) {
-         final next = words[i + 1];
-         if (next.startsWith('hour')) {
-           hours = value;
-         } else if (next.startsWith('minute')) {
-           minutes = value;
-         } else if (next.startsWith('second')) {
-           seconds = value.toDouble();
-         }
-       }
-     }
-
-     final totalMinutes = hours * 60 + minutes;
-     final minStr = totalMinutes.toString().padLeft(2, '0');
-     final secStr = seconds.toStringAsFixed(2).padLeft(5, '0'); // ss.ss
-
-     return '$minStr:$secStr';
-   }
 
   @override
   Widget build(BuildContext context) {
@@ -465,71 +406,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         ),
                         SizedBox(height: 20.h,),
 
-                        // Column(
-                        //   crossAxisAlignment: CrossAxisAlignment.start,
-                        //   children: [
-                        //     CustomText(text:
-                        //     AppLocalizations.of(context)!.distance,
-                        //
-                        //       color: AppColors.primary,
-                        //       fontWeight: FontWeight.w600,
-                        //       fontSize: 14.sp,
-                        //
-                        //     ),
-                        //
-                        //     SizedBox(height: 10.h),
-                        //
-                        //
-                        //
-                        //     SizedBox(
-                        //       width: double.infinity,
-                        //       child: Consumer(builder: (context, ref, _) {
-                        //         final state1 = ref.watch(converterProvider1);
-                        //         final controller1 = ref.read(converterProvider1.notifier);
-                        //
-                        //         const distanceItems = ["50", "100", "150", "200", "250","500"];
-                        //
-                        //         return PopupMenuButton<String>(
-                        //           color: isDark?Color(0xff153250):Colors.white,
-                        //           /// move dropdown to the right
-                        //           offset: const Offset(100, 45),
-                        //           onSelected: controller1.setDistance,
-                        //           itemBuilder: (context) => distanceItems
-                        //               .map(
-                        //                 (distance) => PopupMenuItem(
-                        //               value: distance,
-                        //               child: Text(distance),
-                        //             ),
-                        //           )
-                        //               .toList(),
-                        //           child: Container(
-                        //             width: double.infinity,
-                        //             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                        //             decoration: BoxDecoration(
-                        //               color: isDark?Color(0xff153250):Colors.white,
-                        //               borderRadius: BorderRadius.circular(6),
-                        //               border: Border.all(color: Colors.grey),
-                        //             ),
-                        //             child: Row(
-                        //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //               children: [
-                        //                 Text(
-                        //                   state1.distance,
-                        //                   style: TextStyle(
-                        //                     fontSize: 16.sp,
-                        //
-                        //                   ),
-                        //                 ),
-                        //                 const Icon(Icons.arrow_drop_down),
-                        //               ],
-                        //             ),
-                        //           ),
-                        //         );
-                        //       }),
-                        //     )
-                        //   ],
-                        // ),
-                        // SizedBox(height: 25.h),
+
                       ],
                     ),
 
@@ -543,7 +420,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomText(
-                        text: "Time (mm:ss or ss.ss)",
+                        text: AppLocalizations.of(context)!.timeMmSs,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
                         fontSize: 14.sp,
@@ -560,20 +437,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             borderRadius: BorderRadius.circular(6),
                             borderSide: const BorderSide(color: Colors.grey),
                           ),
-                          suffixIcon: GestureDetector(
-                            onTap: startListening, // 🔊 Start listening on tap
-                            child: SizedBox(
-                              height: 24.h,
-                              width: 24.w,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SvgPicture.asset(
-                                  IconPath.voiceIcon,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
+
                         ),
                         onChanged: (value) {
                           ref.read(converterProvider1.notifier).setTimeText(value);
@@ -589,7 +453,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CustomText(text:
-                      'Show splits',
+                      AppLocalizations.of(context)!.showSplits,
                       ),
 
                       Consumer(builder: (context, ref, child) {
@@ -609,12 +473,12 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                   GestureDetector(
                     onTap: (){
-                      controller1.convert();
+                      controller1.convert(context: context);
                       ref.read(showCourseSectionConverter.notifier).state = false;
                     },
                     child: Container(
                       width: double.infinity,
-                      height: 55,
+                      height: 55.h,
                       decoration: BoxDecoration(
                         color: const Color(0xffc59d3f),
                         borderRadius: BorderRadius.circular(16),
@@ -741,7 +605,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
    Future<void> exportOutputAsPdf(BuildContext context, String output) async {
      if (output.isEmpty) {
        ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content: Text('No output to export!')),
+         SnackBar(content:CustomText(text: AppLocalizations.of(context)!.noOutputToExport)),
        );
        return;
      }
@@ -768,7 +632,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
        await file.writeAsBytes(await pdf.save());
 
        ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(content: Text('PDF saved at: ${file.path}')),
+         SnackBar(content: CustomText(text: '${AppLocalizations.of(context)!.pDFSavedAt}: ${file.path}')),
        );
 
        // Open the PDF
@@ -776,7 +640,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
      } catch (e) {
        debugPrint("PDF export error: $e");
        ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content: Text('Failed to export PDF')),
+        SnackBar(content: CustomText(text: AppLocalizations.of(context)!.failedToExportPDF)),
        );
      }
    }

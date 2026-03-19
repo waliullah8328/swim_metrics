@@ -175,6 +175,14 @@
 "invalidPhoneNumber": "Format de numéro de téléphone invalide (10 chiffres requis).",
 "nameIsRequired": "Le nom est requis.",
 "subjectOfProblemIsRequired": "Le sujet du problème est requis.",
-"problemOrSuggestionIsRequired": "Le problème ou la suggestion sont requis."
+"problemOrSuggestionIsRequired": "Le problème ou la suggestion sont requis.",
+
+"timeMmSs": "Temps (mm:ss ou ss.ss)",
+"showSplits": "Afficher les splits",
+"noOutputToExport": "Aucune sortie à exporter !",
+"failedToExportPDF": "Échec de l'exportation du PDF",
+"pDFSavedAt": "PDF enregistré à",
+"pleaseFillAllFields": "Veuillez remplir tous les champs.",
+"invalidTimeFormat": "Format de temps invalide. Utilisez mm:ss ou ss.ss."
 
 }

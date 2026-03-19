@@ -98,8 +98,17 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                         ],
                       ),
                     ),
-                    CustomText(text: AppLocalizations.of(context)!.privacyPolicy,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
-                    Divider(),
+                    GestureDetector(
+                      onTap: (){
+                        context.push(RouteNames.termsConditionsScreen);
+                      },
+                      child: Column(
+                        children: [
+                          CustomText(text: AppLocalizations.of(context)!.privacyPolicy,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
+                          Divider(),
+                        ],
+                      ),
+                    ),
                     CustomText(text: AppLocalizations.of(context)!.copyRight,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize:getAdjustedFontSize(14, widget.fontSizeOption).sp,),
                     SizedBox(height: 16.h,),
                   ],

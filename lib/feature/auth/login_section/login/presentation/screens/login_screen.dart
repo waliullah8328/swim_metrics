@@ -162,11 +162,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       onPressed: () async {
 
                       if(loginFormKey.currentState!.validate()){
-                        final result = await ref.read(loginProvider.notifier).login(context: context);
-                        if(result){
-                          await TokenStorage.setLogin(true);
-                          context.go(RouteNames.homeNavBarScreen);
-                        }
+                        ref.read(loginProvider.notifier).login(context: context);
+
 
                       }
 

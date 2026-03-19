@@ -439,7 +439,13 @@ class AuthenticationRepository{
         debugPrint("tokens $tokens");
         //final refreshToken = data['data']['refresh'];
         final refreshToken = data['refresh'];
+
         debugPrint("refreshToken: $refreshToken");
+
+
+        final isPayment= data['payment'];
+        debugPrint("IS PAYMENT: $isPayment");
+
         //final user = data['data']["user"];
 
 
@@ -450,7 +456,8 @@ class AuthenticationRepository{
           'success': true,
           'message': data['message'] ?? 'Login successfully',
           'tokens': tokens,
-          'refreshToken':refreshToken
+          'refreshToken':refreshToken,
+          'isPayment':isPayment,
 
         };
       }

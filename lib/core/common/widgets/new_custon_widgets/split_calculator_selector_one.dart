@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
 
-class SplitCalculatorSelectorOne extends StatefulWidget {
+class SplitCalculatorSelectorOne extends ConsumerStatefulWidget {
   final List<String> items;
   final String selectedValue;
   final ValueChanged<String> onChanged;
@@ -15,12 +17,12 @@ class SplitCalculatorSelectorOne extends StatefulWidget {
   });
 
   @override
-  State<SplitCalculatorSelectorOne> createState() =>
+  ConsumerState<SplitCalculatorSelectorOne> createState() =>
       _SplitCalculatorSelectorOneState();
 }
 
 class _SplitCalculatorSelectorOneState
-    extends State<SplitCalculatorSelectorOne> {
+    extends ConsumerState<SplitCalculatorSelectorOne> {
 
   late FixedExtentScrollController _controller;
   late int selectedIndex;
@@ -33,7 +35,6 @@ class _SplitCalculatorSelectorOneState
     if (selectedIndex == -1) selectedIndex = 0;
 
     _controller = FixedExtentScrollController(initialItem: selectedIndex);
-    debugPrint(widget.selectedValue.toString());
   }
 
   @override
@@ -50,13 +51,14 @@ class _SplitCalculatorSelectorOneState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     const double itemHeight = 55;
 
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide( // ✅ Card grey border
-          color: Colors.grey,
+        side:  BorderSide( // ✅ Card grey border
+          color: isDark?Colors.grey:Color(0xffEAEDF1),
           width: 1,
         ),
       ),
@@ -93,15 +95,15 @@ class _SplitCalculatorSelectorOneState
                       width: double.infinity,
                       alignment: Alignment.center,
 
-                      child: Text(
+                      child: CustomText(text:
                         widget.items[index],
-                        style: TextStyle(
+
                           fontSize: 19.sp,
-                          color: isSelected ? Colors.amber : null,
+                          color: isSelected ? AppColors.primary :null,
                           fontWeight: isSelected
                               ? FontWeight.w500
                               : FontWeight.normal,
-                        ),
+
                       ),
                     ),
                   );
