@@ -15,6 +15,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import '../../../setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/calculator_split_state.dart';
 import '../../riverpod/split_calculator_controller.dart';
 final currencyProvider = StateProvider<String>((ref) => "SCY");
@@ -25,10 +26,22 @@ class SplitCalculatorPage extends ConsumerWidget {
   final TextEditingController timeController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+
+  double getAdjustedFontSize(double baseSize, FontSizeOption option) {
+    switch (option) {
+      case FontSizeOption.small:
+        return baseSize - 2;
+      case FontSizeOption.medium:
+        return baseSize;
+      case FontSizeOption.big:
+        return baseSize + 2;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    final selected = ref.watch(currencyProvider);
+    final fontOption = ref.watch(settingsProvider).fontSize;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionProvider);
 
@@ -37,7 +50,7 @@ class SplitCalculatorPage extends ConsumerWidget {
 
       drawer: CustomDrawer(),
       appBar: AppBar(
-        title: CustomText(text: AppLocalizations.of(context)!.splitCalculator,fontSize: 24.sp,fontWeight: FontWeight.w600,),
+        title: CustomText(text: AppLocalizations.of(context)!.splitCalculator,fontSize: getAdjustedFontSize(24, fontOption).sp,fontWeight: FontWeight.w600,),
         centerTitle: true,
         leading: GestureDetector(
           onTap: (){
@@ -84,7 +97,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SvgPicture.asset(IconPath.pullIcon),
-                              CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: 14.sp,color: Color(0xffC7C7C7),)
+                              CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: getAdjustedFontSize(14, fontOption).sp,color: Color(0xffC7C7C7),)
                             ],
                           ),
                           SizedBox(height: 20.h,)
@@ -120,7 +133,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                                 children: [
                                   CustomText(
                                     text: AppLocalizations.of(context)!.course,
-                                    fontSize: 20.sp,
+                                    fontSize: getAdjustedFontSize(20, fontOption).sp,
                                     color: AppColors.primary,
                                   ),
 
@@ -149,7 +162,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                                             dropdownColor: isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
                                             style: TextStyle(
                                               color: const Color(0xFFB8892D),
-                                              fontSize: 12.sp,
+                                              fontSize: getAdjustedFontSize(12, fontOption).sp,
                                               fontWeight: FontWeight.w500,
                                             ),
                                             items: [
@@ -157,21 +170,21 @@ class SplitCalculatorPage extends ConsumerWidget {
                                                 value: "SCY",
                                                 child: CustomText(
                                                   text: AppLocalizations.of(context)!.scy,
-                                                  fontSize: 12.sp,
+                                                  fontSize: getAdjustedFontSize(12, fontOption).sp,
                                                 ),
                                               ),
                                               DropdownMenuItem(
                                                 value: "SCM",
                                                 child: CustomText(
                                                   text: AppLocalizations.of(context)!.scm,
-                                                  fontSize: 12.sp,
+                                                  fontSize: getAdjustedFontSize(12, fontOption).sp,
                                                 ),
                                               ),
                                               DropdownMenuItem(
                                                 value: "LCM",
                                                 child: CustomText(
                                                   text: AppLocalizations.of(context)!.lcm,
-                                                  fontSize: 12.sp,
+                                                  fontSize: getAdjustedFontSize(12, fontOption).sp,
                                                 ),
                                               ),
                                             ],
@@ -264,35 +277,36 @@ class SplitCalculatorPage extends ConsumerWidget {
                         SizedBox(height: 20.h),
                         CustomText(
                           text: AppLocalizations.of(context)!.goalTime,
-                          fontSize: 18.sp,
+                          fontSize: getAdjustedFontSize(18, fontOption).sp,
                           color: AppColors.primary,
                         ),
                         SizedBox(height: 16.h),
                         CustomTextField(
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.text,
                           hintText: AppLocalizations.of(context)!.enterYourTime,
                           onChanged: (value){
                             ref.read(splitCalcProvider.notifier).setGoalTime(value);
                           },
                           controller: timeController,
-                          suffixIcon: GestureDetector(
-                            onTap: (){
-
-
-                            },
-                            child: SizedBox(
-                                height: 24.h,
-                                width: 24.w,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SvgPicture.asset(
-                                    IconPath.voiceIcon,
-                                    fit: BoxFit.contain,
-
-                                  ),
-                                ),
-                                                    ),
-                          )),
+                          // suffixIcon: GestureDetector(
+                          //   onTap: (){
+                          //
+                          //
+                          //   },
+                          //   child: SizedBox(
+                          //       height: 24.h,
+                          //       width: 24.w,
+                          //       child: Padding(
+                          //         padding: const EdgeInsets.all(8.0),
+                          //         child: SvgPicture.asset(
+                          //           IconPath.voiceIcon,
+                          //           fit: BoxFit.contain,
+                          //
+                          //         ),
+                          //       ),
+                          //                           ),
+                          // )
+                        ),
 
                         SizedBox(height: 16.h),
 
@@ -315,7 +329,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                             children: [
                               SvgPicture.asset(IconPath.calculatorSplitIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
                               SizedBox(width: 6.w,),
-                              CustomText(text: AppLocalizations.of(context)!.calculateSplit,fontSize: 14.sp,fontWeight: FontWeight.w600),
+                              CustomText(text: AppLocalizations.of(context)!.calculateSplit,fontSize: getAdjustedFontSize(14, fontOption).sp,fontWeight: FontWeight.w600),
                             ],
                           )),
                         ),
@@ -342,9 +356,9 @@ class SplitCalculatorPage extends ConsumerWidget {
                   child:Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CustomText(text: AppLocalizations.of(context)!.split,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                      CustomText(text: AppLocalizations.of(context)!.splitTime,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                      CustomText(text: AppLocalizations.of(context)!.total,fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                      CustomText(text: AppLocalizations.of(context)!.split,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                      CustomText(text: AppLocalizations.of(context)!.splitTime,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                      CustomText(text: AppLocalizations.of(context)!.total,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
 
                     ],
                   ),
@@ -381,19 +395,19 @@ class SplitCalculatorPage extends ConsumerWidget {
                             children: [
                               CustomText(
                                 text: split.distance.toString(),
-                                fontSize: 14.sp,
+                                fontSize: getAdjustedFontSize(14, fontOption).sp,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
                               ),
                               CustomText(
                                 text: split.splitTime.toStringAsFixed(2),
-                                fontSize: 14.sp,
+                                fontSize: getAdjustedFontSize(14, fontOption).sp,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
                               ),
                               CustomText(
                                 text: split.total.toStringAsFixed(2),
-                                fontSize: 14.sp,
+                                fontSize: getAdjustedFontSize(14, fontOption).sp,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
                               ),
@@ -426,7 +440,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                                children: [
                                  SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
                                  SizedBox(width: 6.w,),
-                                 CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                                 CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: getAdjustedFontSize(16, fontOption).sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
                                ],
                              ),
                            ),
@@ -446,7 +460,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                              children: [
                                SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
                                SizedBox(width: 6.w,),
-                               CustomText(text:  AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                               CustomText(text:  AppLocalizations.of(context)!.export,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w700,),
                              ],
                            ),
                          ),
