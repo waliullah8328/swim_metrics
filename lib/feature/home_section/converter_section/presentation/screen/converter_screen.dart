@@ -16,6 +16,7 @@ import '../../../../../core/common/widgets/new_custon_widgets/split_calculator_s
 import '../../../../../core/utils/constants/icon_path.dart';
 
 import '../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
+import '../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/converter_controller1.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -46,6 +47,17 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
      timeController.text = state1.timeText;
    }
 
+   double getAdjustedFontSize(double baseSize, FontSizeOption option) {
+     switch (option) {
+       case FontSizeOption.small:
+         return baseSize - 2;
+       case FontSizeOption.medium:
+         return baseSize;
+       case FontSizeOption.big:
+         return baseSize + 2;
+     }
+   }
+
 
 
   @override
@@ -61,13 +73,14 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionConverter);
+    final fontOption = ref.watch(settingsProvider).fontSize;
 
     return Scaffold(
       key: scaffoldKey,
 
       drawer: CustomDrawer(),
       appBar: AppBar(
-        title: CustomText(text: AppLocalizations.of(context)!.converter,fontSize: 24.sp,fontWeight: FontWeight.w600,),
+        title: CustomText(text: AppLocalizations.of(context)!.converter,fontSize: getAdjustedFontSize(24, fontOption).sp,fontWeight: FontWeight.w600,),
         centerTitle: true,
         leading: GestureDetector(
           onTap: (){
@@ -113,7 +126,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SvgPicture.asset(IconPath.pullIcon),
-                          CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: 14.sp,color: Color(0xffC7C7C7),)
+                          CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: getAdjustedFontSize(14, fontOption).sp,color: Color(0xffC7C7C7),)
                         ],
                       ),
                       SizedBox(height: 20.h,)
@@ -161,7 +174,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
+                                    fontSize: getAdjustedFontSize(14, fontOption).sp,
                                   ),
                                   SizedBox(height: 8.h),
                                   Consumer(
@@ -202,7 +215,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
+                                    fontSize: getAdjustedFontSize(14, fontOption).sp,
                                   ),
                                   SizedBox(height: 8.h),
                                   Consumer(
@@ -256,7 +269,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
+                                    fontSize: getAdjustedFontSize(14, fontOption).sp,
                                   ),
                                   SizedBox(height: 8.h),
                                   Consumer(
@@ -303,7 +316,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
+                                    fontSize: getAdjustedFontSize(14, fontOption).sp,
                                   ),
                                   SizedBox(height: 8.h),
                                   Consumer(
@@ -348,7 +361,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                               text: AppLocalizations.of(context)!.to,
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
-                              fontSize: 16.sp,
+                              fontSize: getAdjustedFontSize(14, fontOption).sp,
                             ),
                             Consumer(builder: (context,ref,child){
 
@@ -423,7 +436,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         text: AppLocalizations.of(context)!.timeMmSs,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
-                        fontSize: 14.sp,
+                        fontSize: getAdjustedFontSize(14, fontOption).sp,
                       ),
                       SizedBox(height: 10.h),
 
@@ -489,14 +502,14 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         children: [
                           SvgPicture.asset(IconPath.calculatorSplitIcon),
                           SizedBox(width: 6.w,),
-                          Text(
+                          CustomText(text:
                             AppLocalizations.of(context)!.convertTime,
-                            style: TextStyle(
-                                fontSize: 16.sp,
+
+                                fontSize: getAdjustedFontSize(16, fontOption).sp,
                                 fontWeight: FontWeight.w600,
                               color: AppColors.backgroundDark
 
-                            ),
+
                           ),
                         ],
                       ),
@@ -559,7 +572,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                               children: [
                                 SvgPicture.asset(IconPath.clearIcon),
                                 SizedBox(width: 6.w,),
-                                CustomText(text: AppLocalizations.of(context)!.clear,fontSize: 16.sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                                CustomText(text: AppLocalizations.of(context)!.clear,fontSize: getAdjustedFontSize(16, fontOption).sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
                               ],
                             ),
                           ),
@@ -580,7 +593,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             children: [
                               SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
                               SizedBox(width: 6.w,),
-                              CustomText(text: AppLocalizations.of(context)!.export,fontSize: 16.sp,fontWeight: FontWeight.w700,),
+                              CustomText(text: AppLocalizations.of(context)!.export,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w700,),
                             ],
                           ),
                         ),
