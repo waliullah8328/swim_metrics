@@ -286,6 +286,75 @@ class TermsConditionsScreen extends StatelessWidget {
                   fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
               ),
 
+              SizedBox(height: 10.h,),
+              Divider(),
+
+              SizedBox(height: 10.h),
+              CustomText(
+                  text:
+                  "7. User Responsibilities",
+                  fontSize: 16.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "You agree to:",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Use SwimMetrics safely, responsibly, and lawfully.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Not use the App while driving or during activities requiring full attention.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Not rely on the App for emergency, safety-critical, or life-saving purposes.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Ensure the accuracy of all numeric inputs you enter.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Comply with all applicable laws, sport regulations, and organizational requirements.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Assume all risks associated with physical activity, training decisions, and reliance on App outputs.",
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "You acknowledge that you exercise independent judgment in all training, pacing, and performance decisions and that you do not rely on SwimMetrics as the sole or primary basis for any athletic, health, or safety decision. You acknowledge that the App does not replace judgment, experience, supervision, or professional instruction, and that App outputs are only one of many factors you may consider when making training or performance decisions. You acknowledge that SwimMetrics provides computational assistance only and does not make decisions or recommendations on your behalf.",
+                  fontSize: 13.sp, color: isDark?Color(0xffC7C7C7):Colors.black87,fontWeight: FontWeight.w400,
+              ),
+
+              SizedBox(height: 10.h,),
+              Divider(),
+
+              SizedBox(height: 10.h),
+              CustomText(
+                  text:
+                  "7. User Responsibilities",
+                  fontSize: 16.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "You agree to:",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+
 
 
 
