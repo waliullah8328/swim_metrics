@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar.dart';
 import 'package:swim_metrics/core/services/token_storage.dart';
+import '../../../../../../config/route/routes_name.dart';
 import '../../../../data/repository/authentication_repository.dart';
 import 'login_state.dart';
 
@@ -100,12 +102,24 @@ class LoginNotifier extends StateNotifier<LoginState> {
         debugPrint("Get Access Token : $tokens");
         final refreshToken = response['refreshToken'];
         debugPrint("Get Refresh Token : $refreshToken");
+        final isPayment = response['isPayment'];
+        debugPrint("Get Is Payment : $isPayment");
+
 
 
 
         await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
 
         debugPrint(await TokenStorage.getAccessToken());
+        await TokenStorage.setLogin(true);
+
+        if(isPayment){
+          context.go(RouteNames.homeNavBarScreen);
+        }
+        else{
+          context.push("${RouteNames.paymentScreen}/$tokens");
+        }
+
 
 
 

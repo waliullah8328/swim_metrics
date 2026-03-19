@@ -64,7 +64,13 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
   Future<void> openUrl(String url) async {
     final Uri uri = Uri.parse(url);
 
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+    if (!await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+      webViewConfiguration: const WebViewConfiguration(
+        enableJavaScript: true,
+      ),
+    )) {
       throw Exception('Could not launch $url');
     }
   }
