@@ -164,7 +164,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 child: Row(
                   children: List.generate(modes.length * 2 - 1, (index) {
                     if (index.isOdd) {
-                      return  SizedBox(width: 6.w);
+                      return SizedBox(width: 6.w);
                     }
 
                     final itemIndex = index ~/ 2;
@@ -187,15 +187,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                 : const Color(0xFFEAEDF1),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: CustomText(text:
-                            mode,
+                          child: CustomText(
+                            text: mode,
 
-                              fontWeight: FontWeight.w600,
-                              fontSize: getAdjustedFontSize(17, fontOption).sp,
-                              color: isActive
-                                  ? Colors.black
-                                  : const Color(0xFF82888E),
-
+                            fontWeight: FontWeight.w600,
+                            fontSize: getAdjustedFontSize(17, fontOption).sp,
+                            color: isActive
+                                ? Colors.black
+                                : const Color(0xFF82888E),
                           ),
                         ),
                       ),
@@ -312,7 +311,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         padding: const EdgeInsets.all(24.0),
                                         child: CustomText(
                                           text: _formatElapsed(time),
-                                          fontSize: getAdjustedFontSize(35, fontOption).sp,
+                                          fontSize: getAdjustedFontSize(
+                                            35,
+                                            fontOption,
+                                          ).sp,
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
@@ -350,12 +352,16 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ),
                                       ),
                                       SizedBox(width: 10.w),
-                                      CustomText(text:
-                                        AppLocalizations.of(context)!.start,
+                                      CustomText(
+                                        text: AppLocalizations.of(
+                                          context,
+                                        )!.start,
 
-                                          fontSize: getAdjustedFontSize(14, fontOption).sp,
-                                          fontWeight: FontWeight.w600,
-
+                                        fontSize: getAdjustedFontSize(
+                                          14,
+                                          fontOption,
+                                        ).sp,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ],
                                   ),
@@ -398,7 +404,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               text: AppLocalizations.of(
                                                 context,
                                               )!.split,
-                                              fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                              fontSize: getAdjustedFontSize(
+                                                16,
+                                                fontOption,
+                                              ).sp,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ],
@@ -452,7 +461,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     context,
                                                   )!.undoSplit,
                                                   color: AppColors.textWhite,
-                                                  fontSize: getAdjustedFontSize(12, fontOption).sp,
+                                                  fontSize: getAdjustedFontSize(
+                                                    12,
+                                                    fontOption,
+                                                  ).sp,
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ],
@@ -504,7 +516,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     context,
                                                   )!.stop,
                                                   color: AppColors.textWhite,
-                                                  fontSize: getAdjustedFontSize(12, fontOption).sp,
+                                                  fontSize: getAdjustedFontSize(
+                                                    12,
+                                                    fontOption,
+                                                  ).sp,
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ],
@@ -562,8 +577,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   currentLanguageCode
                                                           .toString() !=
                                                       "en"
-                                                  ? getAdjustedFontSize(12, fontOption).sp
-                                                  : getAdjustedFontSize(16, fontOption).sp.sp,
+                                                  ? getAdjustedFontSize(
+                                                      12,
+                                                      fontOption,
+                                                    ).sp
+                                                  : getAdjustedFontSize(
+                                                      16,
+                                                      fontOption,
+                                                    ).sp.sp,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ],
@@ -614,8 +635,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   currentLanguageCode
                                                           .toString() !=
                                                       "en"
-                                                  ? getAdjustedFontSize(12, fontOption).sp
-                                                  : getAdjustedFontSize(16, fontOption).sp,
+                                                  ? getAdjustedFontSize(
+                                                      12,
+                                                      fontOption,
+                                                    ).sp
+                                                  : getAdjustedFontSize(
+                                                      16,
+                                                      fontOption,
+                                                    ).sp,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ],
@@ -654,13 +681,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                   ],
                                 ),
                                 child: SingleChildScrollView(
-                                  child:CustomText(text:
-                                    _activeLog(
+                                  child: CustomText(
+                                    text: _activeLog(
                                       ref.read(stopwatchProvider2.notifier),
                                     ),
-
-
-
                                   ),
                                 ),
                               ),
@@ -703,7 +727,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               text: AppLocalizations.of(
                                                 context,
                                               )!.clear,
-                                              fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                              fontSize: getAdjustedFontSize(
+                                                16,
+                                                fontOption,
+                                              ).sp,
                                               color: AppColors.textWhite,
                                               fontWeight: FontWeight.w700,
                                             ),
@@ -737,7 +764,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             text: AppLocalizations.of(
                                               context,
                                             )!.export,
-                                            fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                            fontSize: getAdjustedFontSize(
+                                              16,
+                                              fontOption,
+                                            ).sp,
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ],
@@ -776,7 +806,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                         color: AppColors.primary,
                                         fontWeight: FontWeight.w600,
-                                        fontSize: getAdjustedFontSize(14, fontOption).sp,
+                                        fontSize: getAdjustedFontSize(
+                                          14,
+                                          fontOption,
+                                        ).sp,
                                       ),
                                       SizedBox(height: 8.h),
                                       Consumer(
@@ -813,7 +846,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                         color: AppColors.primary,
                                         fontWeight: FontWeight.w600,
-                                        fontSize: getAdjustedFontSize(14, fontOption).sp,
+                                        fontSize: getAdjustedFontSize(
+                                          14,
+                                          fontOption,
+                                        ).sp,
                                       ),
                                       SizedBox(height: 8.h),
                                       Consumer(
@@ -877,7 +913,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           padding: const EdgeInsets.all(24.0),
                                           child: CustomText(
                                             text: _formatElapsed(time),
-                                            fontSize: getAdjustedFontSize(35, fontOption).sp,
+                                            fontSize: getAdjustedFontSize(
+                                              35,
+                                              fontOption,
+                                            ).sp,
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
@@ -925,12 +964,16 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ),
                                         ),
                                         SizedBox(width: 10.w),
-                                       CustomText(text:
-                                          AppLocalizations.of(context)!.start,
+                                        CustomText(
+                                          text: AppLocalizations.of(
+                                            context,
+                                          )!.start,
 
-                                            fontSize: getAdjustedFontSize(14, fontOption).sp,
-                                            fontWeight: FontWeight.w600,
-
+                                          fontSize: getAdjustedFontSize(
+                                            14,
+                                            fontOption,
+                                          ).sp,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ],
                                     ),
@@ -977,7 +1020,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 text: AppLocalizations.of(
                                                   context,
                                                 )!.split,
-                                                fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                                fontSize: getAdjustedFontSize(
+                                                  16,
+                                                  fontOption,
+                                                ).sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ],
@@ -1034,7 +1080,11 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                       context,
                                                     )!.undoSplit,
                                                     color: AppColors.textWhite,
-                                                    fontSize: getAdjustedFontSize(12, fontOption).sp,
+                                                    fontSize:
+                                                        getAdjustedFontSize(
+                                                          12,
+                                                          fontOption,
+                                                        ).sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
                                                 ],
@@ -1089,7 +1139,11 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                       context,
                                                     )!.stop,
                                                     color: AppColors.textWhite,
-                                                    fontSize: getAdjustedFontSize(12, fontOption).sp,
+                                                    fontSize:
+                                                        getAdjustedFontSize(
+                                                          12,
+                                                          fontOption,
+                                                        ).sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
                                                 ],
@@ -1152,8 +1206,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     currentLanguageCode
                                                             .toString() !=
                                                         "en"
-                                                    ? getAdjustedFontSize(12, fontOption).sp
-                                                    : getAdjustedFontSize(16, fontOption).sp,
+                                                    ? getAdjustedFontSize(
+                                                        12,
+                                                        fontOption,
+                                                      ).sp
+                                                    : getAdjustedFontSize(
+                                                        16,
+                                                        fontOption,
+                                                      ).sp,
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ],
@@ -1215,8 +1275,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     currentLanguageCode
                                                             .toString() !=
                                                         "en"
-                                                    ? getAdjustedFontSize(12, fontOption).sp
-                                                    : getAdjustedFontSize(16, fontOption).sp,
+                                                    ? getAdjustedFontSize(
+                                                        12,
+                                                        fontOption,
+                                                      ).sp
+                                                    : getAdjustedFontSize(
+                                                        16,
+                                                        fontOption,
+                                                      ).sp,
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ],
@@ -1254,11 +1320,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ],
                                   ),
                                   child: SingleChildScrollView(
-                                    child: CustomText(text:
-                                      _activeLog(
+                                    child: CustomText(
+                                      text: _activeLog(
                                         ref.read(stopwatchProvider2.notifier),
                                       ),
-
                                     ),
                                   ),
                                 ),
@@ -1301,7 +1366,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 text: AppLocalizations.of(
                                                   context,
                                                 )!.clear,
-                                                fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                                fontSize: getAdjustedFontSize(
+                                                  16,
+                                                  fontOption,
+                                                ).sp,
                                                 color: AppColors.textWhite,
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -1335,7 +1403,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               text: AppLocalizations.of(
                                                 context,
                                               )!.export,
-                                              fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                              fontSize: getAdjustedFontSize(
+                                                16,
+                                                fontOption,
+                                              ).sp,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ],
@@ -1376,7 +1447,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(14, fontOption).sp,
+                                            fontSize: getAdjustedFontSize(
+                                              14,
+                                              fontOption,
+                                            ).sp,
                                           ),
                                           SizedBox(height: 8.h),
 
@@ -1419,70 +1493,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ],
                                       ),
                                     ),
-
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(
-                                              context,
-                                            )!.course,
-
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(16, fontOption).sp,
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final state = ref.watch(
-                                                stopwatchProvider2,
-                                              );
-                                              const items = [
-                                                "scy",
-                                                "scm",
-                                                "lcm",
-                                              ];
-
-                                              return SplitCalculatorSelectorOne(
-                                                items: items
-                                                    .map((e) => e.toUpperCase())
-                                                    .toList(),
-                                                selectedValue: state.course
-                                                    .toUpperCase(),
-                                                onChanged: (v) {
-                                                  // Convert back to lowercase before storing
-                                                  final lowerCaseValue = v
-                                                      .toLowerCase();
-                                                  ref
-                                                      .read(
-                                                        stopwatchProvider2
-                                                            .notifier,
-                                                      )
-                                                      .setPredictorParams(
-                                                        c: lowerCaseValue,
-                                                      );
-                                                },
-
-                                                // ✅ keep selected after refresh
-                                                //                                             onChanged: (v) => ref
-                                                //     .read(
-                                                // stopwatchProvider2.notifier,
-                                                // )
-                                                //     .setPredictorParams(
-                                                // c: v.toLowerCase(),
-                                                // ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10.h),
-                                Row(
-                                  children: [
                                     Expanded(
                                       child: Column(
                                         children: [
@@ -1493,7 +1503,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(14, fontOption).sp,
+                                            fontSize: getAdjustedFontSize(
+                                              14,
+                                              fontOption,
+                                            ).sp,
                                           ),
                                           SizedBox(height: 8.h),
 
@@ -1509,7 +1522,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 "free",
                                                 "breast",
                                                 "im",
-
                                               ];
                                               String formatStroke(String s) {
                                                 if (s.toLowerCase() == 'im') {
@@ -1546,7 +1558,80 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ],
                                       ),
                                     ),
+                                  ],
+                                ),
+                                SizedBox(height: 10.h),
+                                Row(
+                                  children: [
+                                    /// ================= COURSE =================
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomText(
+                                            text: AppLocalizations.of(
+                                              context,
+                                            )!.course,
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: getAdjustedFontSize(
+                                              16,
+                                              fontOption,
+                                            ).sp,
+                                          ),
+                                          SizedBox(height: 8.h),
 
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(
+                                                stopwatchProvider2,
+                                              );
+
+                                              const items = [
+                                                "scy",
+                                                "scm",
+                                                "lcm",
+                                              ];
+
+                                              return SplitCalculatorSelectorOne(
+                                                items: items
+                                                    .map((e) => e.toUpperCase())
+                                                    .toList(),
+
+                                                selectedValue: state.course
+                                                    .toUpperCase(),
+
+                                                onChanged: (v) {
+                                                  final newCourse = v
+                                                      .toLowerCase();
+
+                                                  // 🔥 Get valid distances for new course
+                                                  final distances =
+                                                      getDistancesByCourse(
+                                                        newCourse,
+                                                      );
+
+                                                  ref
+                                                      .read(
+                                                        stopwatchProvider2
+                                                            .notifier,
+                                                      )
+                                                      .setPredictorParams(
+                                                        c: newCourse,
+
+                                                        // ✅ Reset distance safely
+                                                        d: distances.first,
+                                                      );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+
+
+                                    /// ================= DISTANCE =================
                                     Expanded(
                                       child: Column(
                                         children: [
@@ -1554,39 +1639,48 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             text: AppLocalizations.of(
                                               context,
                                             )!.distance,
-
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(14, fontOption).sp,
+                                            fontSize: getAdjustedFontSize(
+                                              14,
+                                              fontOption,
+                                            ).sp,
                                           ),
                                           SizedBox(height: 8.h),
+
                                           Consumer(
                                             builder: (context, ref, child) {
                                               final state = ref.watch(
                                                 stopwatchProvider2,
                                               );
 
+                                              // 🔥 Dynamic distances
+                                              final distances =
+                                                  getDistancesByCourse(
+                                                    state.course,
+                                                  );
+
+                                              // ✅ Fix invalid selection automatically
+                                              final selectedDistance =
+                                                  distances.contains(
+                                                    state.distance,
+                                                  )
+                                                  ? state.distance
+                                                  : distances.first;
+
                                               return SplitCalculatorSelectorOne(
-                                                items: const [
-                                                  "50",
-                                                  "100",
-                                                  "150",
-                                                  "200",
-                                                  "250",
-                                                  "300",
-                                                  "350",
-                                                  "400",
-                                                  "450",
-                                                  "500",
-                                                ],
-                                                selectedValue: state
-                                                    .distance, // ✅ keep selected after refresh
-                                                onChanged: (v) => ref
-                                                    .read(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .setPredictorParams(d: v),
+                                                items: distances,
+
+                                                selectedValue: selectedDistance,
+
+                                                onChanged: (v) {
+                                                  ref
+                                                      .read(
+                                                        stopwatchProvider2
+                                                            .notifier,
+                                                      )
+                                                      .setPredictorParams(d: v);
+                                                },
                                               );
                                             },
                                           ),
@@ -1603,40 +1697,36 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                       child: Column(
                                         children: [
                                           CustomText(
-                                            text: AppLocalizations.of(
-                                              context,
-                                            )!.splitSize,
-
+                                            text: AppLocalizations.of(context)!.splitSize,
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.w600,
                                             fontSize: getAdjustedFontSize(14, fontOption).sp,
                                           ),
                                           SizedBox(height: 8.h),
+
                                           Consumer(
                                             builder: (context, ref, child) {
-                                              final state = ref.watch(
-                                                stopwatchProvider2,
+                                              final state = ref.watch(stopwatchProvider2);
+
+                                              // 🔥 dynamic splits
+                                              final splits = getSplitSizes(
+                                                course: state.course,
+                                                distance: state.distance,
                                               );
 
+                                              // ✅ safe selected value
+                                              final selectedSplit = splits.contains(state.splitSize)
+                                                  ? state.splitSize
+                                                  : splits.first;
+
                                               return SplitCalculatorSelectorOne(
-                                                items: const [
-                                                  "50",
-                                                  "100",
-                                                  "150",
-                                                  "200",
-                                                  "250",
-                                                  "500",
-                                                ],
-                                                selectedValue: state
-                                                    .splitSize, // ✅ keep selected after refresh
-                                                onChanged: (v) => ref
-                                                    .read(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .setPredictorParams(
-                                                      split: v,
-                                                    ),
+                                                items: splits,
+                                                selectedValue: selectedSplit,
+                                                onChanged: (v) {
+                                                  ref
+                                                      .read(stopwatchProvider2.notifier)
+                                                      .setPredictorParams(split: v);
+                                                },
                                               );
                                             },
                                           ),
@@ -1654,7 +1744,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(14, fontOption).sp,
+                                            fontSize: getAdjustedFontSize(
+                                              14,
+                                              fontOption,
+                                            ).sp,
                                           ),
                                           SizedBox(height: 8.h),
                                           Consumer(
@@ -1667,7 +1760,6 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 items: const [
                                                   "From Start",
                                                   "From Push",
-
                                                 ],
                                                 selectedValue: state
                                                     .startType, // ✅ keep selected after refresh
@@ -1769,12 +1861,16 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ),
                                         ),
                                         SizedBox(width: 10.w),
-                                       CustomText(text:
-                                          AppLocalizations.of(context)!.start,
+                                        CustomText(
+                                          text: AppLocalizations.of(
+                                            context,
+                                          )!.start,
 
-                                            fontSize: getAdjustedFontSize(14, fontOption).sp,
-                                            fontWeight: FontWeight.w600,
-
+                                          fontSize: getAdjustedFontSize(
+                                            14,
+                                            fontOption,
+                                          ).sp,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ],
                                     ),
@@ -1820,7 +1916,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 text: AppLocalizations.of(
                                                   context,
                                                 )!.split,
-                                                fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                                fontSize: getAdjustedFontSize(
+                                                  16,
+                                                  fontOption,
+                                                ).sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ],
@@ -1877,7 +1976,11 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                       context,
                                                     )!.undoSplit,
                                                     color: AppColors.textWhite,
-                                                    fontSize: getAdjustedFontSize(12, fontOption).sp,
+                                                    fontSize:
+                                                        getAdjustedFontSize(
+                                                          12,
+                                                          fontOption,
+                                                        ).sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
                                                 ],
@@ -1932,7 +2035,11 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                       context,
                                                     )!.stop,
                                                     color: AppColors.textWhite,
-                                                    fontSize: getAdjustedFontSize(12, fontOption).sp,
+                                                    fontSize:
+                                                        getAdjustedFontSize(
+                                                          12,
+                                                          fontOption,
+                                                        ).sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
                                                 ],
@@ -1994,8 +2101,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     currentLanguageCode
                                                             .toString() !=
                                                         "en"
-                                                    ? getAdjustedFontSize(12, fontOption).sp
-                                                    : getAdjustedFontSize(16, fontOption).sp,
+                                                    ? getAdjustedFontSize(
+                                                        12,
+                                                        fontOption,
+                                                      ).sp
+                                                    : getAdjustedFontSize(
+                                                        16,
+                                                        fontOption,
+                                                      ).sp,
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ],
@@ -2050,8 +2163,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     currentLanguageCode
                                                             .toString() !=
                                                         "en"
-                                                    ? getAdjustedFontSize(12, fontOption).sp
-                                                    : getAdjustedFontSize(16, fontOption).sp,
+                                                    ? getAdjustedFontSize(
+                                                        12,
+                                                        fontOption,
+                                                      ).sp
+                                                    : getAdjustedFontSize(
+                                                        16,
+                                                        fontOption,
+                                                      ).sp,
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ],
@@ -2089,11 +2208,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ],
                                   ),
                                   child: SingleChildScrollView(
-                                    child: CustomText(text:
-                                      _activeLog(
+                                    child: CustomText(
+                                      text: _activeLog(
                                         ref.read(stopwatchProvider2.notifier),
                                       ),
-
                                     ),
                                   ),
                                 ),
@@ -2136,7 +2254,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 text: AppLocalizations.of(
                                                   context,
                                                 )!.clear,
-                                                fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                                fontSize: getAdjustedFontSize(
+                                                  16,
+                                                  fontOption,
+                                                ).sp,
                                                 color: AppColors.textWhite,
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -2170,7 +2291,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               text: AppLocalizations.of(
                                                 context,
                                               )!.export,
-                                              fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                              fontSize: getAdjustedFontSize(
+                                                16,
+                                                fontOption,
+                                              ).sp,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ],
@@ -2189,6 +2313,46 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         ),
       ),
     );
+  }
+
+  List<String> getSplitSizes({
+    required String course,
+    required String distance,
+  }) {
+    int dist = int.tryParse(distance) ?? 0;
+
+    // 🏊 SCY
+    if (course == "scy") {
+      switch (dist) {
+        case 50:
+          return ["25"];
+        case 100:
+          return ["25", "50"];
+        default:
+          return ["50"];
+      }
+    }
+
+    // 🏊 LCM special progressive
+    if (course == "lcm" && dist == 50) {
+      return ["15", "25", "35", "50"]; // progressive + normal
+    }
+
+    // 🏊 SCM + other LCM
+    return ["50"];
+  }
+
+
+  List<String> getDistancesByCourse(String course) {
+    switch (course.toLowerCase()) {
+      case 'scy':
+        return ["50", "100", "200", "500", "1000", "1650"];
+      case 'scm':
+      case 'lcm':
+        return ["50", "100", "200", "400", "800", "1500"];
+      default:
+        return ["50"];
+    }
   }
 
   Future<void> exportOutputAsPdf(BuildContext context, WidgetRef ref) async {

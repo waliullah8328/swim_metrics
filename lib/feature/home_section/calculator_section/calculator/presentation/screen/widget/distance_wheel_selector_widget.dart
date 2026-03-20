@@ -3,18 +3,16 @@ import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 import '../../../../../../../core/utils/constants/app_colors.dart';
 
-import 'package:flutter/material.dart';
-import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
-import '../../../../../../../core/utils/constants/app_colors.dart';
-
 class DistanceWheelSelector extends StatefulWidget {
   final List<int> items;
   final ValueChanged<int> onChanged;
+  final int? selectedValue; // ✅ new
 
   const DistanceWheelSelector({
     super.key,
     required this.items,
     required this.onChanged,
+    this.selectedValue, // optional
   });
 
   @override
@@ -23,11 +21,35 @@ class DistanceWheelSelector extends StatefulWidget {
 }
 
 class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
-  final FixedExtentScrollController _controller =
-  FixedExtentScrollController();
-
+  late FixedExtentScrollController _controller;
   int selectedIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    selectedIndex = _getInitialIndex();
+    _controller = FixedExtentScrollController(initialItem: selectedIndex);
+  }
+
+  @override
+  void didUpdateWidget(covariant DistanceWheelSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // ✅ Update controller if selectedValue changed
+    final newIndex = _getInitialIndex();
+    if (newIndex != selectedIndex) {
+      selectedIndex = newIndex;
+      _controller.jumpToItem(selectedIndex);
+    }
+  }
+
+  int _getInitialIndex() {
+    if (widget.selectedValue != null) {
+      final idx = widget.items.indexOf(widget.selectedValue!);
+      if (idx != -1) return idx;
+    }
+    return 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +61,11 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: SizedBox(
-        width: double.infinity, // take full width
+        width: double.infinity,
         height: (itemHeight * 3).h,
-
         child: Stack(
           alignment: Alignment.center,
           children: [
-
-            /// Scroll List
             ListWheelScrollView.useDelegate(
               controller: _controller,
               itemExtent: itemHeight,
@@ -61,21 +80,18 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
               },
               childDelegate: ListWheelChildBuilderDelegate(
                 builder: (context, index) {
-                  if (index < 0 || index >= widget.items.length) {
-                    return null;
-                  }
-
+                  if (index < 0 || index >= widget.items.length) return null;
                   final isSelected = index == selectedIndex;
-
                   return Center(
                     child: Text(
                       widget.items[index].toString(),
                       style: TextStyle(
                         fontSize: 19.sp,
-                        color: isSelected ? Colors.amber : isDark?AppColors.textWhite:Colors.black,
-                        fontWeight: isSelected
-                            ? FontWeight.w500
-                            : FontWeight.normal,
+                        color: isSelected
+                            ? Colors.amber
+                            : isDark ? AppColors.textWhite : Colors.black,
+                        fontWeight:
+                        isSelected ? FontWeight.w500 : FontWeight.normal,
                       ),
                     ),
                   );
@@ -83,8 +99,6 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
                 childCount: widget.items.length,
               ),
             ),
-
-            /// Center Highlight Line
             IgnorePointer(
               child: Container(
                 height: itemHeight,
