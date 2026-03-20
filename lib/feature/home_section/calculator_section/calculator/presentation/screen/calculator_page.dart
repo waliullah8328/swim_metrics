@@ -15,6 +15,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import '../../../../../../core/common/widgets/new_custon_widgets/split_calculator_selector_one.dart';
 import '../../../setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/calculator_split_state.dart';
 import '../../riverpod/split_calculator_controller.dart';
@@ -216,13 +217,41 @@ class SplitCalculatorPage extends ConsumerWidget {
                                             color: AppColors.primary,
                                           ),
                                           SizedBox(height: 6.h),
-                                          SplitCalculatorSelector(
-                                            items:  ["Men", "Women"],
-                                            selectedValue: ref.watch(splitCalcProvider).gender,
-                                            onChanged: (value) {
-                                              ref.read(splitCalcProvider.notifier).setGender((value ).toLowerCase());
-                                            },
-                                          ),
+
+
+
+                                          Consumer(builder: (context, ref, child) {
+
+                                            final state = ref.watch(
+                                              splitCalcProvider,
+                                            );
+
+                                            // Define items
+                                            const items = ["men", "women"];
+                                            String capitalize(String s) =>
+                                                s.isNotEmpty
+                                                    ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
+                                                    : s;
+                                            return SplitCalculatorSelector(
+                                              items: items
+                                                  .map(capitalize)
+                                                  .toList(), // display first letter uppercase
+                                              selectedValue: capitalize(
+                                                state.gender,
+                                              ),
+                                              onChanged: (value) {
+                                                final lowerCaseValue = value
+                                                    .toLowerCase();
+                                                ref
+                                                    .read(
+                                                  splitCalcProvider
+                                                      .notifier,
+                                                )
+                                                    .setGender(lowerCaseValue );
+                                              },
+                                            );
+                                          },)
+
                                         ],
                                       ),
                                     ),
@@ -236,13 +265,95 @@ class SplitCalculatorPage extends ConsumerWidget {
                                             color: AppColors.primary,
                                           ),
                                           SizedBox(height: 6.h),
-                                          SplitCalculatorSelector(
-                                            items: ["Fly", "Back","Breast","Free","IM"],
-                                             selectedValue: ref.watch(splitCalcProvider).stroke,
-                                            onChanged: (value) {
-                                              ref.read(splitCalcProvider.notifier).setStroke((value ?? 'SCY').toLowerCase());
-                                            },
-                                          ),
+
+                                          // Consumer(
+                                          //   builder: (context, ref, child) {
+                                          //     final state = ref.watch(
+                                          //       stopwatchProvider2,
+                                          //     );
+                                          //
+                                          //     const strokes = [
+                                          //       "fly",
+                                          //       "back",
+                                          //       "free",
+                                          //       "breast",
+                                          //       "im",
+                                          //     ];
+                                          //     String formatStroke(String s) {
+                                          //       if (s.toLowerCase() == 'im') {
+                                          //         return 'IM';
+                                          //       }
+                                          //       return s.isNotEmpty
+                                          //           ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
+                                          //           : s;
+                                          //     }
+                                          //
+                                          //     return SplitCalculatorSelectorOne(
+                                          //       items: strokes
+                                          //           .map(formatStroke)
+                                          //           .toList(), // display formatted strokes
+                                          //       selectedValue: formatStroke(
+                                          //         state.stroke,
+                                          //       ), // display current selection formatted
+                                          //       onChanged: (v) {
+                                          //         // Convert back to lowercase for storing
+                                          //         final lowerCaseValue = v
+                                          //             .toLowerCase();
+                                          //         ref
+                                          //             .read(
+                                          //           stopwatchProvider2
+                                          //               .notifier,
+                                          //         )
+                                          //             .setPredictorParams(
+                                          //           s: lowerCaseValue,
+                                          //         );
+                                          //       },
+                                          //     );
+                                          //   },
+                                          // ),
+                                          Consumer(builder: (context, ref, child) {
+
+                                            final state = ref.watch(
+                                              splitCalcProvider,
+                                            );
+
+                                            const strokes = [
+                                              "fly",
+                                              "back",
+                                              "free",
+                                              "breast",
+                                              "im",
+                                            ];
+                                            String formatStroke(String s) {
+                                              if (s.toLowerCase() == 'im') {
+                                                return 'IM';
+                                              }
+                                              return s.isNotEmpty
+                                                  ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
+                                                  : s;
+                                            }
+                                            return SplitCalculatorSelector(
+                                              items: strokes
+                                                  .map(formatStroke)
+                                                  .toList(), // display formatted strokes
+                                              selectedValue: formatStroke(
+                                                state.stroke,
+                                              ),
+                                              onChanged: (value) {
+
+                                                final lowerCaseValue = value
+                                                    .toLowerCase();
+                                                ref
+                                                    .read(
+                                                  splitCalcProvider
+                                                      .notifier,
+                                                )
+                                                    .setStroke(lowerCaseValue);
+
+                                              },
+                                            );
+                                          },)
+
                                         ],
                                       ),
                                     ),
@@ -256,11 +367,36 @@ class SplitCalculatorPage extends ConsumerWidget {
                                             color: AppColors.primary,
                                           ),
                                           SizedBox(height: 6.h),
-                                          DistanceWheelSelector(
-                                            items: [50, 100, 150, 200, 250],
-                                            onChanged: (value) {
-                                              ref.read(splitCalcProvider.notifier).setDistance(value.toString());
 
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(splitCalcProvider);
+
+                                              final distances = getDistances(
+                                                state.course,
+                                                state.stroke,
+                                              );
+
+                                              /// ✅ Ensure selected distance is valid
+                                              final currentDistance = int.tryParse(state.distance);
+
+                                              if (currentDistance == null || !distances.contains(currentDistance)) {
+                                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                  ref
+                                                      .read(splitCalcProvider.notifier)
+                                                      .setDistance(distances.first.toString()); // ✅ force update
+                                                });
+                                              }
+
+                                              return DistanceWheelSelector(
+                                                items: distances,
+                                                selectedValue: currentDistance ?? distances.first, // ✅ show selected
+                                                onChanged: (value) {
+                                                  ref
+                                                      .read(splitCalcProvider.notifier)
+                                                      .setDistance(value.toString());
+                                                },
+                                              );
                                             },
                                           ),
                                         ],
@@ -321,7 +457,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                           ),
                           onPressed: (){
 
-                            ref.read(splitCalcProvider.notifier).project1();
+                            ref.read(splitCalcProvider.notifier).project();
                             ref.read(showCourseSectionProvider.notifier).state = false;
                           },
                           child: Center(child:  Row(
@@ -418,6 +554,8 @@ class SplitCalculatorPage extends ConsumerWidget {
                     ),
                   ),
 
+                Container(child: Text(ref.watch(splitCalcProvider.select((s)=>s.output))),),
+
 
                 SizedBox(height: 16.h),
 
@@ -474,6 +612,8 @@ class SplitCalculatorPage extends ConsumerWidget {
         )
     );
   }
+
+
 
   Future<void> exportSplitPdf(BuildContext context, WidgetRef ref) async {
     final pdf = pw.Document();
@@ -547,6 +687,29 @@ class SplitCalculatorPage extends ConsumerWidget {
       onLayout: (PdfPageFormat format) async => pdf.save(),
     );
   }
+
+  List<int> getDistances(String course, String stroke) {
+    course = course.toLowerCase();
+    stroke = stroke.toLowerCase();
+
+    if (stroke == "free") {
+      if (course == "scy") {
+        return [50, 100, 200, 500, 1000, 1650];
+      } else {
+        return [50, 100, 200, 400, 800, 1500];
+      }
+    } else if (["fly", "back", "breast"].contains(stroke)) {
+      return [50, 100, 200];
+    } else if (stroke == "im") {
+      if (course == "lcm") {
+        return [200, 400];
+      } else {
+        return [100, 200, 400];
+      }
+    }
+
+    return [];
+  }
 }
 
 
@@ -607,4 +770,8 @@ Widget distButton(WidgetRef ref,String value) {
       child: Text(value,style: const TextStyle(color: Colors.white)),
     ),
   );
+}
+
+extension StringCasingExtension on String {
+  String capitalize() => this.length > 0 ? '${this[0].toUpperCase()}${substring(1)}' : '';
 }
