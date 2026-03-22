@@ -84,7 +84,7 @@ class PaymentScreen extends ConsumerWidget {
                     margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: isDark?Color(0xFF2F6F9F):AppColors.textWhite,
+                      color: isDark?Color(0xFF0C3156):AppColors.textWhite,
 
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(

@@ -1276,7 +1276,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                             .toString() !=
                                                         "en"
                                                     ? getAdjustedFontSize(
-                                                        12,
+                                                       9,
                                                         fontOption,
                                                       ).sp
                                                     : getAdjustedFontSize(
@@ -2164,7 +2164,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                             .toString() !=
                                                         "en"
                                                     ? getAdjustedFontSize(
-                                                        12,
+                                                        9,
                                                         fontOption,
                                                       ).sp
                                                     : getAdjustedFontSize(

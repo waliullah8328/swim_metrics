@@ -51,6 +51,7 @@ class IconPath{
   static const  String pullIcon ='$_basePath/pull_icon.svg';
   static const  String minusIcon ='$_basePath/minus_icon.svg';
   static const  String plusIcon ='$_basePath/plus_icon.svg';
+  static const  String calenderIconOne ='$_basePath/calender_icon_one.svg';
 
 
 
