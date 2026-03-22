@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
-
 import '../../../../../../../core/utils/constants/app_colors.dart';
 
 class DistanceWheelSelector extends StatefulWidget {
   final List<int> items;
   final ValueChanged<int> onChanged;
-  final int? selectedValue; // ✅ new
+  final int? selectedValue;
 
   const DistanceWheelSelector({
     super.key,
     required this.items,
     required this.onChanged,
-    this.selectedValue, // optional
+    this.selectedValue,
   });
 
   @override
@@ -35,11 +34,17 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
   void didUpdateWidget(covariant DistanceWheelSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // ✅ Update controller if selectedValue changed
     final newIndex = _getInitialIndex();
+
     if (newIndex != selectedIndex) {
       selectedIndex = newIndex;
-      _controller.jumpToItem(selectedIndex);
+
+      // ✅ FIX: delay scroll update to avoid Riverpod crash
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _controller.jumpToItem(selectedIndex);
+        }
+      });
     }
   }
 
@@ -72,16 +77,29 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
               physics: const FixedExtentScrollPhysics(),
               perspective: 0.003,
               diameterRatio: 10,
+
+              // ✅ FIXED (Riverpod-safe)
               onSelectedItemChanged: (index) {
+                if (index == selectedIndex) return;
+
                 setState(() {
                   selectedIndex = index;
                 });
-                widget.onChanged(widget.items[index]);
+
+                // ✅ Delay provider update (IMPORTANT)
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    widget.onChanged(widget.items[index]);
+                  }
+                });
               },
+
               childDelegate: ListWheelChildBuilderDelegate(
                 builder: (context, index) {
                   if (index < 0 || index >= widget.items.length) return null;
+
                   final isSelected = index == selectedIndex;
+
                   return Center(
                     child: Text(
                       widget.items[index].toString(),
@@ -89,7 +107,9 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
                         fontSize: 19.sp,
                         color: isSelected
                             ? Colors.amber
-                            : isDark ? AppColors.textWhite : Colors.black,
+                            : isDark
+                            ? AppColors.textWhite
+                            : Colors.black,
                         fontWeight:
                         isSelected ? FontWeight.w500 : FontWeight.normal,
                       ),
@@ -99,6 +119,8 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
                 childCount: widget.items.length,
               ),
             ),
+
+            // ✅ Center highlight lines
             IgnorePointer(
               child: Container(
                 height: itemHeight,
@@ -114,5 +136,11 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

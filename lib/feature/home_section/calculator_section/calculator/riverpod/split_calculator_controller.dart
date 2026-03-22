@@ -1,10 +1,6 @@
-
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:swim_metrics/core/utils/utils/get_ratios.dart';
 import 'split_item.dart';
-import '../../../../../core/utils/utils/splits.dart';
-import '../../../../../core/utils/utils/time_utils.dart';
-import '../../../../../core/utils/utils/ratios.dart';
-
 
 class SplitCalcState {
   final String course;
@@ -47,9 +43,7 @@ class SplitCalcState {
 }
 
 class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
-  SplitCalcNotifier() : super(const SplitCalcState()) {
-    initializeRatios();
-  }
+  SplitCalcNotifier() : super(const SplitCalcState());
 
   // ------------------- Setters -------------------
   void setCourse(String v) => state = state.copyWith(course: v.toLowerCase());
@@ -60,110 +54,133 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
 
   // ------------------- Clear -------------------
   void clear() {
-    state = state.copyWith(
-      goalTime: '',
-      splits: [],
-      output: '',
-    );
+    state = state.copyWith(goalTime: '', splits: [], output: '');
   }
 
-  // ------------------- Projection -------------------
+  // ------------------- MAIN CALC -------------------
   void project() {
     final s = state;
 
-    if ([s.course, s.gender, s.stroke, s.distance, s.goalTime].any((e) => e.isEmpty)) {
+    if ([s.course, s.gender, s.stroke, s.distance, s.goalTime]
+        .any((e) => e.isEmpty)) {
       state = s.copyWith(output: 'Please fill all fields.');
       return;
     }
 
     double totalSeconds;
     try {
-      totalSeconds = TimeUtils.parseToSeconds(s.goalTime);
+      totalSeconds = _parseToSeconds(s.goalTime);
     } catch (_) {
       state = s.copyWith(output: 'Invalid time format. Use mm:ss or ss.ss');
       return;
     }
 
-    final dist = int.parse(s.distance);
+    final course = s.course;
+    final gender = s.gender;
+    final stroke = s.stroke;
+    final distance = s.distance;
 
-    List<int> splitDistances;
+    // ================= LCM 50 SPECIAL =================
+    if (course == 'lcm' && distance == '50' && stroke != 'im') {
+      final ratios = getLcm50FinalRatios(gender);
 
-    // Special case for LCM 50
-    if (s.course == 'lcm' && dist == 50 && s.stroke != 'im') {
-      splitDistances = [15, 25, 35, 50];
-    } else {
-      splitDistances = _getSplitDistances(s.course, s.stroke, dist);
+      final split15 = totalSeconds * ratios["15m"]!;
+      final split25 = totalSeconds * (ratios["25m"]! - ratios["15m"]!);
+      final split35 = totalSeconds * (ratios["35m"]! - ratios["25m"]!);
+
+      final buffer = StringBuffer();
+      buffer.writeln("===============");
+      buffer.writeln(
+          "${_cap(gender)} 50m ${_cap(stroke)} LCM (15/25/35 Avg Model)");
+      buffer.writeln("Goal Time: ${totalSeconds.toStringAsFixed(2)}");
+      buffer.writeln("===============");
+
+      // ✅ MATCH EXACT UI OUTPUT
+      buffer.writeln("15m: ${split15.toStringAsFixed(2)}");
+      buffer.writeln(
+          "25m: ${(split15 + split25).toStringAsFixed(2)}");
+      buffer.writeln(
+          "35m: ${(split15 + split25 + split35).toStringAsFixed(2)}");
+      buffer.writeln("Total time: ${totalSeconds.toStringAsFixed(2)}");
+
+      buffer.writeln("===============");
+
+      state = s.copyWith(output: buffer.toString());
+      return;
     }
 
-    List<double> modelRatios;
-    if (s.course == 'lcm' && dist == 50 && s.stroke != 'im') {
-      final segs = SplitsCore.lcm50Segments(s.gender);
-      modelRatios = [segs['s1']!, segs['s2']!, segs['s3']!, segs['s4']!];
-    } else {
-      final ratios = SplitsCore.getRatios(s.course, s.gender, s.stroke, s.distance);
-      if (ratios == null || ratios.isEmpty) {
-        state = s.copyWith(output: 'No ratios found for this event.');
-        return;
-      }
-      modelRatios = SplitsCore.interpolateRatios(ratios, splitDistances.length);
+    // ================= NORMAL RATIOS =================
+    final ratioList = getRatios(course, gender, stroke, distance);
+
+    if (ratioList == null || ratioList.isEmpty) {
+      state = s.copyWith(output: 'Ratios not defined for this event.');
+      return;
     }
 
-    double cumulativeModel = 0;
-    double cumulativeAvg = 0;
-    List<SplitItem> splits = [];
+    final splitsTimes = ratioList.map((r) => r * totalSeconds).toList();
 
-    for (int i = 0; i < splitDistances.length; i++) {
-      final splitTimeModel = modelRatios[i] * totalSeconds;
-      final splitTimeAvg = totalSeconds / splitDistances.length;
+    double cumulative = 0;
+    final splits = <SplitItem>[];
+    final buffer = StringBuffer();
 
-      cumulativeModel += splitTimeModel;
-      cumulativeAvg += splitTimeAvg;
+    buffer.writeln("===============");
+    buffer.writeln(
+        "${_cap(gender)}'s $distance ${_cap(stroke)} ${course.toUpperCase()} Projection");
+    buffer.writeln("Goal Time: ${_formatSeconds(totalSeconds)}");
+    buffer.writeln("===============");
+
+    for (int i = 0; i < splitsTimes.length; i++) {
+      cumulative += splitsTimes[i];
+
+      final dist = ((i + 1) * (distance == "50" ? 25 : 50));
 
       splits.add(SplitItem(
-        distance: splitDistances[i],
-        splitTime: splitTimeModel,
-        total: cumulativeModel,
-        // If you want, you can also store average split in SplitItem as extra field
+        distance: dist,
+        splitTime: splitsTimes[i],
+        total: cumulative,
       ));
+
+      buffer.writeln(
+          "$dist: ${splitsTimes[i].toStringAsFixed(2)} / ${_formatSeconds(cumulative)}");
     }
 
-    final title =
-        "===============\n${s.gender[0].toUpperCase()}${s.gender.substring(1)}'s ${s.distance} ${s.stroke} ${s.course.toUpperCase()} Projection\nGoal Time: ${TimeUtils.formatSeconds(totalSeconds)}\n===============\n";
-
-    final splitText = splits
-        .map((e) =>
-    "${e.distance}m: Model ${TimeUtils.formatSeconds(e.splitTime)} / Avg ${TimeUtils.formatSeconds(totalSeconds / splitDistances.length)} / Total ${TimeUtils.formatSeconds(e.total)}")
-        .join("\n");
-
-    state = s.copyWith(
-      splits: splits,
-      output: "$title$splitText\n===============",
-    );
-  }
-
-  // ------------------- Helpers -------------------
-  List<int> _getSplitDistances(String course, String stroke, int dist) {
-    course = course.toLowerCase();
-    stroke = stroke.toLowerCase();
-
-    // LCM 50 special case
-    if (course == 'lcm' && dist == 50 && stroke != 'im') {
-      return [15, 25, 35, 50];
+    if (stroke == "im") {
+      buffer.writeln("\n⚠️ Does not account for best/worst stroke.");
     }
 
-    // Split unit: SCY = 25, SCM/LCM = 50
-    final splitUnit = (course == 'scy') ? 25 : 50;
+    buffer.writeln("===============");
 
-    int count = (dist / splitUnit).ceil();
-    return List.generate(count, (i) {
-      int val = (i + 1) * splitUnit;
-      return val > dist ? dist : val;
-    });
+    state = s.copyWith(output: buffer.toString(), splits: splits);
   }
+
+  // ------------------- HELPERS -------------------
+  double _parseToSeconds(String input) {
+    if (input.contains(":")) {
+      final parts = input.split(":");
+      final min = double.parse(parts[0]);
+      final sec = double.parse(parts[1]);
+      return min * 60 + sec;
+    } else {
+      return double.parse(input);
+    }
+  }
+
+  // ✅ FIXED TIME FORMAT (mm:ss.ss)
+  String _formatSeconds(double seconds) {
+    final minutes = seconds ~/ 60;
+    final secs = seconds % 60;
+
+    if (minutes > 0) {
+      return "$minutes:${secs.toStringAsFixed(2).padLeft(5, '0')}";
+    } else {
+      return secs.toStringAsFixed(2);
+    }
+  }
+
+  String _cap(String s) => s[0].toUpperCase() + s.substring(1);
 }
 
-// ------------------- Provider -------------------
+// ------------------- PROVIDER -------------------
 final splitCalcProvider =
-StateNotifierProvider<SplitCalcNotifier, SplitCalcState>((ref) {
-  return SplitCalcNotifier();
-});
+StateNotifierProvider<SplitCalcNotifier, SplitCalcState>(
+        (ref) => SplitCalcNotifier());

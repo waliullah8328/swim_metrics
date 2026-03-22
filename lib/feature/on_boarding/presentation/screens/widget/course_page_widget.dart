@@ -8,6 +8,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 import '../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../core/utils/constants/icon_path.dart';
+import '../../../../home_section/calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/on_boarding_view_model.dart';
 import 'course_wheel_selector_wiget.dart';
 
@@ -16,6 +17,8 @@ class CoursePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
 
 
     return Column(
@@ -34,7 +37,7 @@ class CoursePage extends ConsumerWidget {
                     SizedBox(width: 10.w),
                     CustomText(
                       text: AppLocalizations.of(context)!.selectYourCourses,
-                      fontSize: 24.sp,
+                      fontSize: currentLanguageCode == 'en'?24.sp:18.sp,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textWhite,
                     )
@@ -46,6 +49,7 @@ class CoursePage extends ConsumerWidget {
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 color: AppColors.textGrey,
+                textAlign: TextAlign.center,
               )
             ],
           ),
