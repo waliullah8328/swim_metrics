@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:open_file/open_file.dart';
 import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
@@ -12,10 +15,9 @@ import 'package:swim_metrics/feature/home_section/calculator_section/calculator/
 import 'package:swim_metrics/feature/home_section/calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/calculator/presentation/screen/widget/distance_wheel_selector_widget.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
-import 'package:pdf/pdf.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import '../../../../../../core/common/widgets/new_custon_widgets/split_calculator_selector_one.dart';
+
 import '../../../setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/calculator_split_state.dart';
 import '../../riverpod/split_calculator_controller.dart';
@@ -480,87 +482,109 @@ class SplitCalculatorPage extends ConsumerWidget {
 
                 /// RESULT TABLE
                 ///
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark?Color(0xff234B6E):Color(0xffEAEDF1),
-                    borderRadius:BorderRadius.only(
-                      topRight: Radius.circular(10),
-                      topLeft: Radius.circular(10)
-                    )
-                  ),
-                  child:Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // Container(
+                //   padding: EdgeInsets.all(16),
+                //   decoration: BoxDecoration(
+                //     color: isDark?Color(0xff234B6E):Color(0xffEAEDF1),
+                //     borderRadius:BorderRadius.only(
+                //       topRight: Radius.circular(10),
+                //       topLeft: Radius.circular(10)
+                //     )
+                //   ),
+                //   child:Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       CustomText(text: AppLocalizations.of(context)!.split,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                //       CustomText(text: AppLocalizations.of(context)!.splitTime,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                //       CustomText(text: AppLocalizations.of(context)!.total,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                //
+                //     ],
+                //   ),
+                // ),
+                 // Container(
+                 //   height: 200.h,
+                 //    decoration: BoxDecoration(
+                 //      color: isDark?Color(0xff1B3A5C):Color(0xffFFFFFF),
+                 //
+                 //
+                 //    ),
+                 //    child: ref.watch(splitCalcProvider).splits.isEmpty
+                 //        ?  Center(
+                 //      child: CustomText(text:
+                 //      AppLocalizations.of(context)!.noSplitsYet,
+                 //       color: Colors.grey
+                 //      ),
+                 //    )
+                 //        : ListView.builder(
+                 //      shrinkWrap: true,
+                 //      physics: NeverScrollableScrollPhysics(),
+                 //      itemCount: ref.watch(splitCalcProvider).splits.length,
+                 //      itemBuilder: (context, index) {
+                 //        final split = ref.watch(splitCalcProvider).splits[index];
+                 //
+                 //        // alternate colors: even -> E3F0FF, odd -> FFFFFF
+                 //        final bgColor = index % 2 == 0 ? Color(0xFFE3F0FF) : Color(0xFFFFFFFF);
+                 //
+                 //        return Container(
+                 //          color: bgColor,
+                 //          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+                 //          child: Row(
+                 //            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                 //            children: [
+                 //              CustomText(
+                 //                text: split.distance.toString(),
+                 //                fontSize: getAdjustedFontSize(14, fontOption).sp,
+                 //                fontWeight: FontWeight.w600,
+                 //                color: AppColors.primary,
+                 //              ),
+                 //              CustomText(
+                 //                text: split.splitTime.toStringAsFixed(2),
+                 //                fontSize: getAdjustedFontSize(14, fontOption).sp,
+                 //                fontWeight: FontWeight.w600,
+                 //                color: AppColors.primary,
+                 //              ),
+                 //              CustomText(
+                 //                text: split.total.toStringAsFixed(2),
+                 //                fontSize: getAdjustedFontSize(14, fontOption).sp,
+                 //                fontWeight: FontWeight.w600,
+                 //                color: AppColors.primary,
+                 //              ),
+                 //            ],
+                 //          ),
+                 //        );
+                 //      },
+                 //    ),
+                 //  ),
+                if(ref.watch(splitCalcProvider).output.isNotEmpty)
+                  Column(
                     children: [
-                      CustomText(text: AppLocalizations.of(context)!.split,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                      CustomText(text: AppLocalizations.of(context)!.splitTime,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                      CustomText(text: AppLocalizations.of(context)!.total,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
 
+                        decoration: BoxDecoration(
+                          color: isDark ? Color(0xff0C3156) : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            width: 1,
+                            color: Color(0xff2DA8F0),
+                          ),
+                          boxShadow: const [
+                            BoxShadow(blurRadius: 12, color: Colors.black12),
+                          ],
+                        ),
+                        child: Text(ref.watch(splitCalcProvider.select((s)=>s.output))),),
+                      SizedBox(height: 16.h),
                     ],
                   ),
-                ),
-                 Container(
-                   height: 200.h,
-                    decoration: BoxDecoration(
-                      color: isDark?Color(0xff1B3A5C):Color(0xffFFFFFF),
 
 
-                    ),
-                    child: ref.watch(splitCalcProvider).splits.isEmpty
-                        ?  Center(
-                      child: CustomText(text:
-                      AppLocalizations.of(context)!.noSplitsYet,
-                       color: Colors.grey
-                      ),
-                    )
-                        : ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: ref.watch(splitCalcProvider).splits.length,
-                      itemBuilder: (context, index) {
-                        final split = ref.watch(splitCalcProvider).splits[index];
-
-                        // alternate colors: even -> E3F0FF, odd -> FFFFFF
-                        final bgColor = index % 2 == 0 ? Color(0xFFE3F0FF) : Color(0xFFFFFFFF);
-
-                        return Container(
-                          color: bgColor,
-                          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CustomText(
-                                text: split.distance.toString(),
-                                fontSize: getAdjustedFontSize(14, fontOption).sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
-                              ),
-                              CustomText(
-                                text: split.splitTime.toStringAsFixed(2),
-                                fontSize: getAdjustedFontSize(14, fontOption).sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
-                              ),
-                              CustomText(
-                                text: split.total.toStringAsFixed(2),
-                                fontSize: getAdjustedFontSize(14, fontOption).sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                Container(child: Text(ref.watch(splitCalcProvider.select((s)=>s.output))),),
 
 
-                SizedBox(height: 16.h),
+
 
                 /// ACTION BUTTONS
-                 if(ref.watch(splitCalcProvider).splits.isNotEmpty)
+                 if(ref.watch(splitCalcProvider).output.isNotEmpty)
                    Row(
                      children: [
                        Expanded(
@@ -591,7 +615,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                              backgroundColor:AppColors.primary,
                            ),
                            onPressed: () {
-                             exportSplitPdf(context, ref);
+                             exportOutputAsPdf(context, ref.watch(splitCalcProvider).output);
                            },
                            child: Row(
                              mainAxisAlignment: MainAxisAlignment.center,
@@ -615,67 +639,52 @@ class SplitCalculatorPage extends ConsumerWidget {
 
 
 
-  Future<void> exportSplitPdf(BuildContext context, WidgetRef ref) async {
-    final pdf = pw.Document();
+  Future<void> exportOutputAsPdf(
+      BuildContext context,
+      String output,
+      ) async {
+    if (output.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No output to export"),
+        ),
+      );
+      return;
+    }
 
-    final splits = ref.read(splitCalcProvider).splits;
+    final pdf = pw.Document();
 
     pdf.addPage(
       pw.Page(
-        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(24),
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
+
+              /// Title
               pw.Text(
-                "Swim Split Calculator",
+                "Swim Split Calculation",
                 style: pw.TextStyle(
-                  fontSize: 24,
+                  fontSize: 18,
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
-              pw.SizedBox(height: 20),
 
-              pw.Table(
-                border: pw.TableBorder.all(),
-                children: [
-                  pw.TableRow(
-                    decoration: const pw.BoxDecoration(color: PdfColors.grey300),
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text("Split"),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text("Split Time"),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text("Total"),
-                      ),
-                    ],
-                  ),
+              pw.SizedBox(height: 12),
 
-                  ...splits.map(
-                        (e) => pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text(e.distance.toString()),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text(e.splitTime.toStringAsFixed(2)),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8),
-                          child: pw.Text(e.total.toStringAsFixed(2)),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+              /// Divider
+              pw.Divider(),
+
+              pw.SizedBox(height: 12),
+
+              /// Output text (monospace like console)
+              pw.Text(
+                output,
+                style: pw.TextStyle(
+                  font: pw.Font.courier(),
+                  fontSize: 12,
+                ),
               ),
             ],
           );
@@ -683,9 +692,29 @@ class SplitCalculatorPage extends ConsumerWidget {
       ),
     );
 
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-    );
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/swim_split_output.pdf');
+
+      await file.writeAsBytes(await pdf.save());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("PDF saved at: ${file.path}"),
+        ),
+      );
+
+      await OpenFile.open(file.path);
+
+    } catch (e) {
+      debugPrint("PDF export error: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to export PDF"),
+        ),
+      );
+    }
   }
 
   List<int> getDistances(String course, String stroke) {
@@ -773,5 +802,5 @@ Widget distButton(WidgetRef ref,String value) {
 }
 
 extension StringCasingExtension on String {
-  String capitalize() => this.length > 0 ? '${this[0].toUpperCase()}${substring(1)}' : '';
+  String capitalize() => length > 0 ? '${this[0].toUpperCase()}${substring(1)}' : '';
 }

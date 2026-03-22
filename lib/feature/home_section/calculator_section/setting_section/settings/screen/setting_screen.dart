@@ -9,6 +9,7 @@ import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/image_path.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/screen/widget/profile_shimmer_widget.dart';
+import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/screen/widget/subscription_screen.dart';
 
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_switch_widget.dart';
@@ -267,6 +268,45 @@ class SettingsScreen extends ConsumerWidget {
                 ),
 
                 SizedBox(height: 20.h),
+                CustomText(text: "SUBSCRIPTION",fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
+                SizedBox(height: 10.h,),
+                GestureDetector(
+                  onTap: () async {
+                    final token = await TokenStorage.getAccessToken();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => SubscriptionScreen(token: token! ,),));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark?AppColors.darkThemeContainerColor: Color(0xffFFFFFF),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 4), // shadow position
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomText(text: "View your plan",fontSize: 16.sp,),
+                        Icon(
+
+                          Icons.arrow_forward_ios_rounded,
+                          color: Color(0xff368ABB),
+                          size: 16,
+                          weight: 8.w,
+                        ),
+
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+
                 CustomText(text: AppLocalizations.of(context)!.accessibility,fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
                 SizedBox(height: 10.h,),
                 // CourseDropdown(),
@@ -383,31 +423,31 @@ class SettingsScreen extends ConsumerWidget {
                             },),
                           ],
                         ),
-                        SizedBox(height: 16.h,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                SvgPicture.asset(IconPath.voiceInputIcon),
-                                SizedBox(width: 10.w,),
-                                CustomText(text: AppLocalizations.of(context)!.voiceInput,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
-                              ],
-                            ),
-                            Consumer(builder: (context, ref, child) {
-                              final isRemember = ref.watch(settingsProvider.select((s)=>s.voiceInput));
-                              return CustomSwitchWidget(
-                                value: isRemember,
-                                onChanged: (value) {
-                                  ref.read(settingsProvider.notifier)
-                                      .toggleVoice(value);
-
-
-                                },
-                              );
-                            },),
-                          ],
-                        ),
+                        // SizedBox(height: 16.h,),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Row(
+                        //       children: [
+                        //         SvgPicture.asset(IconPath.voiceInputIcon),
+                        //         SizedBox(width: 10.w,),
+                        //         CustomText(text: AppLocalizations.of(context)!.voiceInput,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w500,),
+                        //       ],
+                        //     ),
+                        //     Consumer(builder: (context, ref, child) {
+                        //       final isRemember = ref.watch(settingsProvider.select((s)=>s.voiceInput));
+                        //       return CustomSwitchWidget(
+                        //         value: isRemember,
+                        //         onChanged: (value) {
+                        //           ref.read(settingsProvider.notifier)
+                        //               .toggleVoice(value);
+                        //
+                        //
+                        //         },
+                        //       );
+                        //     },),
+                        //   ],
+                        // ),
                         SizedBox(height: 16.h,),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -45,7 +45,13 @@ class _SplitCalculatorSelectorOneState
 
     if (newIndex != -1 && newIndex != selectedIndex) {
       selectedIndex = newIndex;
-      _controller.jumpToItem(newIndex);
+
+      // ✅ FIX: delay jump to avoid build-phase crash
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _controller.jumpToItem(newIndex);
+        }
+      });
     }
   }
 
@@ -57,8 +63,8 @@ class _SplitCalculatorSelectorOneState
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side:  BorderSide( // ✅ Card grey border
-          color: isDark?Colors.grey:Color(0xffEAEDF1),
+        side: BorderSide(
+          color: isDark ? Colors.grey : const Color(0xffEAEDF1),
           width: 1,
         ),
       ),
@@ -76,14 +82,23 @@ class _SplitCalculatorSelectorOneState
               physics: const FixedExtentScrollPhysics(),
               perspective: 0.003,
               diameterRatio: 10,
+
+              // ✅ FIXED: Safe update
               onSelectedItemChanged: (index) {
+                if (index == selectedIndex) return;
 
                 setState(() {
                   selectedIndex = index;
                 });
 
-                widget.onChanged(widget.items[index]);
+                // ✅ VERY IMPORTANT: delay Riverpod update
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    widget.onChanged(widget.items[index]);
+                  }
+                });
               },
+
               childDelegate: ListWheelChildBuilderDelegate(
                 childCount: widget.items.length,
                 builder: (context, index) {
@@ -94,16 +109,13 @@ class _SplitCalculatorSelectorOneState
                     child: Container(
                       width: double.infinity,
                       alignment: Alignment.center,
-
-                      child: CustomText(text:
-                        widget.items[index],
-
-                          fontSize: 19.sp,
-                          color: isSelected ? AppColors.primary :null,
-                          fontWeight: isSelected
-                              ? FontWeight.w500
-                              : FontWeight.normal,
-
+                      child: CustomText(
+                        text: widget.items[index],
+                        fontSize: 19.sp,
+                        color: isSelected ? AppColors.primary : null,
+                        fontWeight: isSelected
+                            ? FontWeight.w500
+                            : FontWeight.normal,
                       ),
                     ),
                   );
@@ -133,5 +145,11 @@ class _SplitCalculatorSelectorOneState
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
