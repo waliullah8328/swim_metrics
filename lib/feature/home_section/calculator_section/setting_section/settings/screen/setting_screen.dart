@@ -268,7 +268,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
 
                 SizedBox(height: 20.h),
-                CustomText(text: "SUBSCRIPTION",fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
+                CustomText(text: AppLocalizations.of(context)!.bigSubscription,fontSize: getAdjustedFontSize(18, fontOption).sp,fontWeight: FontWeight.w600,),
                 SizedBox(height: 10.h,),
                 GestureDetector(
                   onTap: () async {
@@ -292,7 +292,7 @@ class SettingsScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CustomText(text: "View your plan",fontSize: 16.sp,),
+                        CustomText(text: AppLocalizations.of(context)!.viewYourPlan,fontSize: 16.sp,),
                         Icon(
 
                           Icons.arrow_forward_ios_rounded,

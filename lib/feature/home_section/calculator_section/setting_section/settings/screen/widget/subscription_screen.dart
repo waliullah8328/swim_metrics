@@ -2,39 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/feature/auth/sign_up_section/payment/presentation/screen/payment_screen.dart';
 import 'package:swim_metrics/feature/auth/sign_up_section/payment/presentation/screen/widget/premium_card_shimmer_widget.dart';
-import 'package:swim_metrics/feature/on_boarding/presentation/screens/widget/premium_plan_card_widget.dart';
+
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import '../../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../../auth/sign_up_section/payment/river_pod/payment_controller.dart';
+import '../../riverpod/user_plan_controller.dart';
 
 
 
 
 
 class SubscriptionScreen extends ConsumerWidget {
-  const SubscriptionScreen( {super.key,required this.token,});
+  const SubscriptionScreen({super.key, required this.token,});
 
   final String token;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final promoCode = ref.watch(promoCodeProvider);
-    final isApplying = ref.watch(isApplyingProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final payment = ref.watch( getPaymentProvider );
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
+    final payment = ref.watch(getUserPaymentProvider);
 
 
     return Scaffold(
       appBar: AppBar(
         title: CustomText(
-          text: "Subscription",
+          text: AppLocalizations.of(context)!.smallSubscription,
           fontSize: 24.sp,
           fontWeight: FontWeight.w600,
         ),
@@ -64,16 +66,16 @@ class SubscriptionScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SizedBox(height: 80.h),
+            SizedBox(height: 40.h),
             Padding(
               padding: EdgeInsets.only(left: 24.w),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: CustomText(
                   text:
-                  "Current Plan",
+                  AppLocalizations.of(context)!.currentPlan,
 
-                  color: isDark?Colors.white:Color(0xff131520),
+                  color: isDark ? Colors.white : Color(0xff131520),
                   fontSize: 22.sp,
                   fontWeight: FontWeight.w600,
 
@@ -83,19 +85,22 @@ class SubscriptionScreen extends ConsumerWidget {
             payment.when(
               data: (data) {
                 return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: 20.w, vertical: 20.h),
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: isDark?Color(0xFF0C3156):AppColors.textWhite,
+                    color: isDark ? Color(0xFF0C3156) : AppColors.textWhite,
 
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: isDark?Color(0xFF2F6F9F):AppColors.textWhite,
+                      color: isDark ? Color(0xFF2F6F9F) : AppColors.textWhite,
                       width: 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: isDark?Colors.black.withValues(alpha: 0.4):Color(0xff000000).withValues(alpha: 0.35),
+                        color: isDark
+                            ? Colors.black.withValues(alpha: 0.4)
+                            : Color(0xff000000).withValues(alpha: 0.35),
                         blurRadius: 8,
                         spreadRadius: 0,
 
@@ -123,10 +128,10 @@ class SubscriptionScreen extends ConsumerWidget {
 
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
-                            children:  [
+                            children: [
                               CustomText(
                                 text:
-                                "\$${data.price}",
+                                "\$${data.actualPrice}",
 
                                 fontSize: 26.sp,
                                 fontWeight: FontWeight.bold,
@@ -136,10 +141,10 @@ class SubscriptionScreen extends ConsumerWidget {
                               SizedBox(height: 2.h),
                               CustomText(
                                 text:
-                                "Paid",
+                                AppLocalizations.of(context)!.paid,
 
                                 fontSize: 12.sp,
-                                color:Color(0xff2DA8F0),
+                                color: Color(0xff2DA8F0),
 
                               ),
                             ],
@@ -153,127 +158,22 @@ class SubscriptionScreen extends ConsumerWidget {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: data.features?.length,
+                        itemCount: data.features.length,
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+
                           crossAxisCount: 2,
                           mainAxisSpacing: 8,
                           crossAxisSpacing: 8,
                           childAspectRatio: 4,
                         ),
                         itemBuilder: (context, index) {
-                          final featureList = data.features?[index];
-                          return _FeatureItem(text: featureList!.featureName.toString());
+                          final feature = data.features[index];
+
+                          return _FeatureItem(text: feature);
                         },
                       ),
 
-                      //SizedBox(height: 20.h),
 
-                      // /// Promo + Button
-                      // Row(
-                      //   children: [
-                      //
-                      //     /// Promo Field
-                      //     Expanded(
-                      //       child: Container(
-                      //         height: 48.h,
-                      //         decoration: BoxDecoration(
-                      //           color: isDark? Color(0xFF0F2D44):Color(0xffEAEDF1),
-                      //           borderRadius: BorderRadius.circular(6),
-                      //           boxShadow: [
-                      //             BoxShadow(
-                      //               color: isDark?Colors.black.withValues(alpha: 0.35):Color(0xff000000).withValues(alpha: 0.35),
-                      //               blurRadius: 8,
-                      //               spreadRadius: 0,
-                      //
-                      //             ),
-                      //           ],
-                      //
-                      //         ),
-                      //         child: TextField(
-                      //           onChanged: (value) =>
-                      //           ref.read(promoCodeProvider.notifier).state = value,
-                      //           style:  TextStyle(color: isDark?AppColors.textWhite:Colors.black),
-                      //           decoration: InputDecoration(
-                      //             hintText: AppLocalizations.of(context)!.enterPromoCode,
-                      //             filled: true,
-                      //             fillColor: isDark?Color(0xff153250):Color(0xffEAEDF1),
-                      //             hintStyle:  TextStyle(color:AppColors.textGrey,),
-                      //             border: OutlineInputBorder(
-                      //               borderRadius: BorderRadius.circular(4),
-                      //               borderSide: BorderSide(color:isDark?Color(0xff153250):Color(0xffEAEDF1)),
-                      //
-                      //             ),
-                      //             focusedBorder:OutlineInputBorder(
-                      //               borderRadius: BorderRadius.circular(4),
-                      //               borderSide: BorderSide(color:isDark?Color(0xff153250):Color(0xffEAEDF1)),
-                      //
-                      //             ),
-                      //             enabledBorder: OutlineInputBorder(
-                      //               borderRadius: BorderRadius.circular(4),
-                      //               borderSide: BorderSide(color:isDark?Color(0xff153250):Color(0xffEAEDF1)),
-                      //
-                      //             ),
-                      //             contentPadding:
-                      //             EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //
-                      //     SizedBox(width: 12.w),
-                      //
-                      //     /// Apply Button
-                      //     GestureDetector(
-                      //       onTap: isApplying
-                      //           ? null
-                      //           : () async {
-                      //         ref.read(isApplyingProvider.notifier).state = true;
-                      //
-                      //         await Future.delayed(
-                      //             const Duration(seconds: 2));
-                      //
-                      //         ref.read(isApplyingProvider.notifier).state = false;
-                      //
-                      //         final result = ref.read(paymentProvider.notifier ).applyCupon(context: context, code: promoCode, token: token);
-                      //       },
-                      //       child: Container(
-                      //         height: 44.w,
-                      //         padding: const EdgeInsets.symmetric(horizontal: 24),
-                      //         decoration: BoxDecoration(
-                      //           gradient: const LinearGradient(
-                      //             colors: [
-                      //               Color(0xFF4F5BFF),
-                      //               Color(0xFF5E6BFF),
-                      //             ],
-                      //           ),
-                      //           borderRadius: BorderRadius.circular(4),
-                      //         ),
-                      //         alignment: Alignment.center,
-                      //         child: isApplying
-                      //             ? const SizedBox(
-                      //           height: 18,
-                      //           width: 18,
-                      //           child: CircularProgressIndicator(
-                      //             strokeWidth: 2,
-                      //             color: Colors.white,
-                      //           ),
-                      //         )
-                      //             : CustomText(
-                      //           text:
-                      //           AppLocalizations.of(context)!.apply,
-                      //
-                      //           color: Colors.white,
-                      //           fontWeight: FontWeight.w600,
-                      //
-                      //
-                      //         ),
-                      //       ),
-                      //     ),
-                      //
-                      //
-                      //   ],
-                      // ),
-                      // SizedBox(height: 16.h,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -282,16 +182,21 @@ class SubscriptionScreen extends ConsumerWidget {
                             children: [
                               Row(
                                 children: [
-                                  SvgPicture.asset(IconPath .calenderIconOne),
+                                  SvgPicture.asset(IconPath.calenderIconOne),
                                   SizedBox(width: 10.w,),
-                                  CustomText(text: "Plan Started",fontSize: 14.sp,fontWeight: FontWeight.w600,),
+                                  CustomText(text: AppLocalizations.of(context)!.planStarted,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,),
                                 ],
                               ),
                               SizedBox(height: 6.h,),
                               Row(
                                 children: [
                                   SizedBox(width: 28.w,),
-                                  CustomText(text: "January 10,2025",fontSize: 12.sp,fontWeight: FontWeight.w400,),
+                                  CustomText(text: formatDate(data.planStartDate
+                                      .toString()),
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w400,),
                                 ],
                               ),
                             ],
@@ -301,16 +206,26 @@ class SubscriptionScreen extends ConsumerWidget {
                             children: [
                               Row(
                                 children: [
-                                  SvgPicture.asset(IconPath .calenderIconOne,colorFilter: ColorFilter.mode(Color(0xffC8AA52), BlendMode.srcIn),),
+                                  SvgPicture.asset(IconPath.calenderIconOne,
+                                    colorFilter: ColorFilter.mode(
+                                        Color(0xffC8AA52), BlendMode.srcIn),),
                                   SizedBox(width: 10.w,),
-                                  CustomText(text: "Next Renewal",fontSize: 14.sp,fontWeight: FontWeight.w600,color: Color(0xffC8AA52,),
-                                  )],
+                                  CustomText(text: AppLocalizations.of(context)!.nextRenewal,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xffC8AA52,),
+                                  )
+                                ],
                               ),
                               SizedBox(height: 6.h,),
                               Row(
                                 children: [
                                   SizedBox(width: 28.w,),
-                                  CustomText(text: "January 10,2026",fontSize: 12.sp,fontWeight: FontWeight.w400,),
+                                  CustomText(
+                                    text: formatDate(data.planEndDate
+                                        .toString()),
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w400,),
                                 ],
                               ),
                             ],
@@ -319,36 +234,44 @@ class SubscriptionScreen extends ConsumerWidget {
                       ),
                       SizedBox(height: 26.h,),
                       Consumer(builder: (context, ref, child) {
-                        final isLoading = ref.read(paymentProvider.select((s)=>s.paymentLoading));
+                        final isLoading = ref.read(
+                            paymentProvider.select((s) => s.paymentLoading));
                         return CustomPrimaryButton(onPressed: () async {
-                          final result = await ref.read(paymentProvider.notifier).paymentFunction(context: context, token: token);
-                          if(result){
+                          final result = await ref.read(
+                              paymentProvider.notifier).paymentFunction(
+                              context: context, token: token);
+                          if (result) {
                             // context.go(RouteNames.loginScreen);
-                            Navigator.push(context,MaterialPageRoute(builder: (context) => PaymentScreen(token: token),));
-
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) =>
+                                  PaymentScreen(token: token),));
                           }
 
 
-
                           //context.go(RouteNames.getStartedScreen);
-                        },title: AppLocalizations.of(context)!.purchaseNow,isLoading: isLoading,);
+                        },
+                          title: AppLocalizations.of(context)!.upgradePlan,
+                          isLoading: isLoading,);
                       },),
                       SizedBox(height: 10,),
 
                       Align(
-                        alignment: Alignment.center,
-                          child: CustomText(text: "10 days remaining",color: Color(0xffFFB0B2),fontSize: 16.sp,fontWeight: FontWeight.w400,textAlign: TextAlign.center,))
+                          alignment: Alignment.center,
+                          child: CustomText(text: "${data.remainingDays} ${AppLocalizations.of(context)!.daysRemaining}",
+                            color: Color(0xffFFB0B2),
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w400,
+                            textAlign: TextAlign.center,))
 
 
                     ],
                   ),
                 );
               },
-              error:(error,stack)=>Center(child: CustomText(text: "No data found")),
-              loading: ()=>PremiumCardShimmer(isDark: isDark,),
+              error: (error, stack) =>
+                  Center(child: CustomText(text: "No data found")),
+              loading: () => PremiumCardShimmer(isDark: isDark,),
             ),
-
-
 
 
           ],
@@ -356,6 +279,17 @@ class SubscriptionScreen extends ConsumerWidget {
       ),
     );
   }
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) return '';
+
+    try {
+      final parsedDate = DateTime.parse(date);
+      return DateFormat('dd MMM yyyy').format(parsedDate);
+    } catch (e) {
+      return '';
+    }
+  }
+
 }
 
 class _FeatureItem extends StatelessWidget {

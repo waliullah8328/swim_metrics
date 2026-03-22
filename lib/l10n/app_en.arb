@@ -193,7 +193,18 @@
 "failedToExportPDF": "Failed to export PDF",
 "pDFSavedAt": "PDF saved at",
 "pleaseFillAllFields": "Please fill all fields.",
-"invalidTimeFormat": "Invalid time format. Use mm:ss or ss.ss."
+"invalidTimeFormat": "Invalid time format. Use mm:ss or ss.ss.",
+
+"smallSubscription": "Subscription",
+"currentPlan": "Current Plan",
+"paid": "Paid",
+"planStarted": "Plan Started",
+"nextRenewal": "Next Renewal",
+"upgradePlan": "Upgrade Plan",
+"daysRemaining": "days remaining",
+"bigSubscription": "SUBSCRIPTION",
+"viewYourPlan": "View your plan",
+"yearlyPay": "Yearly Pay"
 
 
 

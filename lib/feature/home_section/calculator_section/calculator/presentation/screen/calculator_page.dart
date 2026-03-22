@@ -789,7 +789,7 @@ Widget distButton(WidgetRef ref,String value) {
   return GestureDetector(
     onTap: () => notifier.setGender(value),
     child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 12),
+      padding:  EdgeInsets.symmetric(horizontal: 20.w,vertical: 12.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: state.gender == value

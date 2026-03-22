@@ -183,6 +183,17 @@
 "failedToExportPDF": "Échec de l'exportation du PDF",
 "pDFSavedAt": "PDF enregistré à",
 "pleaseFillAllFields": "Veuillez remplir tous les champs.",
-"invalidTimeFormat": "Format de temps invalide. Utilisez mm:ss ou ss.ss."
+"invalidTimeFormat": "Format de temps invalide. Utilisez mm:ss ou ss.ss.",
+
+"smallSubscription": "Abonnement",
+  "currentPlan": "Plan actuel",
+  "paid": "Payé",
+  "planStarted": "Début du plan",
+  "nextRenewal": "Prochain renouvellement",
+  "upgradePlan": "Mettre à niveau le plan",
+  "daysRemaining": "jours restants",
+  "bigSubscription": "ABONNEMENT",
+  "viewYourPlan": "Voir votre plan",
+  "yearlyPay": "Paiement annuel"
 
 }

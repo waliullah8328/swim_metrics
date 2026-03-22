@@ -1103,6 +1103,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid time format. Use mm:ss or ss.ss.'**
   String get invalidTimeFormat;
+
+  /// No description provided for @smallSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get smallSubscription;
+
+  /// No description provided for @currentPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Plan'**
+  String get currentPlan;
+
+  /// No description provided for @paid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paid;
+
+  /// No description provided for @planStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Started'**
+  String get planStarted;
+
+  /// No description provided for @nextRenewal.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Renewal'**
+  String get nextRenewal;
+
+  /// No description provided for @upgradePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Plan'**
+  String get upgradePlan;
+
+  /// No description provided for @daysRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'days remaining'**
+  String get daysRemaining;
+
+  /// No description provided for @bigSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'SUBSCRIPTION'**
+  String get bigSubscription;
+
+  /// No description provided for @viewYourPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'View your plan'**
+  String get viewYourPlan;
+
+  /// No description provided for @yearlyPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly Pay'**
+  String get yearlyPay;
 }
 
 class _AppLocalizationsDelegate

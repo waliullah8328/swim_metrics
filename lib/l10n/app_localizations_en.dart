@@ -523,4 +523,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidTimeFormat => 'Invalid time format. Use mm:ss or ss.ss.';
+
+  @override
+  String get smallSubscription => 'Subscription';
+
+  @override
+  String get currentPlan => 'Current Plan';
+
+  @override
+  String get paid => 'Paid';
+
+  @override
+  String get planStarted => 'Plan Started';
+
+  @override
+  String get nextRenewal => 'Next Renewal';
+
+  @override
+  String get upgradePlan => 'Upgrade Plan';
+
+  @override
+  String get daysRemaining => 'days remaining';
+
+  @override
+  String get bigSubscription => 'SUBSCRIPTION';
+
+  @override
+  String get viewYourPlan => 'View your plan';
+
+  @override
+  String get yearlyPay => 'Yearly Pay';
 }
