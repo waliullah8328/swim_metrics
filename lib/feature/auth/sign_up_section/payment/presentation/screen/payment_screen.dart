@@ -134,7 +134,7 @@ class PaymentScreen extends ConsumerWidget {
                                 SizedBox(height: 2.h),
                                 CustomText(
                                   text:
-                                  AppLocalizations.of(context)!.oneTimePay,
+                                  AppLocalizations.of(context)!.yearlyPay,
 
                                   fontSize: 12.sp,
                                   color:Color(0xff2DA8F0),
@@ -232,7 +232,7 @@ class PaymentScreen extends ConsumerWidget {
 
                                 ref.read(isApplyingProvider.notifier).state = false;
 
-                                final result = ref.read(paymentProvider.notifier ).applyCupon(context: context, code: promoCode, token: token);
+                                 ref.read(paymentProvider.notifier ).applyCupon(context: context, code: promoCode, token: token);
                               },
                               child: Container(
                                 height: 44.w,

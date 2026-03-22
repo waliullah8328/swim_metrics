@@ -183,6 +183,17 @@
 "failedToExportPDF": "Errore durante l'esportazione del PDF",
 "pDFSavedAt": "PDF salvato in",
 "pleaseFillAllFields": "Si prega di compilare tutti i campi.",
-"invalidTimeFormat": "Formato del tempo non valido. Usa mm:ss o ss.ss."
+"invalidTimeFormat": "Formato del tempo non valido. Usa mm:ss o ss.ss.",
+
+"smallSubscription": "Abbonamento",
+  "currentPlan": "Piano attuale",
+  "paid": "Pagato",
+  "planStarted": "Inizio del piano",
+  "nextRenewal": "Prossimo rinnovo",
+  "upgradePlan": "Aggiorna piano",
+  "daysRemaining": "giorni rimanenti",
+  "bigSubscription": "ABBONAMENTO",
+  "viewYourPlan": "Visualizza il tuo piano",
+  "yearlyPay": "Pagamento annuale"
 
 }
