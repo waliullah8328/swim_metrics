@@ -9,6 +9,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../setting_section/settings/riverpod/setting_controller.dart';
+import '../../../../setting_section/settings/screen/summary_screen.dart';
 
 
 class LearningHeaderWidget extends  StatefulWidget{
@@ -87,8 +88,18 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: AppLocalizations.of(context)!.summary,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
-                    Divider(),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>  SummaryScreen(),));
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText(text: AppLocalizations.of(context)!.summary,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
+                          Divider(),
+                        ],
+                      ),
+                    ),
                     CustomText(text: AppLocalizations.of(context)!.ideasForUse,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
                     Divider(),
                     GestureDetector(

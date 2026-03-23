@@ -345,15 +345,92 @@ class TermsConditionsScreen extends StatelessWidget {
               SizedBox(height: 10.h),
               CustomText(
                   text:
-                  "7. User Responsibilities",
+                  "8. User Control",
                   fontSize: 16.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
               ),
               SizedBox(height: 6.h),
               CustomText(
                   text:
-                  "You agree to:",
+                  "You acknowledge that you control all training variables, including intensity, duration, rest, and participation, and that PMcC Solutions does not monitor, enforce, or limit any physical activity or training decisions.",
                   fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
               ),
+
+              SizedBox(height: 10.h,),
+
+              Divider(),
+
+              SizedBox(height: 10.h),
+              CustomText(
+                  text:
+                  "9. Prohibited Uses and Restrictions",
+                  fontSize: 16.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "You agree that you will not, directly or indirectly:",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h,),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Use the App for unlawful purposes or in violation of any law.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Reverse engineer, decompile, disassemble, decode, or attempt to extract source code, algorithms, pacing ratios, conversion logic, data models, or proprietary logic.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Copy, modify, distribute, translate, adapt, scrape, benchmark, or create derivative works of the App.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Use the App for competitive analysis or to develop or improve competing products or services.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Remove, alter, or obscure proprietary notices or branding",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Interfere with security features or attempt unauthorized access to systems or data.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Upload harmful code, malware, or automated scripts (the App permits numeric input only).",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Misuse exported files, timing logs, or athlete data, including data relating to minors.",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "Use the App in a manner that violates data-protection or privacy laws.",
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "Any prohibited use immediately terminates your license.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+
+              SizedBox(height: 10.h,),
+
+              Divider(),
+
+              SizedBox(height: 10.h),
+
+
 
 
 

@@ -103,6 +103,7 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                         context.push(RouteNames.termsConditionsScreen);
                       },
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CustomText(text: AppLocalizations.of(context)!.privacyPolicy,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
                           Divider(),
