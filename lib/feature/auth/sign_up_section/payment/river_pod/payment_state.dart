@@ -16,6 +16,7 @@ class PaymentState{
     bool? isLoading,
     bool? cuponLoading,
     bool? paymentLoading,
+    // noting to merge
 }){
     return PaymentState(
       isLoading: isLoading?? this.isLoading,

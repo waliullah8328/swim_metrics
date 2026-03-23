@@ -430,6 +430,149 @@ class TermsConditionsScreen extends StatelessWidget {
 
               SizedBox(height: 10.h),
 
+              CustomText(
+                  text:
+                  "10. Ownership and Intellectual Property",
+                  fontSize: 16.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "The App and all related intellectual property—including but not limited to:",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h,),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "software, code, databases, and algorithms",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "pacing ratios, analytics models, and prediction tools",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "conversion logic and timing methodologies",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "UI/UX design, documentation, branding, trademarks, and logos",
+              ),
+              CustomDottedText(
+                isDark: isDark,
+                title:
+                "updates, improvements, and derivative works",
+              ),
+              SizedBox(height: 6.h,),
+
+              CustomText(
+                  text:
+                  "are the exclusive property of PMcC Solutions LLC and are protected by U.S. and international copyright, trademark, and trade-secret laws. Any feedback or suggestions you provide may be used by PMcC Solutions without compensation or obligation.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              CustomText(
+                  text:
+                  "You acquire no ownership interest in the App.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 10.h,),
+
+              Divider(),
+
+              SizedBox(height: 10.h),
+              CustomText(
+                  text:
+                  "11. Data Handling and Privacy",
+                  fontSize: 16.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "SwimMetrics is designed so that the App’s core functionality operates without collecting, storing, transmitting, synchronizing, or processing personal information on external servers. The App does not require user accounts, and all calculations, timing logs, and projections are processed locally on your device unless you affirmatively choose to export or share them.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "PMcC Solutions does not have access to user-entered data generated through the App’s core functionality. You are solely responsible for securing your device and for the storage, distribution, and lawful use of any exported or shared data.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "Communications sent to PMcC Solutions outside the App (such as emails or support inquiries) are not part of the App’s core functionality and may involve personal information voluntarily provided by you for the purpose of responding to inquiries.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "Future Features and Data Use:",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "PMcC Solutions may, in the future, introduce optional features that require limited collection or processing of user data (such as analytics, cloud synchronization, or account-based functionality). Any such features will be governed by an updated Privacy Policy and, where required by law or platform policy, will be disclosed to users and subject to user consent prior to activation.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "To the extent platform providers, operating systems, or device manufacturers collect data independently of PMcC Solutions, such collection is governed by their respective privacy policies and not by this Agreement.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "In the event of any conflict between these Terms and the Privacy Policy regarding data handling, the Privacy Policy controls.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "User-Generated Outputs:",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "Any exported files, logs, timing records, or derived outputs are generated solely from user-entered inputs. PMcC Solutions does not verify accuracy, ownership, consent, or lawful use of such outputs and disclaims all liability arising from their sharing, publication, or attribution.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+
+              SizedBox(height: 10.h,),
+
+              Divider(),
+
+              SizedBox(height: 10.h),
+
+              CustomText(
+                  text:
+                  "12. No Coaching, Medical, or Performance Guarantees",
+                  fontSize: 16.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "SwimMetrics is designed so that the App’s core functionality operates without collecting, storing, transmitting, synchronizing, or processing personal information on external servers. The App does not require user accounts, and all calculations, timing logs, and projections are processed locally on your device unless you affirmatively choose to export or share them.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+              SizedBox(height: 6.h),
+              CustomText(
+                  text:
+                  "PMcC Solutions does not have access to user-entered data generated through the App’s core functionality. You are solely responsible for securing your device and for the storage, distribution, and lawful use of any exported or shared data.",
+                  fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
+              ),
+
+
+
 
 
 
