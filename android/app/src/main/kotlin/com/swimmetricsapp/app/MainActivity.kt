@@ -1,4 +1,4 @@
-package com.example.swim_metrics
+package com.swimmetricsapp.app
 
 import io.flutter.embedding.android.FlutterActivity
 

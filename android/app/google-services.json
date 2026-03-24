@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324725254489",
+    "project_id": "swim-metrics-5d4f2",
+    "storage_bucket": "swim-metrics-5d4f2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324725254489:android:d3efc061791d0fbe32c448",
+        "android_client_info": {
+          "package_name": "com.swimmetricsapp.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYA4zVEcwY546ZSE1vNpcO23jxhfrg8ss"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
