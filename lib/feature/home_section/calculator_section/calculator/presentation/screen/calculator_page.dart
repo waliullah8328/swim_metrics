@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -47,6 +48,7 @@ class SplitCalculatorPage extends ConsumerWidget {
     final fontOption = ref.watch(settingsProvider).fontSize;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionProvider);
+    final isHaptic = ref.watch(settingsProvider.select((s)=>s.haptic));
 
     return Scaffold(
       key: _scaffoldKey,
@@ -458,6 +460,10 @@ class SplitCalculatorPage extends ConsumerWidget {
                             fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
                           ),
                           onPressed: (){
+                            if(isHaptic == true){
+                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                            }
 
                             ref.read(splitCalcProvider.notifier).project();
                             ref.read(showCourseSectionProvider.notifier).state = false;
@@ -594,6 +600,10 @@ class SplitCalculatorPage extends ConsumerWidget {
                                side: BorderSide(color: Color(0xff234B6E))
                            ),
                            onPressed: () {
+                             if(isHaptic == true){
+                               HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                             }
                              ref.watch(splitCalcProvider.notifier).clear();
                            },
                            child: Center(
@@ -615,6 +625,10 @@ class SplitCalculatorPage extends ConsumerWidget {
                              backgroundColor:AppColors.primary,
                            ),
                            onPressed: () {
+                             if(isHaptic == true){
+                               HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                             }
                              exportOutputAsPdf(context, ref.watch(splitCalcProvider).output);
                            },
                            child: Row(
