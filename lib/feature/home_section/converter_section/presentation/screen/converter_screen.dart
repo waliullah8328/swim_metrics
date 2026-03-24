@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
@@ -62,6 +63,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionConverter);
     final fontOption = ref.watch(settingsProvider).fontSize;
+    final isHaptic = ref.watch(settingsProvider.select((s)=>s.haptic));
 
     return Scaffold(
       key: scaffoldKey,
@@ -77,6 +79,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
         leading: GestureDetector(
           onTap: () {
             scaffoldKey.currentState?.openDrawer();
+            if(isHaptic == true){
+              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+            }
           },
           child: Padding(
             padding: EdgeInsets.only(left: 18.w),
@@ -106,6 +112,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                 child: GestureDetector(
                   onTap: () {
                     ref.read(showCourseSectionConverter.notifier).state = true;
+                    if(isHaptic == true){
+                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                    }
                   },
                   child: Column(
                     children: [
@@ -515,6 +525,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                       controller1.convert(context: context);
                       ref.read(showCourseSectionConverter.notifier).state =
                           false;
+                      if(isHaptic == true){
+                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                      }
                     },
                     child: Container(
                       width: double.infinity,
@@ -599,6 +613,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                   ),
                                   onPressed: () {
                                     controller1.reset();
+                                    if(isHaptic == true){
+                                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                    }
                                   },
                                   child: Center(
                                     child: Row(
@@ -634,6 +652,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                         .read(converterProvider1)
                                         .output;
                                     exportOutputAsPdf(context, output);
+                                    if(isHaptic == true){
+                                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                    }
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

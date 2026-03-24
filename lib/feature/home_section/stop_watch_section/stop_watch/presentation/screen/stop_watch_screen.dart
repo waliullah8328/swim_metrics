@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
@@ -77,11 +78,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final status = ref.watch(stopwatchProvider1);
-    final List<String> items = [
-      AppLocalizations.of(context)!.normal,
-      AppLocalizations.of(context)!.converterBig,
-      AppLocalizations.of(context)!.predictor,
-    ];
+
     final settings = ref.watch(settingsProvider);
     final currentLanguageCode = settings.language.code;
     final showCourse = ref.watch(showCourseSectionStopWatchProvider);
@@ -90,6 +87,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     final log2 = ref.watch(stopwatchProvider2.select((s) => s.logConverter));
     final log3 = ref.watch(stopwatchProvider2.select((s) => s.logPredictor));
     final fontOption = ref.watch(settingsProvider).fontSize;
+    final isHaptic = ref.watch(settingsProvider.select((s)=>s.haptic));
 
     final modes = ["Stopwatch", "Converter", "Predictor"];
     final activeMode = ref.watch(
@@ -109,6 +107,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
+            if(isHaptic == true){
+              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+            }
             scaffoldKey.currentState?.openDrawer();
           },
           child: Padding(
@@ -177,6 +179,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                           ref.read(stopwatchProvider2.notifier).setMode(mode);
                           ref.read(stopwatchProvider1.notifier).clear();
                           ref.read(stopwatchProvider2.notifier).stop();
+                          if(isHaptic == true){
+                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                          }
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -212,6 +218,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               .read(showCourseSectionStopWatchProvider.notifier)
                               .state =
                           true;
+                      if(isHaptic == true){
+                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                      }
                     },
                     child: Column(
                       children: [
@@ -251,6 +261,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               )
                               .state =
                           true;
+                      if(isHaptic == true){
+                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                      }
                     },
                     child: Column(
                       children: [
@@ -340,6 +354,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ref
                                         .read(stopwatchProvider1.notifier)
                                         .start();
+                                    if(isHaptic == true){
+                                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                    }
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -386,6 +404,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ref
                                             .read(stopwatchProvider2.notifier)
                                             .split();
+                                        if(isHaptic == true){
+                                          HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                        }
                                       },
                                       child: Center(
                                         child: Row(
@@ -443,6 +465,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     stopwatchProvider2.notifier,
                                                   )
                                                   .undoLastSplit();
+                                              if(isHaptic == true){
+                                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                              }
                                             },
                                             child: Row(
                                               mainAxisAlignment:
@@ -498,6 +524,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                     stopwatchProvider2.notifier,
                                                   )
                                                   .pause();
+                                              if(isHaptic == true){
+                                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                              }
                                             },
                                             child: Row(
                                               mainAxisAlignment:
@@ -555,6 +585,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ref
                                               .read(stopwatchProvider1.notifier)
                                               .resume();
+                                          if(isHaptic == true){
+                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                          }
                                         },
                                         child: Row(
                                           mainAxisAlignment:
@@ -613,6 +647,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ref
                                               .read(stopwatchProvider2.notifier)
                                               .reset();
+                                          if(isHaptic == true){
+                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                          }
                                         },
                                         child: Row(
                                           mainAxisAlignment:
@@ -709,6 +747,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ref
                                             .read(stopwatchProvider2.notifier)
                                             .pause(); // you need a method to clear log
+                                        if(isHaptic == true){
+                                          HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                        }
                                       },
                                       child: Center(
                                         child: Row(
@@ -747,6 +789,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                       ),
                                       onPressed: () {
                                         exportOutputAsPdf1(context, ref);
+                                        if(isHaptic == true){
+                                          HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                        }
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -830,6 +876,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   .setConverterCourses(
                                                     from: value,
                                                   );
+                                              if(isHaptic == true){
+                                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                              }
                                             },
                                           );
                                         },
@@ -951,6 +1001,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               )
                                               .state =
                                           false;
+                                      if(isHaptic == true){
+                                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                      }
                                     },
                                     child: Row(
                                       mainAxisAlignment:
@@ -1002,6 +1056,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ref
                                               .read(stopwatchProvider2.notifier)
                                               .split();
+                                          if(isHaptic == true){
+                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                          }
                                         },
                                         child: Center(
                                           child: Row(
@@ -1061,6 +1119,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                           .notifier,
                                                     )
                                                     .undoLastSplit();
+                                                if(isHaptic == true){
+                                                  HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                                }
                                               },
                                               child: Row(
                                                 mainAxisAlignment:
@@ -1120,6 +1182,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                           .notifier,
                                                     )
                                                     .pause();
+                                                if(isHaptic == true){
+                                                  HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                                }
                                               },
                                               child: Row(
                                                 mainAxisAlignment:
@@ -1184,6 +1250,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   stopwatchProvider1.notifier,
                                                 )
                                                 .resume();
+                                            if(isHaptic == true){
+                                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                            }
                                           },
                                           child: Row(
                                             mainAxisAlignment:
@@ -1253,6 +1323,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   stopwatchProvider2.notifier,
                                                 )
                                                 .reset();
+                                            if(isHaptic == true){
+                                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                            }
                                           },
                                           child: Row(
                                             mainAxisAlignment:
@@ -1348,6 +1422,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ref
                                               .read(stopwatchProvider2.notifier)
                                               .pause(); // you need a method to clear log
+                                          if(isHaptic == true){
+                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                          }
                                         },
                                         child: Center(
                                           child: Row(
@@ -1386,6 +1464,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ),
                                         onPressed: () {
                                           exportOutputAsPdf(context, ref);
+                                          if(isHaptic == true){
+                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                          }
                                         },
                                         child: Row(
                                           mainAxisAlignment:
@@ -1848,6 +1930,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               )
                                               .state =
                                           false;
+                                      if(isHaptic == true){
+                                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                      }
                                     },
                                     child: Row(
                                       mainAxisAlignment:
@@ -1898,6 +1984,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ref
                                               .read(stopwatchProvider2.notifier)
                                               .split();
+                                          if(isHaptic == true){
+                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                          }
                                         },
                                         child: Center(
                                           child: Row(
@@ -1957,6 +2047,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                           .notifier,
                                                     )
                                                     .undoLastSplit();
+                                                if(isHaptic == true){
+                                                  HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                                }
                                               },
                                               child: Row(
                                                 mainAxisAlignment:
@@ -2016,6 +2110,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                           .notifier,
                                                     )
                                                     .pause();
+                                                if(isHaptic == true){
+                                                  HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                                }
                                               },
                                               child: Row(
                                                 mainAxisAlignment:
@@ -2079,6 +2177,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   stopwatchProvider1.notifier,
                                                 )
                                                 .resume();
+                                            if(isHaptic == true){
+                                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                            }
                                           },
                                           child: Row(
                                             mainAxisAlignment:
@@ -2141,6 +2243,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   stopwatchProvider2.notifier,
                                                 )
                                                 .reset();
+                                            if(isHaptic == true){
+                                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                            }
                                           },
                                           child: Row(
                                             mainAxisAlignment:
@@ -2236,6 +2342,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ref
                                               .read(stopwatchProvider2.notifier)
                                               .pause(); // you need a method to clear log
+                                          if(isHaptic == true){
+                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                          }
                                         },
                                         child: Center(
                                           child: Row(
@@ -2274,6 +2384,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ),
                                         onPressed: () {
                                           exportOutputAsPdf3(context, ref);
+                                          if(isHaptic == true){
+                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                          }
                                         },
                                         child: Row(
                                           mainAxisAlignment:
