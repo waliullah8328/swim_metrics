@@ -558,4 +558,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get yearlyPay => 'Pagamento annuale';
+
+  @override
+  String get pleaseEnterYourPhoneNumber =>
+      'Inserisci il tuo numero di telefono';
+
+  @override
+  String get pleaseSelectAProfileImage => 'Seleziona un\'immagine del profilo';
 }

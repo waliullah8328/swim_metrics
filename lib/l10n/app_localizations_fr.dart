@@ -561,4 +561,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get yearlyPay => 'Paiement annuel';
+
+  @override
+  String get pleaseEnterYourPhoneNumber =>
+      'Veuillez entrer votre numéro de téléphone';
+
+  @override
+  String get pleaseSelectAProfileImage =>
+      'Veuillez sélectionner une image de profil';
 }

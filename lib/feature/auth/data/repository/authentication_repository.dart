@@ -507,13 +507,15 @@ class AuthenticationRepository{
 // Google Sign In with firebase
 
   Future<Map<String, dynamic>> signInWithGoogle({
-    required String email,
+    required String idToken,
   }) async {
     try {
-      final Map<String, dynamic> payload = {"email": email};
+      final Map<String, dynamic> payload = {
+        "id_token": idToken
+      };
 
       final endpoint =
-          dotenv.env['AUTH_GOOGLE_SIGN_UP_ENDPOINT'] ?? 'auth/google/signup/';
+          dotenv.env['AUTH_GOOGLE_SIGN_UP_ENDPOINT'] ?? '/auth/auth/firebase/';
 
       // Log API request
       debugPrint('🚀 API REQUEST - USER GOOGLE SIGN UP');
@@ -533,23 +535,34 @@ class AuthenticationRepository{
       final data = response.data is String ? jsonDecode(response.data) : response.data;
 
       // Handle success response (201 Created or 200 OK)
+      // Handle success response (201 Created or 200 OK)
       if (response.statusCode == 201 || response.statusCode == 200) {
-        final accessToken = data['access'] ?? '';
-        final refreshToken = data['refresh'] ?? '';
-        final isSignUpCompleted = data['signup_status']?["is_completed"] ?? false;
+        // Check if the response contains tokens (new API format)
 
-        debugPrint("Access Token : $accessToken");
-        debugPrint("Refresh Token : $refreshToken");
-        debugPrint("Is Sign Up Completed : $isSignUpCompleted");
+        final tokens = data['access'];
+        debugPrint("tokens $tokens");
+        //final refreshToken = data['data']['refresh'];
+        final refreshToken = data['refresh'];
+
+        debugPrint("refreshToken: $refreshToken");
+
+
+        final isPayment= data['payment'];
+        debugPrint("IS PAYMENT: $isPayment");
+
+        //final user = data['data']["user"];
+
+
+        // Store user data in SharedPreferences
+
 
         return {
           'success': true,
           'message': data['message'] ?? 'Login successfully',
-          'data': {
-            'user': isSignUpCompleted,
-            'tokens': accessToken,
-            'refreshToken': refreshToken,
-          },
+          'tokens': tokens,
+          'refreshToken':refreshToken,
+          'isPayment':isPayment,
+
         };
       }
 

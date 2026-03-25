@@ -553,4 +553,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yearlyPay => 'Yearly Pay';
+
+  @override
+  String get pleaseEnterYourPhoneNumber => 'Please enter your phone number';
+
+  @override
+  String get pleaseSelectAProfileImage => 'Please select a profile image';
 }

@@ -173,28 +173,32 @@ class LoginNotifier extends StateNotifier<LoginState> {
   /// GOOGLE LOGIN
   /// -----------------------
   Future<bool> loginWithGoogle(BuildContext context) async {
-    state = state.copyWith(
-      isLoadingGoogle: true,
-      errorMessage: '',
-      successMessage: '',
-    );
+    state = state.copyWith(isLoadingGoogle: true, errorMessage: '', successMessage: '');
 
     try {
-      final googleSignIn = GoogleSignIn(scopes: ['email']);
+      final googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile', 'openid'], // ✅ critical
+      );
 
-      // Force account chooser
-      await googleSignIn.signOut();
+      await googleSignIn.signOut(); // Force account chooser
 
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        state = state.copyWith(
-          isLoadingGoogle: false,
-          errorMessage: 'Google sign-in cancelled',
-        );
+        state = state.copyWith(isLoadingGoogle: false, errorMessage: 'Google sign-in cancelled');
         return false;
       }
 
       final auth = await googleUser.authentication;
+
+      // ✅ Verify ID token before sending
+      if (auth.idToken == null) {
+        debugPrint('❌ Google ID token is null!');
+        state = state.copyWith(isLoadingGoogle: false, errorMessage: 'Failed to get Google ID token');
+        return false;
+      }
+
+      debugPrint('✅ Google ID Token: ${auth.idToken}');
+      debugPrint('✅ Google Access Token: ${auth.accessToken}');
 
       final credential = GoogleAuthProvider.credential(
         idToken: auth.idToken,
@@ -204,57 +208,17 @@ class LoginNotifier extends StateNotifier<LoginState> {
       // Firebase login
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-      debugPrint('Email: ${googleUser.email}');
-      debugPrint('Name: ${googleUser.displayName}');
-
-      // Backend login
+      // Send to backend
       final response = await AuthenticationRepository().signInWithGoogle(
-        email: googleUser.email,
+        idToken: auth.idToken!, // non-null
       );
 
-      if (response['success'] != true) {
-        // 🔴 rollback Firebase session if backend fails
-        await FirebaseAuth.instance.signOut();
-        await googleSignIn.signOut();
-
-        state = state.copyWith(
-          isLoadingGoogle: false,
-          errorMessage: response['error'] ?? 'Google login failed',
-        );
-        return false;
-      }
-
-      // ✅ success
-      state = state.copyWith(isLoadingGoogle: false);
-
-      //await _handleSuccess(response['data'], context);
+      debugPrint('Backend response: $response');
 
       state = state.copyWith(
-        successMessage: 'Google login successful',
+        isLoadingGoogle: false,
+        successMessage: response['message'] ?? 'Google login successful',
       );
-      if(response['data']['user']){
-        await TokenStorage.saveTokens(
-          accessToken:response['data']['tokens'],
-          refreshToken: response['data']['refreshToken'],
-        );
-        final getAccessToken = await TokenStorage.getAccessToken();
-        debugPrint("Get SaveAccess Token : $getAccessToken");
-
-        // final socketService = PresenceSocketService();
-        //
-        // socketService.connect(getAccessToken!,);
-        // Navigator.pushNamedAndRemoveUntil(
-        //   context,
-        //   RouteNames.bottomNavScreen,
-        //       (route) => false,
-        // );
-
-
-
-      }else{
-        // final tokens = response['data']['tokens'];
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OnboardingPage(token: tokens,isSocialLogin: true,),));
-      }
 
       return true;
     } catch (e, s) {
@@ -262,11 +226,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
       debugPrintStack(stackTrace: s);
 
       await FirebaseAuth.instance.signOut();
-
-      state = state.copyWith(
-        isLoadingGoogle: false,
-        errorMessage: 'Something went wrong. Please try again.',
-      );
+      state = state.copyWith(isLoadingGoogle: false, errorMessage: 'Something went wrong.');
       return false;
     }
   }

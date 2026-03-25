@@ -194,6 +194,8 @@
   "daysRemaining": "jours restants",
   "bigSubscription": "ABONNEMENT",
   "viewYourPlan": "Voir votre plan",
-  "yearlyPay": "Paiement annuel"
+  "yearlyPay": "Paiement annuel",
+  "pleaseEnterYourPhoneNumber": "Veuillez entrer votre numéro de téléphone",
+  "pleaseSelectAProfileImage": "Veuillez sélectionner une image de profil"
 
 }

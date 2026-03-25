@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/edit_profile/data/model/get_me_profile_model.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/edit_profile/data/repository/profile_repository.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import 'edit_profile_state.dart';
 
@@ -81,8 +82,12 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 
   Future<bool> saveProfile({required BuildContext context}) async {
     if(state.phone.isEmpty){
-      AppSnackBar.showError(context, "Please enter your phone number");
+      AppSnackBar.showError(context,  AppLocalizations.of(context)!.pleaseEnterYourPhoneNumber);
 
+    }
+    if (state.profileImage == null) {
+      AppSnackBar.showError(context, AppLocalizations.of(context)!.pleaseSelectAProfileImage);
+      return false;
     }
     state = state.copyWith(isLoading: true);
 
