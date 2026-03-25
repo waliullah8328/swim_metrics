@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -40,6 +41,7 @@ class SettingsScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final settings = ref.watch(settingsProvider);
     final currentLanguageCode = settings.language.code;
+    final isHaptic = ref.watch(settingsProvider.select((s)=>s.haptic));
 
     final profile = ref.watch(getMeProvider);
 
@@ -179,6 +181,10 @@ class SettingsScreen extends ConsumerWidget {
                                 onChanged: (value) {
                                   ref.read(settingsProvider.notifier)
                                       .toggleDarkMode(value);
+                                  if(isHaptic == true){
+                                    HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                  }
 
 
                                 },
@@ -416,6 +422,10 @@ class SettingsScreen extends ConsumerWidget {
                                 onChanged: (value) {
                                   ref.read(settingsProvider.notifier)
                                       .toggleStopwatch(value);
+                                  if(isHaptic == true){
+                                    HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                  }
 
 
                                 },
@@ -466,6 +476,10 @@ class SettingsScreen extends ConsumerWidget {
                                 onChanged: (value) {
                                   ref.read(settingsProvider.notifier)
                                       .toggleHaptic(value);
+                                  if(isHaptic == true){
+                                    HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                  }
 
 
                                 },
@@ -490,6 +504,10 @@ class SettingsScreen extends ConsumerWidget {
 
                     await TokenStorage.deleteLoginFlag();
                     context.go(RouteNames.loginScreen);
+                    if(isHaptic == true){
+                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                    }
                   },
                   child: Center(child:  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
