@@ -1163,6 +1163,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yearly Pay'**
   String get yearlyPay;
+
+  /// No description provided for @pleaseEnterYourPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your phone number'**
+  String get pleaseEnterYourPhoneNumber;
+
+  /// No description provided for @pleaseSelectAProfileImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a profile image'**
+  String get pleaseSelectAProfileImage;
 }
 
 class _AppLocalizationsDelegate

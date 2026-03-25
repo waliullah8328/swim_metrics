@@ -562,4 +562,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get yearlyPay => 'Pago anual';
+
+  @override
+  String get pleaseEnterYourPhoneNumber =>
+      'Por favor, introduce tu número de teléfono';
+
+  @override
+  String get pleaseSelectAProfileImage =>
+      'Por favor, selecciona una imagen de perfil';
 }
