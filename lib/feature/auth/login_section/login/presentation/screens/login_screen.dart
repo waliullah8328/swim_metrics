@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swim_metrics/config/route/routes_name.dart';
-import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar.dart';
+
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
@@ -17,7 +17,7 @@ import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_account_widget.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/custom_switch_widget.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/social_login.dart';
-import '../../../../../../core/services/token_storage.dart';
+
 import '../../../../../../core/utils/constants/app_sizer.dart';
 import '../../../../../../core/utils/constants/image_path.dart';
 import '../../../../../../core/utils/validators/app_validator.dart';
@@ -52,15 +52,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     print("build");
 
     ref.listen<LoginState>(loginProvider, (previous, next) {
-      if (next.errorMessage != null) {
-
-        AppSnackBar.showError(context, next.errorMessage.toString());
-      }
-
-      if (next.successMessage != null) {
-
-        AppSnackBar.showSuccess(context, next.successMessage.toString());
-      }
+      // if (next.errorMessage != null && next.isLoadingGoogle ==) {
+      //
+      //   AppSnackBar.showError(context, next.errorMessage.toString());
+      // }
+      //
+      // if (next.successMessage != null) {
+      //
+      //   AppSnackBar.showSuccess(context, next.successMessage.toString());
+      // }
 
       /// Update controllers whenever email/password state changes
       if (next.email != emailController.text) {

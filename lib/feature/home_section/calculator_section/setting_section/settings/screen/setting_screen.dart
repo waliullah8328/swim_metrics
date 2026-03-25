@@ -178,7 +178,7 @@ class SettingsScreen extends ConsumerWidget {
                                 value: isRemember,
                                 onChanged: (value) {
                                   ref.read(settingsProvider.notifier)
-                                      .toggleDarkMode(value,ref );
+                                      .toggleDarkMode(value);
 
 
                                 },
