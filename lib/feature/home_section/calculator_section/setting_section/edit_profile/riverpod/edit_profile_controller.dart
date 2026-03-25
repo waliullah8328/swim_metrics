@@ -84,6 +84,10 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       AppSnackBar.showError(context, "Please enter your phone number");
 
     }
+    if (state.profileImage == null) {
+      AppSnackBar.showError(context, "Please select a profile image");
+      return false;
+    }
     state = state.copyWith(isLoading: true);
 
     try {
