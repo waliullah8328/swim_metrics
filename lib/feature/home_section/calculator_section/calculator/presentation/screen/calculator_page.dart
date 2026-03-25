@@ -60,6 +60,10 @@ class SplitCalculatorPage extends ConsumerWidget {
         leading: GestureDetector(
           onTap: (){
             _scaffoldKey.currentState?.openDrawer();
+            if(isHaptic == true){
+              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+            }
           },
           child: Padding(
             padding: EdgeInsets.only(left: 18.w),

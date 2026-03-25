@@ -14,6 +14,7 @@ import '../../../../../../core/common/widgets/new_custon_widgets/split_calculato
 import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
+import '../../../../calculator_section/calculator/riverpod/audio_controller.dart';
 import '../../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -88,6 +89,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     final log3 = ref.watch(stopwatchProvider2.select((s) => s.logPredictor));
     final fontOption = ref.watch(settingsProvider).fontSize;
     final isHaptic = ref.watch(settingsProvider.select((s)=>s.haptic));
+    final isStopWatch = ref.watch(settingsProvider.select((s)=>s.stopwatchSound));
 
     final modes = ["Stopwatch", "Converter", "Predictor"];
     final activeMode = ref.watch(
@@ -358,6 +360,11 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                       HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                     }
+                                    if(isStopWatch == true){
+                                      /// ▶️ PLAY AUDIO
+                                      ref.read(audioProvider.notifier).play();
+                                    }
+
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -528,6 +535,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                 HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                               }
+                                              if(isStopWatch == true){
+                                                /// ▶️ PLAY AUDIO
+                                                ref.read(audioProvider.notifier).stop();
+                                              }
                                             },
                                             child: Row(
                                               mainAxisAlignment:
@@ -588,6 +599,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           if(isHaptic == true){
                                             HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
+                                          }
+                                          if(isStopWatch == true){
+                                            /// ▶️ PLAY AUDIO
+                                            ref.read(audioProvider.notifier).play();
                                           }
                                         },
                                         child: Row(
@@ -1005,6 +1020,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                       }
+                                      if(isStopWatch == true){
+                                        /// ▶️ PLAY AUDIO
+                                        ref.read(audioProvider.notifier).play();
+                                      }
                                     },
                                     child: Row(
                                       mainAxisAlignment:
@@ -1186,6 +1205,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                                 }
+                                                if(isStopWatch == true){
+                                                  /// ▶️ PLAY AUDIO
+                                                  ref.read(audioProvider.notifier).stop();
+                                                }
                                               },
                                               child: Row(
                                                 mainAxisAlignment:
@@ -1253,6 +1276,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             if(isHaptic == true){
                                               HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
+                                            }
+                                            if(isStopWatch == true){
+                                              /// ▶️ PLAY AUDIO
+                                              ref.read(audioProvider.notifier).play();
                                             }
                                           },
                                           child: Row(
@@ -1934,6 +1961,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                       }
+                                      if(isStopWatch == true){
+                                        /// ▶️ PLAY AUDIO
+                                        ref.read(audioProvider.notifier).play();
+                                      }
                                     },
                                     child: Row(
                                       mainAxisAlignment:
@@ -2114,6 +2145,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                   HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                                 }
+                                                if(isStopWatch == true){
+                                                  /// ▶️ PLAY AUDIO
+                                                  ref.read(audioProvider.notifier).stop();
+                                                }
                                               },
                                               child: Row(
                                                 mainAxisAlignment:
@@ -2181,6 +2216,11 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                             }
+                                            /// ▶️ PLAY AUDIO
+                                            if(isStopWatch == true){
+                                              /// ▶️ PLAY AUDIO
+                                              ref.read(audioProvider.notifier).play();
+                                            }
                                           },
                                           child: Row(
                                             mainAxisAlignment:
@@ -2247,6 +2287,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                               HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                             }
+                                            ref.read(audioProvider.notifier).stop();
                                           },
                                           child: Row(
                                             mainAxisAlignment:

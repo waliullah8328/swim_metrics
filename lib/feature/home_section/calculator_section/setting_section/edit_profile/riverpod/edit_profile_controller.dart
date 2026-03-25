@@ -80,6 +80,10 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   }
 
   Future<bool> saveProfile({required BuildContext context}) async {
+    if(state.phone.isEmpty){
+      AppSnackBar.showError(context, "Please enter your phone number");
+
+    }
     state = state.copyWith(isLoading: true);
 
     try {

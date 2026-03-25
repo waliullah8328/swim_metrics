@@ -9,6 +9,7 @@ import 'package:swim_metrics/core/utils/constants/icon_path.dart';
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../../l10n/app_localizations.dart';
 import '../../../../setting_section/settings/riverpod/setting_controller.dart';
+import '../../../../setting_section/settings/screen/privacy_policy_screen.dart';
 
 
 class LegalHeaderWidget extends StatefulWidget {
@@ -100,7 +101,7 @@ class _LegalHeaderWidgetState extends State<LegalHeaderWidget> {
                     ),
                     GestureDetector(
                       onTap: (){
-                        context.push(RouteNames.termsConditionsScreen);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacyPolicyScreen(),));
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,8 +1,15 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar.dart';
 import 'package:swim_metrics/core/services/token_storage.dart';
 import '../../../../../../config/route/routes_name.dart';
@@ -112,6 +119,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
         debugPrint(await TokenStorage.getAccessToken());
         await TokenStorage.setLogin(true);
+        AppSnackBar.showSuccess(context, response['message']);
 
         if(isPayment){
           context.go(RouteNames.homeNavBarScreen);
@@ -139,6 +147,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
       } else {
         // Handle specific error messages from the API
         final error = response['error'] ?? response['message'];
+        AppSnackBar.showError(context, error );
 
 
         state = state.copyWith(isLoading: false,errorMessage: error);
@@ -149,6 +158,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
       }
     } catch (e) {
       debugPrint("Signup exception: $e");
+      AppSnackBar.showError(context, e.toString() );
 
       state = state.copyWith(isLoading: false,errorMessage: e.toString());
 
@@ -159,37 +169,225 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   }
 
-  /// Login logic
-  // Future<bool> login() async {
-  //   try {
-  //     state = state.copyWith(
-  //       isLoading: true,
-  //       errorMessage: null,
-  //       successMessage: null,
-  //     );
-  //
-  //     await Future.delayed(const Duration(seconds: 2));
-  //
-  //     if (state.email.isEmpty || state.password.isEmpty) {
-  //       throw Exception("Email and password required");
-  //     }
-  //
-  //     /// Save credentials if Remember Me is checked
-  //     await saveCredentialsIfRemembered();
-  //
-  //     state = state.copyWith(
-  //       isLoading: false,
-  //       successMessage: "Login Successful",
-  //     );
-  //     return true;
-  //   } catch (e) {
-  //     state = state.copyWith(
-  //       isLoading: false,
-  //       errorMessage: e.toString(),
-  //     );
-  //     return false;
-  //   }
-  // }
+  /// -----------------------
+  /// GOOGLE LOGIN
+  /// -----------------------
+  Future<bool> loginWithGoogle(BuildContext context) async {
+    state = state.copyWith(
+      isLoadingGoogle: true,
+      errorMessage: '',
+      successMessage: '',
+    );
+
+    try {
+      final googleSignIn = GoogleSignIn(scopes: ['email']);
+
+      // Force account chooser
+      await googleSignIn.signOut();
+
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        state = state.copyWith(
+          isLoadingGoogle: false,
+          errorMessage: 'Google sign-in cancelled',
+        );
+        return false;
+      }
+
+      final auth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: auth.idToken,
+        accessToken: auth.accessToken,
+      );
+
+      // Firebase login
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      debugPrint('Email: ${googleUser.email}');
+      debugPrint('Name: ${googleUser.displayName}');
+
+      // Backend login
+      final response = await AuthenticationRepository().signInWithGoogle(
+        email: googleUser.email,
+      );
+
+      if (response['success'] != true) {
+        // 🔴 rollback Firebase session if backend fails
+        await FirebaseAuth.instance.signOut();
+        await googleSignIn.signOut();
+
+        state = state.copyWith(
+          isLoadingGoogle: false,
+          errorMessage: response['error'] ?? 'Google login failed',
+        );
+        return false;
+      }
+
+      // ✅ success
+      state = state.copyWith(isLoadingGoogle: false);
+
+      //await _handleSuccess(response['data'], context);
+
+      state = state.copyWith(
+        successMessage: 'Google login successful',
+      );
+      if(response['data']['user']){
+        await TokenStorage.saveTokens(
+          accessToken:response['data']['tokens'],
+          refreshToken: response['data']['refreshToken'],
+        );
+        final getAccessToken = await TokenStorage.getAccessToken();
+        debugPrint("Get SaveAccess Token : $getAccessToken");
+
+        // final socketService = PresenceSocketService();
+        //
+        // socketService.connect(getAccessToken!,);
+        // Navigator.pushNamedAndRemoveUntil(
+        //   context,
+        //   RouteNames.bottomNavScreen,
+        //       (route) => false,
+        // );
+
+
+
+      }else{
+        // final tokens = response['data']['tokens'];
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OnboardingPage(token: tokens,isSocialLogin: true,),));
+      }
+
+      return true;
+    } catch (e, s) {
+      debugPrint('Google login error: $e');
+      debugPrintStack(stackTrace: s);
+
+      await FirebaseAuth.instance.signOut();
+
+      state = state.copyWith(
+        isLoadingGoogle: false,
+        errorMessage: 'Something went wrong. Please try again.',
+      );
+      return false;
+    }
+  }
+
+
+
+  /// -----------------------
+  /// APPLE LOGIN
+  /// -----------------------
+  Future<bool> loginWithApple(BuildContext context) async {
+    state = state.copyWith(
+      isLoadingApple: true,
+      errorMessage: '',
+      successMessage: '',
+    );
+
+    try {
+      final rawNonce = _generateNonce();
+      final nonce = _sha256(rawNonce);
+
+      // 🍎 Apple Sign In
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      // 🔐 Firebase OAuth
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      final userCred =
+      await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+
+      final fullName =
+          userCred.user?.displayName ;
+
+      // 🌐 Backend login (IMPORTANT: send Apple identityToken)
+      final response = await AuthenticationRepository().signInWithApple(
+        fullName: fullName.toString(),
+        identityToken: appleCredential.identityToken!,
+      );
+
+      if (response['success'] != true) {
+        // 🔴 rollback Firebase
+        await FirebaseAuth.instance.signOut();
+
+        state = state.copyWith(
+          isLoadingApple: false,
+          errorMessage: response['error'] ?? 'Apple login failed',
+        );
+        return false;
+      }
+
+      state = state.copyWith(isLoadingApple: false);
+
+      // ✅ Signup completed
+      if (response['data']['user'] == true) {
+        await TokenStorage.saveTokens(
+          accessToken: response['data']['tokens'],
+          refreshToken: response['data']['refreshToken'],
+        );
+
+        final accessToken = await TokenStorage.getAccessToken();
+        debugPrint("Saved Apple Access Token: $accessToken");
+
+        // final socketService = PresenceSocketService();
+        // socketService.connect(accessToken!);
+      } else {
+        // ➡ Incomplete profile
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (_) => OnboardingPage(
+        //       token: response['data']['tokens'],
+        //       isSocialLogin: true,
+        //     ),
+        //   ),
+        // );
+      }
+
+      state = state.copyWith(
+        successMessage: 'Apple login successful',
+      );
+
+      return true;
+    } catch (e, s) {
+      debugPrint('Apple login error: $e');
+      debugPrintStack(stackTrace: s);
+
+      await FirebaseAuth.instance.signOut();
+
+      state = state.copyWith(
+        isLoadingApple: false,
+        errorMessage: 'Apple login failed. Please try again.',
+      );
+      return false;
+    }
+  }
+
+
+
+
+  /// -----------------------
+  /// HELPERS (APPLE)
+  /// -----------------------
+  String _generateNonce([int length = 32]) {
+    const chars =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => chars[random.nextInt(chars.length)])
+        .join();
+  }
+
+  String _sha256(String input) {
+    return sha256.convert(utf8.encode(input)).toString();
+  }
 }
 
 final loginProvider =
