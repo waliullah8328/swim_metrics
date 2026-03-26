@@ -115,13 +115,14 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
 
 
-        await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
 
-        debugPrint(await TokenStorage.getAccessToken());
-        await TokenStorage.setLogin(true);
-        AppSnackBar.showSuccess(context, response['message']);
 
         if(isPayment){
+          await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
+
+          debugPrint(await TokenStorage.getAccessToken());
+          await TokenStorage.setLogin(true);
+          AppSnackBar.showSuccess(context, response['message']);
           context.go(RouteNames.homeNavBarScreen);
         }
         else{
@@ -173,52 +174,94 @@ class LoginNotifier extends StateNotifier<LoginState> {
   /// GOOGLE LOGIN
   /// -----------------------
   Future<bool> loginWithGoogle(BuildContext context) async {
-    state = state.copyWith(isLoadingGoogle: true, errorMessage: '', successMessage: '');
+    state = state.copyWith(
+      isLoadingGoogle: true,
+      errorMessage: '',
+      successMessage: '',
+    );
 
     try {
-      final googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile', 'openid'], // ✅ critical
-      );
+      final googleSignIn = GoogleSignIn(scopes: ['email']);
 
-      await googleSignIn.signOut(); // Force account chooser
+      // Force account chooser
+      await googleSignIn.signOut();
 
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        state = state.copyWith(isLoadingGoogle: false, errorMessage: 'Google sign-in cancelled');
+        state = state.copyWith(
+          isLoadingGoogle: false,
+          errorMessage: 'Google sign-in cancelled',
+        );
         return false;
       }
 
-      final auth = await googleUser.authentication;
-
-      // ✅ Verify ID token before sending
-      if (auth.idToken == null) {
-        debugPrint('❌ Google ID token is null!');
-        state = state.copyWith(isLoadingGoogle: false, errorMessage: 'Failed to get Google ID token');
-        return false;
-      }
-
-      debugPrint('✅ Google ID Token: ${auth.idToken}');
-      debugPrint('✅ Google Access Token: ${auth.accessToken}');
+      final googleAuth = await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
-        idToken: auth.idToken,
-        accessToken: auth.accessToken,
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
       );
 
-      // Firebase login
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      // 🔥 Firebase Login
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
 
-      // Send to backend
+      final firebaseUser = userCredential.user;
+
+      if (firebaseUser == null) {
+        throw Exception("Firebase user is null");
+      }
+
+      // 🔥 Firebase ID Token (SEND THIS TO BACKEND)
+      final firebaseIdToken = await firebaseUser.getIdToken();
+
+      debugPrint("Firebase ID Token: $firebaseIdToken");
+
+      // 🔥 Backend Login
       final response = await AuthenticationRepository().signInWithGoogle(
-        idToken: auth.idToken!, // non-null
+       idToken: firebaseIdToken!,
       );
 
-      debugPrint('Backend response: $response');
+      if (response['success'] != true) {
+        // rollback Firebase session if backend fails
+        await FirebaseAuth.instance.signOut();
+        await googleSignIn.signOut();
+
+        state = state.copyWith(
+          isLoadingGoogle: false,
+          errorMessage: response['error'] ?? 'Google login failed',
+        );
+        return false;
+      }
 
       state = state.copyWith(
         isLoadingGoogle: false,
-        successMessage: response['message'] ?? 'Google login successful',
+        successMessage: 'Google login successful',
       );
+
+      debugPrint("All response : ${response['data']}");
+      final tokens = response['tokens'];
+      debugPrint("Get Access Token : $tokens");
+      final refreshToken = response['refreshToken'];
+      debugPrint("Get Refresh Token : $refreshToken");
+      final isPayment = response['isPayment'];
+      debugPrint("Get Is Payment : $isPayment");
+
+
+      if(isPayment){
+        await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
+
+        debugPrint(await TokenStorage.getAccessToken());
+        await TokenStorage.setLogin(true);
+        AppSnackBar.showSuccess(context, response['message']);
+        context.go(RouteNames.homeNavBarScreen);
+      }
+      else{
+        context.push("${RouteNames.paymentScreen}/$tokens");
+      }
+
+
 
       return true;
     } catch (e, s) {
@@ -226,7 +269,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
       debugPrintStack(stackTrace: s);
 
       await FirebaseAuth.instance.signOut();
-      state = state.copyWith(isLoadingGoogle: false, errorMessage: 'Something went wrong.');
+
+      state = state.copyWith(
+       isLoadingGoogle: false,
+        errorMessage: 'Something went wrong. Please try again.',
+      );
       return false;
     }
   }
