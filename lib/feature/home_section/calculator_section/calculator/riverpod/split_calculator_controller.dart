@@ -46,32 +46,50 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
   SplitCalcNotifier() : super(const SplitCalcState());
 
   // ------------------- Setters -------------------
-  void setCourse(String v) => state = state.copyWith(course: v.toLowerCase());
-  void setGender(String v) => state = state.copyWith(gender: v.toLowerCase());
-  void setStroke(String v) => state = state.copyWith(stroke: v.toLowerCase());
-  void setDistance(String v) => state = state.copyWith(distance: v);
-  void setGoalTime(String v) => state = state.copyWith(goalTime: v);
+  void setCourse(String v) =>
+      state = state.copyWith(course: v.toLowerCase());
+
+  void setGender(String v) =>
+      state = state.copyWith(gender: v.toLowerCase());
+
+  void setStroke(String v) =>
+      state = state.copyWith(stroke: v.toLowerCase());
+
+  void setDistance(String v) =>
+      state = state.copyWith(distance: v);
+
+  void setGoalTime(String v) =>
+      state = state.copyWith(goalTime: v);
 
   // ------------------- Clear -------------------
   void clear() {
-    state = state.copyWith(goalTime: '', splits: [], output: '');
+    state = state.copyWith(
+
+      splits: [],
+      output: '',
+    );
   }
 
   // ------------------- MAIN CALC -------------------
   void project() {
     final s = state;
 
-    if ([s.course, s.gender, s.stroke, s.distance, s.goalTime]
-        .any((e) => e.isEmpty)) {
-      state = s.copyWith(output: 'Please fill all fields.');
+    // Reset previous result
+    state = s.copyWith(output: '', splits: []);
+
+    // ✅ Only validate goal time
+    if (s.goalTime.trim().isEmpty) {
+      state = s.copyWith(output: 'Please enter goal time.');
       return;
     }
 
     double totalSeconds;
+
     try {
       totalSeconds = _parseToSeconds(s.goalTime);
     } catch (_) {
-      state = s.copyWith(output: 'Invalid time format. Use mm:ss or ss.ss');
+      state =
+          s.copyWith(output: 'Invalid time format. Use mm:ss or ss.ss');
       return;
     }
 
@@ -85,23 +103,26 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
       final ratios = getLcm50FinalRatios(gender);
 
       final split15 = totalSeconds * ratios["15m"]!;
-      final split25 = totalSeconds * (ratios["25m"]! - ratios["15m"]!);
-      final split35 = totalSeconds * (ratios["35m"]! - ratios["25m"]!);
+      final split25 =
+          totalSeconds * (ratios["25m"]! - ratios["15m"]!);
+      final split35 =
+          totalSeconds * (ratios["35m"]! - ratios["25m"]!);
 
       final buffer = StringBuffer();
       buffer.writeln("===============");
       buffer.writeln(
           "${_cap(gender)} 50m ${_cap(stroke)} LCM (15/25/35 Avg Model)");
-      buffer.writeln("Goal Time: ${totalSeconds.toStringAsFixed(2)}");
+      buffer.writeln(
+          "Goal Time: ${totalSeconds.toStringAsFixed(2)}");
       buffer.writeln("===============");
 
-      // ✅ MATCH EXACT UI OUTPUT
       buffer.writeln("15m: ${split15.toStringAsFixed(2)}");
       buffer.writeln(
           "25m: ${(split15 + split25).toStringAsFixed(2)}");
       buffer.writeln(
           "35m: ${(split15 + split25 + split35).toStringAsFixed(2)}");
-      buffer.writeln("Total time: ${totalSeconds.toStringAsFixed(2)}");
+      buffer.writeln(
+          "Total time: ${totalSeconds.toStringAsFixed(2)}");
 
       buffer.writeln("===============");
 
@@ -110,14 +131,17 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
     }
 
     // ================= NORMAL RATIOS =================
-    final ratioList = getRatios(course, gender, stroke, distance);
+    final ratioList =
+    getRatios(course, gender, stroke, distance);
 
     if (ratioList == null || ratioList.isEmpty) {
-      state = s.copyWith(output: 'Ratios not defined for this event.');
+      state = s.copyWith(
+          output: 'Ratios not defined for this event.');
       return;
     }
 
-    final splitsTimes = ratioList.map((r) => r * totalSeconds).toList();
+    final splitsTimes =
+    ratioList.map((r) => r * totalSeconds).toList();
 
     double cumulative = 0;
     final splits = <SplitItem>[];
@@ -126,13 +150,15 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
     buffer.writeln("===============");
     buffer.writeln(
         "${_cap(gender)}'s $distance ${_cap(stroke)} ${course.toUpperCase()} Projection");
-    buffer.writeln("Goal Time: ${_formatSeconds(totalSeconds)}");
+    buffer.writeln(
+        "Goal Time: ${_formatSeconds(totalSeconds)}");
     buffer.writeln("===============");
 
     for (int i = 0; i < splitsTimes.length; i++) {
       cumulative += splitsTimes[i];
 
-      final dist = ((i + 1) * (distance == "50" ? 25 : 50));
+      final dist =
+      ((i + 1) * (distance == "50" ? 25 : 50));
 
       splits.add(SplitItem(
         distance: dist,
@@ -145,27 +171,45 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
     }
 
     if (stroke == "im") {
-      buffer.writeln("\n⚠️ Does not account for best/worst stroke.");
+      buffer.writeln(
+          "\n⚠️ Does not account for best/worst stroke.");
     }
 
     buffer.writeln("===============");
 
-    state = s.copyWith(output: buffer.toString(), splits: splits);
+    state = s.copyWith(
+      output: buffer.toString(),
+      splits: splits,
+    );
   }
 
   // ------------------- HELPERS -------------------
+
   double _parseToSeconds(String input) {
+    input = input.trim();
+
     if (input.contains(":")) {
       final parts = input.split(":");
-      final min = double.parse(parts[0]);
-      final sec = double.parse(parts[1]);
+
+      if (parts.length != 2) {
+        throw FormatException("Invalid format");
+      }
+
+      final min = double.tryParse(parts[0]);
+      final sec = double.tryParse(parts[1]);
+
+      if (min == null || sec == null) {
+        throw FormatException("Invalid number");
+      }
+
       return min * 60 + sec;
     } else {
-      return double.parse(input);
+      final val = double.tryParse(input);
+      if (val == null) throw FormatException("Invalid number");
+      return val;
     }
   }
 
-  // ✅ FIXED TIME FORMAT (mm:ss.ss)
   String _formatSeconds(double seconds) {
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
@@ -177,10 +221,12 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
     }
   }
 
-  String _cap(String s) => s[0].toUpperCase() + s.substring(1);
+  String _cap(String s) =>
+      s[0].toUpperCase() + s.substring(1);
 }
 
 // ------------------- PROVIDER -------------------
+
 final splitCalcProvider =
 StateNotifierProvider<SplitCalcNotifier, SplitCalcState>(
         (ref) => SplitCalcNotifier());
