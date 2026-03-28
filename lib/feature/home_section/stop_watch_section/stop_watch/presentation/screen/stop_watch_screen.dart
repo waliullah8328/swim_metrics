@@ -734,10 +734,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                   ],
                                 ),
                                 child: SingleChildScrollView(
-                                  child: CustomText(
-                                    text: _activeLog(
-                                      ref.read(stopwatchProvider2.notifier),
-                                    ),
+                                  child: Consumer(
+                                    builder: (context, ref, child) {
+                                      final controller = ref.watch(stopwatchProvider2);
+
+                                      return CustomText(
+                                        text: _activeLog(controller), // ✅ reactive now
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
@@ -754,11 +758,15 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                       ),
                                       onPressed: () {
                                         ref
-                                                .watch(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .logStopwatch =
-                                            '';
+                                            .watch(
+                                          stopwatchProvider2
+                                              .notifier,
+                                        )
+                                            .clearLog();
+                                        if(isStopWatch == true){
+                                          /// ▶️ PLAY AUDIO
+                                          ref.read(audioProvider.notifier).stop();
+                                        }
                                         ref
                                             .read(stopwatchProvider2.notifier)
                                             .pause(); // you need a method to clear log
@@ -1421,10 +1429,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ],
                                   ),
                                   child: SingleChildScrollView(
-                                    child: CustomText(
-                                      text: _activeLog(
-                                        ref.read(stopwatchProvider2.notifier),
-                                      ),
+                                    child: Consumer(
+                                      builder: (context, ref, child) {
+                                        final controller = ref.watch(stopwatchProvider2);
+
+                                        return CustomText(
+                                          text: _activeLog(controller), // ✅ reactive now
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
@@ -1440,18 +1452,23 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ),
                                         ),
                                         onPressed: () {
-                                          ref
-                                                  .watch(
-                                                    stopwatchProvider2.notifier,
-                                                  )
-                                                  .logStopwatch =
-                                              '';
+
                                           ref
                                               .read(stopwatchProvider2.notifier)
                                               .pause(); // you need a method to clear log
                                           if(isHaptic == true){
                                             HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
+                                          }
+                                          ref
+                                              .watch(
+                                            stopwatchProvider2
+                                                .notifier,
+                                          )
+                                              .clearLog();
+                                          if(isStopWatch == true){
+                                            /// ▶️ PLAY AUDIO
+                                            ref.read(audioProvider.notifier).stop();
                                           }
                                         },
                                         child: Center(
@@ -2355,10 +2372,14 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                     ],
                                   ),
                                   child: SingleChildScrollView(
-                                    child: CustomText(
-                                      text: _activeLog(
-                                        ref.read(stopwatchProvider2.notifier),
-                                      ),
+                                    child: Consumer(
+                                      builder: (context, ref, child) {
+                                        final controller = ref.watch(stopwatchProvider2);
+
+                                        return CustomText(
+                                          text: _activeLog(controller), // ✅ reactive now
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
@@ -2374,18 +2395,23 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                           ),
                                         ),
                                         onPressed: () {
-                                          ref
-                                                  .watch(
-                                                    stopwatchProvider2.notifier,
-                                                  )
-                                                  .logPredictor =
-                                              '';
+
                                           ref
                                               .read(stopwatchProvider2.notifier)
                                               .pause(); // you need a method to clear log
                                           if(isHaptic == true){
                                             HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
+                                          }
+                                          ref
+                                              .watch(
+                                            stopwatchProvider2
+                                                .notifier,
+                                          )
+                                              .clearLog();
+                                          if(isStopWatch == true){
+                                            /// ▶️ PLAY AUDIO
+                                            ref.read(audioProvider.notifier).stop();
                                           }
                                         },
                                         child: Center(

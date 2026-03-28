@@ -53,6 +53,18 @@ class StopwatchController2 extends ChangeNotifier {
   /// ----------------- Core Controls -----------------
   bool isRunning() => current.running;
 
+  void clearLog() {
+    if (activeMode == 'Stopwatch') {
+      logStopwatch = '';
+    } else if (activeMode == 'Predictor') {
+      logPredictor = '';
+    } else if (activeMode == 'Converter') {
+      logConverter = '';
+    }
+
+    notifyListeners();
+  }
+
   void start() {
     final t = current;
     if (t.running) return;
