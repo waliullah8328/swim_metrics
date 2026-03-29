@@ -1,158 +1,159 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTextTheme {
   AppTextTheme._();
 
-  static TextTheme lightTextTheme = const TextTheme(
-    displayLarge: TextStyle(
+  static TextTheme lightTextTheme = TextTheme(
+    displayLarge: GoogleFonts.merriweather(
       fontSize: 57.0,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    displayMedium: TextStyle(
+    displayMedium: GoogleFonts.merriweather(
       fontSize: 45.0,
       fontWeight: FontWeight.w600,
       color: Colors.black87,
     ),
-    displaySmall: TextStyle(
+    displaySmall: GoogleFonts.merriweather(
       fontSize: 36.0,
       fontWeight: FontWeight.w500,
       color: Colors.black87,
     ),
-    headlineLarge: TextStyle(
+    headlineLarge: GoogleFonts.merriweather(
       fontSize: 32.0,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    headlineMedium: TextStyle(
+    headlineMedium: GoogleFonts.merriweather(
       fontSize: 28.0,
       fontWeight: FontWeight.w600,
       color: Colors.black87,
     ),
-    headlineSmall: TextStyle(
+    headlineSmall: GoogleFonts.merriweather(
       fontSize: 24.0,
       fontWeight: FontWeight.w500,
       color: Colors.black87,
     ),
-    titleLarge: TextStyle(
+    titleLarge: GoogleFonts.merriweather(
       fontSize: 22.0,
       fontWeight: FontWeight.w600,
       color: Colors.black87,
     ),
-    titleMedium: TextStyle(
+    titleMedium: GoogleFonts.merriweather(
       fontSize: 16.0,
       fontWeight: FontWeight.w500,
       color: Colors.black87,
     ),
-    titleSmall: TextStyle(
+    titleSmall: GoogleFonts.merriweather(
       fontSize: 14.0,
       fontWeight: FontWeight.w500,
       color: Colors.black87,
     ),
-    bodyLarge: TextStyle(
+    bodyLarge: GoogleFonts.merriweather(
       fontSize: 16.0,
       fontWeight: FontWeight.normal,
       color: Colors.black87,
     ),
-    bodyMedium: TextStyle(
+    bodyMedium: GoogleFonts.merriweather(
       fontSize: 14.0,
       fontWeight: FontWeight.normal,
       color: Colors.black87,
     ),
-    bodySmall: TextStyle(
+    bodySmall: GoogleFonts.merriweather(
       fontSize: 12.0,
       fontWeight: FontWeight.normal,
       color: Colors.black54,
     ),
-    labelLarge: TextStyle(
+    labelLarge: GoogleFonts.merriweather(
       fontSize: 14.0,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    labelMedium: TextStyle(
+    labelMedium: GoogleFonts.merriweather(
       fontSize: 12.0,
       fontWeight: FontWeight.w500,
       color: Colors.black54,
     ),
-    labelSmall: TextStyle(
+    labelSmall: GoogleFonts.merriweather(
       fontSize: 11.0,
       fontWeight: FontWeight.w500,
       color: Colors.black45,
     ),
   );
 
-  static TextTheme darkTextTheme = const TextTheme(
-    displayLarge: TextStyle(
+  static TextTheme darkTextTheme = TextTheme(
+    displayLarge: GoogleFonts.merriweather(
       fontSize: 57.0,
       fontWeight: FontWeight.bold,
       color: Color(0xffFFFFFF),
     ),
-    displayMedium: TextStyle(
+    displayMedium: GoogleFonts.merriweather(
       fontSize: 45.0,
       fontWeight: FontWeight.w600,
       color: Color(0xffFFFFFF),
     ),
-    displaySmall: TextStyle(
+    displaySmall: GoogleFonts.merriweather(
       fontSize: 36.0,
       fontWeight: FontWeight.w500,
       color: Color(0xffFFFFFF),
     ),
-    headlineLarge: TextStyle(
+    headlineLarge: GoogleFonts.merriweather(
       fontSize: 32.0,
       fontWeight: FontWeight.bold,
       color: Color(0xffFFFFFF),
     ),
-    headlineMedium: TextStyle(
+    headlineMedium: GoogleFonts.merriweather(
       fontSize: 28.0,
       fontWeight: FontWeight.w600,
       color: Color(0xffFFFFFF),
     ),
-    headlineSmall: TextStyle(
+    headlineSmall: GoogleFonts.merriweather(
       fontSize: 24.0,
       fontWeight: FontWeight.w500,
       color: Color(0xffFFFFFF),
     ),
-    titleLarge: TextStyle(
+    titleLarge: GoogleFonts.merriweather(
       fontSize: 22.0,
       fontWeight: FontWeight.w600,
       color: Color(0xffFFFFFF),
     ),
-    titleMedium: TextStyle(
+    titleMedium: GoogleFonts.merriweather(
       fontSize: 16.0,
       fontWeight: FontWeight.w500,
       color: Color(0xffFFFFFF),
     ),
-    titleSmall: TextStyle(
+    titleSmall: GoogleFonts.merriweather(
       fontSize: 14.0,
       fontWeight: FontWeight.w500,
       color: Color(0xffFFFFFF),
     ),
-    bodyLarge: TextStyle(
+    bodyLarge: GoogleFonts.merriweather(
       fontSize: 16.0,
       fontWeight: FontWeight.normal,
       color: Color(0xffFFFFFF),
     ),
-    bodyMedium: TextStyle(
+    bodyMedium: GoogleFonts.merriweather(
       fontSize: 14.0,
       fontWeight: FontWeight.normal,
       color: Color(0xffFFFFFF),
     ),
-    bodySmall: TextStyle(
+    bodySmall: GoogleFonts.merriweather(
       fontSize: 12.0,
       fontWeight: FontWeight.normal,
       color: Color(0xffFFFFFF),
     ),
-    labelLarge: TextStyle(
+    labelLarge: GoogleFonts.merriweather(
       fontSize: 14.0,
       fontWeight: FontWeight.bold,
       color: Color(0xffFFFFFF),
     ),
-    labelMedium: TextStyle(
+    labelMedium: GoogleFonts.merriweather(
       fontSize: 12.0,
       fontWeight: FontWeight.w500,
       color: Color(0xffFFFFFF),
     ),
-    labelSmall: TextStyle(
+    labelSmall: GoogleFonts.merriweather(
       fontSize: 11.0,
       fontWeight: FontWeight.w500,
       color: Color(0xffFFFFFF),
