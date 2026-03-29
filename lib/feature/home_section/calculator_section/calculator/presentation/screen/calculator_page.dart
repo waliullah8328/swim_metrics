@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:open_file/open_file.dart';
 import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
@@ -19,17 +20,53 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../../../../../../config/route/routes_name.dart';
+import '../../../../../../core/services/token_storage.dart';
 import '../../../setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/calculator_split_state.dart';
 import '../../riverpod/split_calculator_controller.dart';
 final currencyProvider = StateProvider<String>((ref) => "SCY");
 final showCourseSectionProvider = StateProvider<bool>((ref) => true);
-class SplitCalculatorPage extends ConsumerWidget {
-  SplitCalculatorPage({super.key});
+class SplitCalculatorPage extends ConsumerStatefulWidget {
+  const SplitCalculatorPage({super.key});
 
-  final TextEditingController timeController = TextEditingController();
+  @override
+  ConsumerState<SplitCalculatorPage> createState() => _SplitCalculatorPageState();
+}
+
+class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
+  late TextEditingController timeController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  @override
+  void initState() {
+    super.initState();
+    checkPlanExpiry( context);
+
+    timeController = TextEditingController();
+  }
+
+  Future<void> checkPlanExpiry(BuildContext context) async {
+    final planEndDate = await TokenStorage.getPlanEndDate();
+
+
+    if (planEndDate == null) return;
+
+    if (DateTime.now().isAfter(planEndDate)) {
+      // ❌ Plan expired → logout
+      await TokenStorage.clearAll();
+      await TokenStorage.deleteLoginFlag();
+
+      // Navigate to login
+      context.go(RouteNames.loginScreen);
+    }
+  }
+
+  @override
+  void dispose() {
+    timeController.dispose(); // ✅ prevent memory leak
+    super.dispose();
+  }
 
   double getAdjustedFontSize(double baseSize, FontSizeOption option) {
     switch (option) {
@@ -43,7 +80,7 @@ class SplitCalculatorPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
 
     final fontOption = ref.watch(settingsProvider).fontSize;
     final isDark = Theme.of(context).brightness == Brightness.dark;

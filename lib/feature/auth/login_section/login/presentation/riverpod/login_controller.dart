@@ -112,6 +112,9 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final isPayment = response['isPayment'];
         debugPrint("Get Is Payment : $isPayment");
 
+        final planEndDate = response['plan_end_date'];
+        debugPrint("Get Is Plan End Date : ${planEndDate.toString() }");
+
 
 
 
@@ -119,6 +122,14 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
         if(isPayment){
           await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
+          await TokenStorage.setPlanEndDate(
+            DateTime.tryParse(planEndDate) ?? DateTime.now(),
+          );
+
+          final planDate = await TokenStorage.getPlanEndDate();
+
+
+          debugPrint("Get Saved Plan End Date : $planDate  ");
 
           debugPrint(await TokenStorage.getAccessToken());
           await TokenStorage.setLogin(true);
@@ -247,10 +258,23 @@ class LoginNotifier extends StateNotifier<LoginState> {
       debugPrint("Get Refresh Token : $refreshToken");
       final isPayment = response['isPayment'];
       debugPrint("Get Is Payment : $isPayment");
+      final planEndDate = response['plan_end_date'];
+      debugPrint("Get Is Plan End Date : ${planEndDate.toString() }");
+
+
 
 
       if(isPayment){
         await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
+
+        await TokenStorage.setPlanEndDate(
+          DateTime.tryParse(planEndDate) ?? DateTime.now(),
+        );
+
+        final planDate = await TokenStorage.getPlanEndDate();
+
+
+        debugPrint("Get Saved Plan End Date : $planDate  ");
 
         debugPrint(await TokenStorage.getAccessToken());
         await TokenStorage.setLogin(true);
@@ -317,8 +341,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
       // 🌐 Backend login (IMPORTANT: send Apple identityToken)
       final response = await AuthenticationRepository().signInWithApple(
-        fullName: fullName.toString(),
-        identityToken: appleCredential.identityToken!,
+        idToken:  appleCredential.identityToken!,
       );
 
       if (response['success'] != true) {
@@ -334,34 +357,39 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
       state = state.copyWith(isLoadingApple: false);
 
-      // ✅ Signup completed
-      if (response['data']['user'] == true) {
-        await TokenStorage.saveTokens(
-          accessToken: response['data']['tokens'],
-          refreshToken: response['data']['refreshToken'],
+      debugPrint("All response : ${response['data']}");
+      final tokens = response['tokens'];
+      debugPrint("Get Access Token : $tokens");
+      final refreshToken = response['refreshToken'];
+      debugPrint("Get Refresh Token : $refreshToken");
+      final isPayment = response['isPayment'];
+      debugPrint("Get Is Payment : $isPayment");
+      final planEndDate = response['plan_end_date'];
+      debugPrint("Get Is Plan End Date : ${planEndDate.toString() }");
+
+
+
+
+      if(isPayment){
+        await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
+
+        await TokenStorage.setPlanEndDate(
+          DateTime.tryParse(planEndDate) ?? DateTime.now(),
         );
 
-        final accessToken = await TokenStorage.getAccessToken();
-        debugPrint("Saved Apple Access Token: $accessToken");
+        final planDate = await TokenStorage.getPlanEndDate();
 
-        // final socketService = PresenceSocketService();
-        // socketService.connect(accessToken!);
-      } else {
-        // ➡ Incomplete profile
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (_) => OnboardingPage(
-        //       token: response['data']['tokens'],
-        //       isSocialLogin: true,
-        //     ),
-        //   ),
-        // );
+
+        debugPrint("Get Saved Plan End Date : $planDate  ");
+
+        debugPrint(await TokenStorage.getAccessToken());
+        await TokenStorage.setLogin(true);
+        AppSnackBar.showSuccess(context, response['message']);
+        context.go(RouteNames.homeNavBarScreen);
       }
-
-      state = state.copyWith(
-        successMessage: 'Apple login successful',
-      );
+      else{
+        context.push("${RouteNames.paymentScreen}/$tokens");
+      }
 
       return true;
     } catch (e, s) {

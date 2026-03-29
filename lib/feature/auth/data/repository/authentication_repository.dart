@@ -437,6 +437,11 @@ class AuthenticationRepository{
 
         final tokens = data['access'];
         debugPrint("tokens $tokens");
+
+        final planEndDate= data['user']['plan_end_date'];
+        debugPrint("Plan End Date $planEndDate");
+
+
         //final refreshToken = data['data']['refresh'];
         final refreshToken = data['refresh'];
 
@@ -458,6 +463,7 @@ class AuthenticationRepository{
           'tokens': tokens,
           'refreshToken':refreshToken,
           'isPayment':isPayment,
+          'plan_end_date':planEndDate
 
         };
       }
@@ -550,6 +556,9 @@ class AuthenticationRepository{
         final isPayment= data['payment'];
         debugPrint("IS PAYMENT: $isPayment");
 
+        final planEndDate= data['user']['plan_end_date'];
+        debugPrint("Plan End Date $planEndDate");
+
         //final user = data['data']["user"];
 
 
@@ -562,6 +571,7 @@ class AuthenticationRepository{
           'tokens': tokens,
           'refreshToken':refreshToken,
           'isPayment':isPayment,
+          'plan_end_date':planEndDate
 
         };
       }
@@ -603,17 +613,15 @@ class AuthenticationRepository{
   // Apple Sign In
 
   Future<Map<String, dynamic>> signInWithApple({
-    required String fullName,
-    required String? identityToken,
+    required String idToken,
   }) async {
     try {
       final Map<String, dynamic> payload = {
-        "identity_token": identityToken,
-        "full_name": fullName
+        "id_token": idToken
       };
 
       final endpoint =
-          dotenv.env['AUTH_APPLE_SIGN_UP_ENDPOINT'] ?? 'auth/apple-login/';
+          dotenv.env['AUTH_GOOGLE_SIGN_UP_ENDPOINT'] ?? '/auth/auth/firebase/';
 
       // Log API request
       debugPrint('🚀 API REQUEST - USER APPLE SIGN UP');
@@ -634,22 +642,35 @@ class AuthenticationRepository{
 
       // Handle success response (201 Created or 200 OK)
       if (response.statusCode == 201 || response.statusCode == 200) {
-        final accessToken = data['access'] ?? '';
-        final refreshToken = data['refresh'] ?? '';
-        final isSignUpCompleted = data['signup_status']?["is_completed"] ?? false;
 
-        debugPrint("Access Token : $accessToken");
-        debugPrint("Refresh Token : $refreshToken");
-        debugPrint("Is Sign Up Completed : $isSignUpCompleted");
+        final tokens = data['access'];
+        debugPrint("tokens $tokens");
+        //final refreshToken = data['data']['refresh'];
+        final refreshToken = data['refresh'];
+
+        debugPrint("refreshToken: $refreshToken");
+
+
+        final isPayment= data['payment'];
+        debugPrint("IS PAYMENT: $isPayment");
+
+        final planEndDate= data['user']['plan_end_date'];
+        debugPrint("Plan End Date $planEndDate");
+
+        //final user = data['data']["user"];
+
+
+        // Store user data in SharedPreferences
+
 
         return {
           'success': true,
           'message': data['message'] ?? 'Login successfully',
-          'data': {
-            'user': isSignUpCompleted,
-            'tokens': accessToken,
-            'refreshToken': refreshToken,
-          },
+          'tokens': tokens,
+          'refreshToken':refreshToken,
+          'isPayment':isPayment,
+          'plan_end_date':planEndDate
+
         };
       }
 

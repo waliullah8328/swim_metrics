@@ -58,9 +58,9 @@ dependencies:
   intl: any
   flutter_localizations:
     sdk: flutter
-  webview_flutter: ^4.2.1
-  webview_flutter_android: ^4.2.1
-  webview_flutter_wkwebview: ^3.24.0
+  #webview_flutter: ^4.2.1
+  #webview_flutter_android: ^4.2.1
+  #webview_flutter_wkwebview: ^3.24.0
 
 dev_dependencies:
   flutter_test:

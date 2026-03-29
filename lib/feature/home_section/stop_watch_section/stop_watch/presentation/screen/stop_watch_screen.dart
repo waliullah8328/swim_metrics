@@ -5,12 +5,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:open_file/open_file.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
+import '../../../../../../config/route/routes_name.dart';
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/split_calculator_selector_one.dart';
+import '../../../../../../core/services/token_storage.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
@@ -59,6 +62,30 @@ class StopwatchScreen extends ConsumerStatefulWidget {
 }
 
 class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    checkPlanExpiry(context);
+    super.initState();
+  }
+
+  Future<void> checkPlanExpiry(BuildContext context) async {
+    final planEndDate = await TokenStorage.getPlanEndDate();
+
+
+    if (planEndDate == null) return;
+
+    if (DateTime.now().isAfter(planEndDate)) {
+      // ❌ Plan expired → logout
+      await TokenStorage.clearAll();
+      await TokenStorage.deleteLoginFlag();
+
+      // Navigate to login
+      context.go(RouteNames.loginScreen);
+    }
+  }
+
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   int selectedIndex = 0;

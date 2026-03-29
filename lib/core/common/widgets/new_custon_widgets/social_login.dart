@@ -49,7 +49,29 @@ class CustomSocialLogin extends ConsumerWidget{
     },
     )
         :
-        CustomCard(title: AppLocalizations.of(context)!.continueWithApple,imagePath: IconPath.appleIcon,onTap: (){},isDark: isDark,isApple: true,),
+
+      Consumer(
+        builder: (context, ref, child) {
+          final isLoading =
+          ref.watch(loginProvider.select((s) => s.isLoadingApple));
+
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+            CustomCard(title: AppLocalizations.of(context)!.continueWithApple,imagePath: IconPath.appleIcon,onTap: isLoading
+                ? null
+                : () {
+              ref
+                  .read(loginProvider.notifier)
+                  .loginWithApple(context);
+            },isDark: isDark,isApple: true,),
+              if (isLoading)
+                const CircularProgressIndicator(),
+            ],
+          );
+        },
+      )
+
       ],
     );
   }
