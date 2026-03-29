@@ -209,10 +209,10 @@ class SettingsScreen extends ConsumerWidget {
                                 ref.watch(settingsProvider.select((s) => s.fontSize));
 
                                 return SizedBox(
-                                  width: 80.w,
+                                  width: 90.w,
                                   height:32.h,
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                    padding: EdgeInsets.symmetric(horizontal: 10.w),
                                     decoration: BoxDecoration(
                                       color: isDark?AppColors.darkThemeContainerColor: Color(0xffEAEDF1),
                                       borderRadius: BorderRadius.circular(45),
@@ -232,15 +232,15 @@ class SettingsScreen extends ConsumerWidget {
                                               items:  [
                                                 DropdownMenuItem(
                                                   value: FontSizeOption.small,
-                                                  child: CustomText(text: AppLocalizations.of(context)!.small,fontSize: 10.sp,),
+                                                  child: CustomText(text: AppLocalizations.of(context)!.small,fontSize: 9.sp,),
                                                 ),
                                                 DropdownMenuItem(
                                                   value: FontSizeOption.medium,
-                                                  child: CustomText(text: AppLocalizations.of(context)!.medium,fontSize: 10.sp,),
+                                                  child: CustomText(text: AppLocalizations.of(context)!.medium,fontSize: 9.sp,),
                                                 ),
                                                 DropdownMenuItem(
                                                   value: FontSizeOption.big,
-                                                  child: CustomText(text: AppLocalizations.of(context)!.big,fontSize: 10.sp,),
+                                                  child: CustomText(text: AppLocalizations.of(context)!.big,fontSize: 9.sp,),
                                                 ),
                                               ],
                                               onChanged: (value) {
@@ -352,10 +352,10 @@ class SettingsScreen extends ConsumerWidget {
                                 ref.watch(settingsProvider.select((s) => s.language));
 
                                 return SizedBox(
-                                  width: 80.w,
+                                  width: 90.w,
                                   height: 32.h,
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                    padding: EdgeInsets.symmetric(horizontal: 10.w),
                                     decoration: BoxDecoration(
                                       color: isDark?AppColors.darkThemeContainerColor: Color(0xffEAEDF1),
                                       borderRadius: BorderRadius.circular(45),
@@ -375,7 +375,7 @@ class SettingsScreen extends ConsumerWidget {
                                                   value: lang,
                                                   child: CustomText(
                                                     text: lang.name,
-                                                    fontSize: 10.sp,
+                                                    fontSize: 9.sp,
                                                   ),
                                                 );
                                               }).toList(),
