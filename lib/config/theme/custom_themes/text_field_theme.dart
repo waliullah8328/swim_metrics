@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/utils/constants/app_colors.dart';
-
-
-
 
 class AppTextFormFieldTheme {
   AppTextFormFieldTheme._();
@@ -25,13 +23,31 @@ class AppTextFormFieldTheme {
     return InputDecorationTheme(
       errorMaxLines: 3,
       prefixIconColor: prefixIconColor,
-       filled: true,
-       fillColor: fillColor,
       suffixIconColor: suffixIconColor,
-      labelStyle: TextStyle(fontSize: 14, color: labelColor),
-      hintStyle: TextStyle(fontSize: 14, color: hintColor),
-      errorStyle: TextStyle(fontSize: 12, color: errorColor),
-      floatingLabelStyle: TextStyle(color: labelColor.withValues(alpha: 0.8)),
+      filled: true,
+      fillColor: fillColor,
+
+      // ✅ Apply GoogleFonts here
+      labelStyle: GoogleFonts.merriweather(
+        fontSize: 14,
+        color: labelColor,
+        fontWeight: FontWeight.w500,
+      ),
+      hintStyle: GoogleFonts.merriweather(
+        fontSize: 14,
+        color: hintColor,
+        fontWeight: FontWeight.w400,
+      ),
+      errorStyle: GoogleFonts.merriweather(
+        fontSize: 12,
+        color: errorColor,
+        fontWeight: FontWeight.w400,
+      ),
+      floatingLabelStyle: GoogleFonts.merriweather(
+        color: labelColor.withValues(alpha: 0.8),
+        fontWeight: FontWeight.w500,
+      ),
+
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: borderColor),
@@ -56,26 +72,27 @@ class AppTextFormFieldTheme {
   }
 
   static final InputDecorationTheme lightInputDecorationTheme =
-      _baseInputDecorationTheme(
-        fillColor:  AppColors.textFormFieldFillColorLightMode.withValues(alpha: 0.6),
+  _baseInputDecorationTheme(
+    fillColor:
+    AppColors.textFormFieldFillColorLightMode.withValues(alpha: 0.6),
     labelColor: Colors.black,
     hintColor: AppColors.textFormFieldHintColorLightMode,
     errorColor: Colors.red,
     focusedErrorColor: Colors.orange,
     prefixIconColor: Colors.grey,
     suffixIconColor: Colors.grey,
-    borderColor: Color(0xffFAFAFA),
-    enabledBorderColor: Color(0xffFAFAFA),
-    focusedBorderColor: Color(0xffFAFAFA),
+    borderColor: const Color(0xffFAFAFA),
+    enabledBorderColor: const Color(0xffFAFAFA),
+    focusedBorderColor: const Color(0xffFAFAFA),
     errorBorderColor: Colors.red,
     focusedErrorBorderColor: Colors.orange,
   );
 
   static final InputDecorationTheme darkInputDecorationTheme =
-      _baseInputDecorationTheme(
-        fillColor: Color(0xff153250),
+  _baseInputDecorationTheme(
+    fillColor: const Color(0xff153250),
     labelColor: Colors.white,
-    hintColor: Color(0xffDADADA),
+    hintColor: const Color(0xffDADADA),
     errorColor: Colors.redAccent,
     focusedErrorColor: Colors.orangeAccent,
     prefixIconColor: Colors.grey,

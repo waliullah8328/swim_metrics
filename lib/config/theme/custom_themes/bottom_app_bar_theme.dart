@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 
 import '../../../core/utils/constants/app_colors.dart';
-
-
 
 class BottomNavBarThemeData {
   BottomNavBarThemeData._();
@@ -20,14 +19,17 @@ class BottomNavBarThemeData {
       unselectedItemColor: unselectedItemColor,
       elevation: elevation,
       type: BottomNavigationBarType.fixed,
-      selectedLabelStyle: TextStyle(
+
+      // ✅ Apply GoogleFonts here
+      selectedLabelStyle: GoogleFonts.merriweather(
         fontSize: 15.0.sp,
         fontWeight: FontWeight.w600,
       ),
-      unselectedLabelStyle: TextStyle(
+      unselectedLabelStyle: GoogleFonts.merriweather(
         fontSize: 14.0.sp,
         fontWeight: FontWeight.w400,
       ),
+
       selectedIconTheme: IconThemeData(
         size: 23.0.sp,
       ),
@@ -40,16 +42,16 @@ class BottomNavBarThemeData {
   static final BottomNavigationBarThemeData lightBottomNavBarTheme =
   _baseBottomNavBarTheme(
     backgroundColor: AppColors.textWhite,
-    selectedItemColor: Color(0xff2DA8F0),
-    unselectedItemColor: Color(0xffC7C7C7),
+    selectedItemColor: const Color(0xff2DA8F0),
+    unselectedItemColor: const Color(0xffC7C7C7),
     elevation: 8,
   );
 
   static final BottomNavigationBarThemeData darkBottomNavBarTheme =
   _baseBottomNavBarTheme(
-    backgroundColor: Color(0xff0F2A44),
-    selectedItemColor: Color(0xff2DA8F0),
-    unselectedItemColor: Color(0xffC7C7C7),
+    backgroundColor: const Color(0xff0F2A44),
+    selectedItemColor: const Color(0xff2DA8F0),
+    unselectedItemColor: const Color(0xffC7C7C7),
     elevation: 0,
   );
 }

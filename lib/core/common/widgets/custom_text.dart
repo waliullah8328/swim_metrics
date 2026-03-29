@@ -33,7 +33,7 @@ class CustomText extends StatelessWidget {
     return Text(
       text,
       textAlign: textAlign,
-      style: GoogleFonts.lora(
+      style: GoogleFonts.merriweather(
           decoration: decoration,
           decorationThickness: decorationThickness,
           decorationColor: decorationColor ?? const Color(0xff2972FF),
