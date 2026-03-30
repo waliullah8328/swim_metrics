@@ -312,93 +312,44 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                           ),
                                           SizedBox(height: 6.h),
 
-                                          // Consumer(
-                                          //   builder: (context, ref, child) {
-                                          //     final state = ref.watch(
-                                          //       stopwatchProvider2,
-                                          //     );
-                                          //
-                                          //     const strokes = [
-                                          //       "fly",
-                                          //       "back",
-                                          //       "free",
-                                          //       "breast",
-                                          //       "im",
-                                          //     ];
-                                          //     String formatStroke(String s) {
-                                          //       if (s.toLowerCase() == 'im') {
-                                          //         return 'IM';
-                                          //       }
-                                          //       return s.isNotEmpty
-                                          //           ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
-                                          //           : s;
-                                          //     }
-                                          //
-                                          //     return SplitCalculatorSelectorOne(
-                                          //       items: strokes
-                                          //           .map(formatStroke)
-                                          //           .toList(), // display formatted strokes
-                                          //       selectedValue: formatStroke(
-                                          //         state.stroke,
-                                          //       ), // display current selection formatted
-                                          //       onChanged: (v) {
-                                          //         // Convert back to lowercase for storing
-                                          //         final lowerCaseValue = v
-                                          //             .toLowerCase();
-                                          //         ref
-                                          //             .read(
-                                          //           stopwatchProvider2
-                                          //               .notifier,
-                                          //         )
-                                          //             .setPredictorParams(
-                                          //           s: lowerCaseValue,
-                                          //         );
-                                          //       },
-                                          //     );
-                                          //   },
-                                          // ),
+
                                           Consumer(builder: (context, ref, child) {
+                                            final state = ref.watch(splitCalcProvider);
+                                            final course = state.course.toLowerCase(); // SCY, SCM, LCM
+                                            final gender = state.gender.toLowerCase(); // men or women
 
-                                            final state = ref.watch(
-                                              splitCalcProvider,
-                                            );
-
-                                            const strokes = [
-                                              "fly",
-                                              "back",
-                                              "free",
-                                              "breast",
-                                              "im",
-                                            ];
-                                            String formatStroke(String s) {
-                                              if (s.toLowerCase() == 'im') {
-                                                return 'IM';
-                                              }
-                                              return s.isNotEmpty
-                                                  ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
-                                                  : s;
+                                            // Get available strokes based on course & gender
+                                            List<String> availableStrokes = [];
+                                            if (course == 'scy') {
+                                              availableStrokes = SwimSplitCalculator.ratiosScy[gender]?.keys.toList() ?? [];
+                                            } else if (course == 'scm') {
+                                              availableStrokes = SwimSplitCalculator.ratiosScm[gender]?.keys.toList() ?? [];
+                                            } else if (course == 'lcm') {
+                                              availableStrokes = SwimSplitCalculator.ratiosLcmRaw[gender]?.keys.toList() ?? [];
                                             }
+
+                                            // Format strokes for display
+                                            String formatStroke(String s) {
+                                              if (s.toLowerCase() == 'im') return 'IM';
+                                              return s.isNotEmpty ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}' : s;
+                                            }
+
+                                            // Ensure selected stroke exists in the list
+                                            String selectedStroke = availableStrokes.contains(state.stroke)
+                                                ? state.stroke
+                                                : availableStrokes.isNotEmpty
+                                                ? availableStrokes.first
+                                                : '';
+
                                             return SplitCalculatorSelector(
-                                              items: strokes
-                                                  .map(formatStroke)
-                                                  .toList(), // display formatted strokes
-                                              selectedValue: formatStroke(
-                                                state.stroke,
-                                              ),
+                                              items: availableStrokes.map(formatStroke).toList(),
+                                              selectedValue: formatStroke(selectedStroke),
                                               onChanged: (value) {
-
-                                                final lowerCaseValue = value
-                                                    .toLowerCase();
-                                                ref
-                                                    .read(
-                                                  splitCalcProvider
-                                                      .notifier,
-                                                )
-                                                    .setStroke(lowerCaseValue);
-
+                                                final lowerCaseValue = value.toLowerCase();
+                                                ref.read(splitCalcProvider.notifier).setStroke(lowerCaseValue);
                                               },
                                             );
-                                          },)
+                                          }),
 
                                         ],
                                       ),
