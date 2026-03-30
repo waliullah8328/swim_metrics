@@ -22,6 +22,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../../../../../../config/route/routes_name.dart';
 import '../../../../../../core/services/token_storage.dart';
+import '../../../../../../core/utils/utils/get_ratios.dart';
 import '../../../setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/calculator_split_state.dart';
 import '../../riverpod/split_calculator_controller.dart';
@@ -420,6 +421,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               final distances = getDistances(
                                                 state.course,
                                                 state.stroke,
+                                                state.gender
                                               );
 
                                               /// ✅ Ensure selected distance is valid
@@ -772,24 +774,26 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
     }
   }
 
-  List<int> getDistances(String course, String stroke) {
+  static List<int> getDistances(String course, String stroke, String gender) {
     course = course.toLowerCase();
     stroke = stroke.toLowerCase();
+    gender = gender.toLowerCase();
 
-    if (stroke == "free") {
-      if (course == "scy") {
-        return [50, 100, 200, 500, 1000, 1650];
-      } else {
-        return [50, 100, 200, 400, 800, 1500];
-      }
-    } else if (["fly", "back", "breast"].contains(stroke)) {
-      return [50, 100, 200];
-    } else if (stroke == "im") {
-      if (course == "lcm") {
-        return [200, 400];
-      } else {
-        return [100, 200, 400];
-      }
+    Map<String, dynamic>? data;
+
+    if (course == "scy") {
+      data = SwimSplitCalculator .ratiosScy[gender]?[stroke];
+    } else if (course == "scm") {
+      data = SwimSplitCalculator .ratiosScm[gender]?[stroke];
+    } else if (course == "lcm") {
+      data = SwimSplitCalculator .ratiosLcmRaw[gender]?[stroke];
+    }
+
+    if (data != null) {
+      // Convert distance keys from String to int and sort ascending
+      final distances = data.keys.map((k) => int.tryParse(k) ?? 0).toList();
+      distances.sort();
+      return distances;
     }
 
     return [];

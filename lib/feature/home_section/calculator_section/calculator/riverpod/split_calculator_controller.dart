@@ -99,8 +99,8 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
     final distance = s.distance;
 
     // ================= LCM 50 SPECIAL =================
-    if (course == 'lcm' && distance == '50' && stroke != 'im') {
-      final ratios = getLcm50FinalRatios(gender);
+    if ( distance == '50' ) {
+      final ratios = SwimSplitCalculator .getLcm50FinalRatios(gender);
 
       final split15 = totalSeconds * ratios["15m"]!;
       final split25 =
@@ -111,7 +111,7 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
       final buffer = StringBuffer();
       buffer.writeln("===============");
       buffer.writeln(
-          "${_cap(gender)} 50m ${_cap(stroke)} LCM (15/25/35 Avg Model)");
+          "${_cap(gender)} 50m ${_cap(stroke)}  (15/25/35 Avg Model)");
       buffer.writeln(
           "Goal Time: ${totalSeconds.toStringAsFixed(2)}");
       buffer.writeln("===============");
@@ -132,7 +132,7 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
 
     // ================= NORMAL RATIOS =================
     final ratioList =
-    getRatios(course, gender, stroke, distance);
+        SwimSplitCalculator .getRatios(course, gender, stroke, distance);
 
     if (ratioList == null || ratioList.isEmpty) {
       state = s.copyWith(
