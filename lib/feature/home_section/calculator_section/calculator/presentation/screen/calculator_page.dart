@@ -22,10 +22,12 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../../../../../../config/route/routes_name.dart';
 import '../../../../../../core/services/token_storage.dart';
-import '../../../../../../core/utils/utils/get_ratios.dart';
+
 import '../../../setting_section/settings/riverpod/setting_controller.dart';
+import '../../riverpod/calculations.dart';
 import '../../riverpod/calculator_split_state.dart';
-import '../../riverpod/split_calculator_controller.dart';
+import '../../riverpod/split_calculator.dart';
+
 final currencyProvider = StateProvider<String>((ref) => "SCY");
 final showCourseSectionProvider = StateProvider<bool>((ref) => true);
 class SplitCalculatorPage extends ConsumerStatefulWidget {
@@ -313,43 +315,52 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                           SizedBox(height: 6.h),
 
 
-                                          Consumer(builder: (context, ref, child) {
-                                            final state = ref.watch(splitCalcProvider);
-                                            final course = state.course.toLowerCase(); // SCY, SCM, LCM
-                                            final gender = state.gender.toLowerCase(); // men or women
+                                          Consumer(
+                                            builder: (context, ref, child) {
+                                              final state = ref.watch(splitCalcProvider);
+                                              final course = state.course.toLowerCase();
+                                              final gender = state.gender.toLowerCase();
 
-                                            // Get available strokes based on course & gender
-                                            List<String> availableStrokes = [];
-                                            if (course == 'scy') {
-                                              availableStrokes = SwimSplitCalculator.ratiosScy[gender]?.keys.toList() ?? [];
-                                            } else if (course == 'scm') {
-                                              availableStrokes = SwimSplitCalculator.ratiosScm[gender]?.keys.toList() ?? [];
-                                            } else if (course == 'lcm') {
-                                              availableStrokes = SwimSplitCalculator.ratiosLcmRaw[gender]?.keys.toList() ?? [];
-                                            }
+                                              // ✅ FIX: Proper cast
+                                              final Map<String, dynamic>? strokesMap = (course == 'scy'
+                                                  ? SwimSplitCalculator1.ratiosScy[gender]
+                                                  : course == 'scm'
+                                                  ? SwimSplitCalculator1.ratiosScm[gender]
+                                                  : SwimSplitCalculator1.ratiosLcm[gender])
+                                              as Map<String, dynamic>?;
 
-                                            // Format strokes for display
-                                            String formatStroke(String s) {
-                                              if (s.toLowerCase() == 'im') return 'IM';
-                                              return s.isNotEmpty ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}' : s;
-                                            }
+                                              // ✅ FIX: Safe conversion
+                                              List<String> availableStrokes =
+                                              (strokesMap?.keys.toList() ?? [])
+                                                  .map((e) => e.toString().toLowerCase())
+                                                  .toList();
 
-                                            // Ensure selected stroke exists in the list
-                                            String selectedStroke = availableStrokes.contains(state.stroke)
-                                                ? state.stroke
-                                                : availableStrokes.isNotEmpty
-                                                ? availableStrokes.first
-                                                : '';
+                                              const strokeOrder = ['fly', 'back', 'breast', 'free', 'im'];
 
-                                            return SplitCalculatorSelector(
-                                              items: availableStrokes.map(formatStroke).toList(),
-                                              selectedValue: formatStroke(selectedStroke),
-                                              onChanged: (value) {
-                                                final lowerCaseValue = value.toLowerCase();
-                                                ref.read(splitCalcProvider.notifier).setStroke(lowerCaseValue);
-                                              },
-                                            );
-                                          }),
+                                              availableStrokes.sort((a, b) {
+                                                final indexA = strokeOrder.indexOf(a);
+                                                final indexB = strokeOrder.indexOf(b);
+                                                return (indexA == -1 ? 99 : indexA)
+                                                    .compareTo(indexB == -1 ? 99 : indexB);
+                                              });
+
+                                              String formatStroke(String s) =>
+                                                  s == 'im' ? 'IM' : '${s[0].toUpperCase()}${s.substring(1)}';
+
+                                              final selectedStroke =
+                                              availableStrokes.contains(state.stroke.toLowerCase())
+                                                  ? state.stroke.toLowerCase()
+                                                  : (availableStrokes.isNotEmpty ? availableStrokes.first : '');
+
+                                              return SplitCalculatorSelector(
+                                                items: availableStrokes.map(formatStroke).toList(),
+                                                selectedValue: formatStroke(selectedStroke),
+                                                onChanged: (value) {
+                                                  ref.read(splitCalcProvider.notifier).setStroke(value.toLowerCase());
+                                                },
+                                              );
+                                            },
+                                          ),
 
                                         ],
                                       ),
@@ -372,23 +383,37 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               final distances = getDistances(
                                                 state.course,
                                                 state.stroke,
-                                                state.gender
+                                                state.gender,
                                               );
 
-                                              /// ✅ Ensure selected distance is valid
                                               final currentDistance = int.tryParse(state.distance);
 
-                                              if (currentDistance == null || !distances.contains(currentDistance)) {
-                                                WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                  ref
-                                                      .read(splitCalcProvider.notifier)
-                                                      .setDistance(distances.first.toString()); // ✅ force update
+                                              // ✅ Validate distance safely
+                                              final isValid = currentDistance != null &&
+                                                  distances.contains(currentDistance);
+
+                                              // ✅ FIX: update only once when invalid
+                                              if (!isValid && distances.isNotEmpty) {
+                                                Future.microtask(() {
+                                                  final newDistance = distances.first.toString();
+
+                                                  // prevent unnecessary updates
+                                                  if (ref.read(splitCalcProvider).distance != newDistance) {
+                                                    ref
+                                                        .read(splitCalcProvider.notifier)
+                                                        .setDistance(newDistance);
+                                                  }
                                                 });
                                               }
 
                                               return DistanceWheelSelector(
                                                 items: distances,
-                                                selectedValue: currentDistance ?? distances.first, // ✅ show selected
+
+                                                // ✅ Always show valid value
+                                                selectedValue: isValid
+                                                    ? currentDistance
+                                                    : (distances.isNotEmpty ? distances.first : 0),
+
                                                 onChanged: (value) {
                                                   ref
                                                       .read(splitCalcProvider.notifier)
@@ -422,24 +447,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                             ref.read(splitCalcProvider.notifier).setGoalTime(value);
                           },
                           controller: timeController,
-                          // suffixIcon: GestureDetector(
-                          //   onTap: (){
-                          //
-                          //
-                          //   },
-                          //   child: SizedBox(
-                          //       height: 24.h,
-                          //       width: 24.w,
-                          //       child: Padding(
-                          //         padding: const EdgeInsets.all(8.0),
-                          //         child: SvgPicture.asset(
-                          //           IconPath.voiceIcon,
-                          //           fit: BoxFit.contain,
-                          //
-                          //         ),
-                          //       ),
-                          //                           ),
-                          // )
+
                         ),
 
                         SizedBox(height: 16.h),
@@ -459,8 +467,10 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                             }
 
-                            ref.read(splitCalcProvider.notifier).project();
+                            ref.read(splitCalcProvider.notifier).calculate();
                             ref.read(showCourseSectionProvider.notifier).state = false;
+
+                            debugPrint(ref.watch(splitCalcProvider).output);
                           },
                           child: Center(child:  Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -726,28 +736,29 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
   }
 
   static List<int> getDistances(String course, String stroke, String gender) {
-    course = course.toLowerCase();
-    stroke = stroke.toLowerCase();
-    gender = gender.toLowerCase();
+    course = course.toLowerCase().trim();
+    stroke = stroke.toLowerCase().trim();
+    gender = gender.toLowerCase().trim();
 
     Map<String, dynamic>? data;
 
     if (course == "scy") {
-      data = SwimSplitCalculator .ratiosScy[gender]?[stroke];
+      data = SwimSplitCalculator1.ratiosScy[gender]?[stroke];
     } else if (course == "scm") {
-      data = SwimSplitCalculator .ratiosScm[gender]?[stroke];
+      data = SwimSplitCalculator1.ratiosScm[gender]?[stroke];
     } else if (course == "lcm") {
-      data = SwimSplitCalculator .ratiosLcmRaw[gender]?[stroke];
+      data = SwimSplitCalculator1.ratiosLcm[gender]?[stroke];
     }
 
-    if (data != null) {
-      // Convert distance keys from String to int and sort ascending
-      final distances = data.keys.map((k) => int.tryParse(k) ?? 0).toList();
-      distances.sort();
-      return distances;
-    }
+    if (data == null || data.isEmpty) return []; // ✅ fix
 
-    return [];
+    final distances = data.keys
+        .map((k) => int.tryParse(k) ?? 0)
+        .where((e) => e > 0)
+        .toList();
+
+    distances.sort();
+    return distances;
   }
 }
 

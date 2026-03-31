@@ -1,252 +1,116 @@
-
-
-class SwimSplitCalculator {
-  // ---------------- NORMALIZE ----------------
-  static List<double> normalize(List<double> r) {
-    final sum = r.reduce((a, b) => a + b);
-    return r.map((e) => e / sum).toList();
-  }
-
-  // ---------------- SCY RATIOS ----------------
-  static final Map<String, dynamic> ratiosScy = {
-    "men": {
-      "free": {
-        "50": normalize([0.4828, 0.5172]),
-        "100": normalize([0.2233, 0.2508, 0.2618, 0.2641]),
-        "200": normalize([0.2297, 0.2527, 0.2569, 0.2607]),
-        "500": normalize([0.0912, 0.1000, 0.1015, 0.1019, 0.1021, 0.1021, 0.1016, 0.1013, 0.1004, 0.0979]),
-        "1000": normalize([
-          0.0455, 0.0490, 0.0496, 0.0498, 0.0500, 0.0501, 0.0501, 0.0503, 0.0503, 0.0505,
-          0.0502, 0.0502, 0.0507, 0.0508, 0.0509, 0.0505, 0.0507, 0.0508, 0.0508, 0.0493
-        ]),
-        "1650": normalize([
-          0.0279, 0.0303, 0.0307, 0.0307, 0.0308, 0.0307, 0.0307, 0.0308, 0.0307, 0.0307,
-          0.0306, 0.0304, 0.0305, 0.0302, 0.0303, 0.0303, 0.0301, 0.0304, 0.0303, 0.0304,
-          0.0302, 0.0302, 0.0302, 0.0301, 0.0303, 0.0302, 0.0304, 0.0304, 0.0302, 0.0303,
-          0.0301, 0.0301, 0.0293
-        ]),
-      },
-      "back": {
-        "100": normalize([0.4832, 0.5168]),
-        "200": normalize([0.2353, 0.2522, 0.2556, 0.2569]),
-      },
-      "breast": {
-        "100": normalize([0.466, 0.534]),
-        "200": normalize([0.2282, 0.2547, 0.2572, 0.2599]),
-      },
-      "fly": {
-        "100": normalize([0.4678, 0.5322]),
-        "200": normalize([0.221, 0.2534, 0.2589, 0.2667]),
-      },
-      "im": {
-        "200": normalize([0.214, 0.2523, 0.2896, 0.2441]),
-        "400": normalize([0.1041, 0.1199, 0.1298, 0.127, 0.1421, 0.1438, 0.1193, 0.114]),
-      },
-    },
-    "women": {
-      "free": {
-        "50": normalize([0.4845, 0.5155]),
-        "100": normalize([0.2264, 0.2521, 0.2596, 0.2619]),
-        "200": normalize([0.2346, 0.2542, 0.2552, 0.2560]),
-      },
-      "back": {
-        "100": normalize([0.486, 0.514]),
-        "200": normalize([0.235, 0.251, 0.256, 0.258]),
-      },
-      "breast": {
-        "100": normalize([0.465, 0.535]),
-        "200": normalize([0.232, 0.251, 0.257, 0.26]),
-      },
-      "fly": {
-        "100": normalize([0.468, 0.532]),
-        "200": normalize([0.225, 0.254, 0.258, 0.263]),
-      },
-      "im": {
-        "200": normalize([0.214, 0.254, 0.291, 0.241]),
-        "400": normalize([0.1049, 0.1204, 0.1285, 0.1268, 0.1424, 0.1467, 0.1188, 0.1114]),
-      },
-    },
-  };
-
-  // ---------------- SCM RATIOS ----------------
-  static final Map<String, dynamic> ratiosScm = {
-    "women": {
-      "free": {
-        "50": normalize([0.4843, 0.5157]),
-        "100": normalize([0.2283, 0.2526, 0.259, 0.2601]),
-        "200": normalize([0.2332, 0.2507, 0.2569, 0.2592]),
-        "400": normalize([0.1157, 0.1244, 0.1257, 0.1265, 0.1265, 0.1271, 0.128, 0.126]),
-        "800": normalize([0.057, 0.0615, 0.0624, 0.0629, 0.0633, 0.0635, 0.0634, 0.0635, 0.0633, 0.0632, 0.0633, 0.0632, 0.0629, 0.0631, 0.0625, 0.0611]),
-        "1500": normalize([0.0318, 0.0331, 0.0333, 0.0332, 0.0333, 0.0334, 0.0333, 0.0334, 0.0333, 0.0332, 0.0334, 0.0335, 0.0334, 0.0335, 0.0334, 0.0336, 0.0335, 0.0334, 0.0335, 0.0334, 0.0336, 0.0335, 0.0334, 0.0336, 0.0335, 0.0336, 0.0335, 0.0336, 0.0335, 0.0328])
-      },
-      "fly": {
-        "50": normalize([0.4668, 0.5332]),
-        "100": normalize([0.212, 0.2525, 0.2634, 0.2721]),
-        "200": normalize([0.2257, 0.2519, 0.26, 0.2624])
-      },
-      "back": {
-        "50": normalize([0.4913, 0.5087]),
-        "100": normalize([0.2338, 0.2473, 0.2588, 0.2601]),
-        "200": normalize([0.2354, 0.2524, 0.2561, 0.2563])
-      },
-      "breast": {
-        "50": normalize([0.4571, 0.5429]),
-        "100": normalize([0.2127, 0.2573, 0.2627, 0.2673]),
-        "200": normalize([0.2286, 0.2534, 0.2575, 0.2606])
-      },
-      "im": {
-        "100": normalize([0.2065, 0.2473, 0.2991, 0.2471]),
-        "200": normalize([0.2179, 0.2523, 0.2883, 0.2415]),
-        "400": normalize([0.1072, 0.122, 0.1287, 0.1268, 0.141, 0.144, 0.1171, 0.1132])
-      }
-    },
-    "men": {
-      "free": {
-        "50": normalize([0.4791, 0.5209]),
-        "100": normalize([0.2262, 0.2513, 0.2605, 0.262]),
-        "200": normalize([0.2337, 0.2519, 0.2565, 0.2579]),
-        "400": normalize([0.1153, 0.1262, 0.1274, 0.1282, 0.1263, 0.1264, 0.1261, 0.1241]),
-        "800": normalize([0.0567, 0.0612, 0.0622, 0.0628, 0.0628, 0.0631, 0.0632, 0.0635, 0.0634, 0.0635, 0.0634, 0.0636, 0.0635, 0.0633, 0.0632, 0.061]),
-        "1500": normalize([0.0304, 0.0328, 0.0331, 0.0335, 0.0336, 0.0335, 0.0336, 0.0334, 0.0335, 0.0336, 0.0335, 0.0334, 0.0335, 0.0334, 0.0335, 0.0334, 0.0336, 0.0335, 0.0336, 0.0337, 0.0336, 0.0337, 0.0336, 0.0337, 0.0336, 0.0335, 0.0336, 0.0335, 0.0331, 0.0315])
-      },
-      "fly": {
-        "50": normalize([0.4553, 0.5447]),
-        "100": normalize([0.2134, 0.2509, 0.2617, 0.274]),
-        "200": normalize([0.2283, 0.2536, 0.2577, 0.2605])
-      },
-      "back": {
-        "50": normalize([0.4906, 0.5094]),
-        "100": normalize([0.233, 0.2483, 0.2579, 0.2608]),
-        "200": normalize([0.2351, 0.2543, 0.2541, 0.2565])
-      },
-      "breast": {
-        "50": normalize([0.4506, 0.5494]),
-        "100": normalize([0.2096, 0.2558, 0.2633, 0.2713]),
-        "200": normalize([0.225, 0.2519, 0.2606, 0.2625])
-      },
-      "im": {
-        "100": normalize([0.2025, 0.2491, 0.2986, 0.2498]),
-        "200": normalize([0.2158, 0.2492, 0.2875, 0.2475]),
-        "400": normalize([0.1067, 0.1219, 0.1284, 0.1264, 0.1407, 0.1437, 0.1186, 0.1136])
-      }
-    }
-  };
-
-  // ---------------- LCM RATIOS RAW ----------------
-  static final Map<String, dynamic> ratiosLcmRaw = {
-    "men": {
-      "free": {
-        "100": [0.48, 0.52],
-        "200": [0.2330, 0.2532, 0.2567, 0.2571],
-        "400": [0.1156, 0.1249, 0.1267, 0.1276, 0.1275, 0.1276, 0.1268, 0.1233],
-        "800": [0.0577, 0.0617, 0.0622, 0.0625, 0.0626, 0.0627, 0.0628, 0.0629, 0.063, 0.0631, 0.0632, 0.0634, 0.0635, 0.0636, 0.0633, 0.0618],
-        "1500": [0.0308, 0.0329, 0.0336, 0.0332, 0.0334, 0.0333, 0.0338, 0.0336, 0.0337, 0.0336, 0.0339, 0.0336, 0.0338, 0.0336, 0.0338, 0.0337, 0.0336, 0.0334, 0.0335, 0.0334, 0.0336, 0.0335, 0.0334, 0.0335, 0.0334, 0.0335, 0.0336, 0.0337, 0.0333, 0.0302]
-      },
-      "fly": {
-        "100": [0.4678, 0.5322],
-        "200": [0.221, 0.2534, 0.2589, 0.2667]
-      },
-      "back": {
-        "100": [0.4832, 0.5168],
-        "200": [0.2353, 0.2522, 0.2556, 0.2569]
-      },
-      "breast": {
-        "100": [0.466, 0.534],
-        "200": [0.2282, 0.2547, 0.2572, 0.2599]
-      },
-      "im": {
-        "200": [0.214, 0.2523, 0.2896, 0.2441],
-        "400": [0.1041, 0.1199, 0.1298, 0.127, 0.1421, 0.1438, 0.1193, 0.114]
-      }
-    },
-    "women": {
-      "free": {
-        "100": [0.481, 0.519],
-        "200": [0.235, 0.252, 0.256, 0.257],
-        "400": [0.1151, 0.1245, 0.1262, 0.1268, 0.1267, 0.1273, 0.1278, 0.1256],
-        "800": [0.0563, 0.0607, 0.062, 0.0628, 0.0631, 0.0635, 0.0636, 0.0634, 0.0636, 0.0637, 0.0635, 0.0632, 0.063, 0.063, 0.0628, 0.0618],
-        "1500": [0.0301, 0.0323, 0.0329, 0.033, 0.0331, 0.0333, 0.0334, 0.0334, 0.0333, 0.0335, 0.0334, 0.0335, 0.0336, 0.0337, 0.0338, 0.0336, 0.0337, 0.0335, 0.0336, 0.0337, 0.0335, 0.0338, 0.0336, 0.0341, 0.0335, 0.0339, 0.0336, 0.0339, 0.0335, 0.0322]
-      },
-      "fly": {
-        "100": [0.468, 0.532],
-        "200": [0.225, 0.254, 0.258, 0.263]
-      },
-      "back": {
-        "100": [0.486, 0.514],
-        "200": [0.235, 0.251, 0.256, 0.258]
-      },
-      "breast": {
-        "100": [0.465, 0.535],
-        "200": [0.232, 0.251, 0.257, 0.26]
-      },
-      "im": {
-        "200": [0.214, 0.254, 0.291, 0.241],
-        "400": [0.1049, 0.1204, 0.1285, 0.1268, 0.1424, 0.1467, 0.1188, 0.1114]
-      }
-    }
-  };
-
-  // ---------------- NORMALIZE ALL LCM ----------------
-  static Map<String, dynamic> normalizeAll(Map<String, dynamic> data) {
-    Map<String, dynamic> result = {};
-
-    data.forEach((gender, strokes) {
-      result[gender] = {};
-      strokes.forEach((stroke, distances) {
-        result[gender]![stroke] = {};
-        distances.forEach((distance, values) {
-          result[gender]![stroke]![distance] = normalize(List<double>.from(values));
-        });
-      });
-    });
-
-    return result;
-  }
-
-  static final Map<String, dynamic> ratiosLcm = normalizeAll(ratiosLcmRaw);
-
-  // ---------------- GET RATIOS ----------------
-  static List<double>? getRatios(String course, String gender, String stroke, String distance) {
-    final source = course.toLowerCase() == "scy"
-        ? ratiosScy
-        : course.toLowerCase() == "scm"
-        ? ratiosScm
-        : ratiosLcm;
-
-    return source[gender]?[stroke]?[distance];
-  }
-
-  // ---------------- LCM 50 FINAL RATIOS ----------------
-  static Map<String, double> getLcm50FinalRatios(String gender) {
-    if (gender.toLowerCase() == "men") {
-      return {"15m": 0.249, "25m": 0.456, "35m": 0.668};
-    } else {
-      return {"15m": 0.255, "25m": 0.465, "35m": 0.675};
-    }
-  }
-
-  // ---------------- GET DISTANCES ----------------
-  static List<int> getDistances(String course, String stroke, String gender) {
-    course = course.toLowerCase();
-    stroke = stroke.toLowerCase();
-    gender = gender.toLowerCase();
-
-    Map<String, dynamic>? data;
-
-    if (course == "scy") {
-      data = SwimSplitCalculator.ratiosScy[gender]?[stroke];
-    } else if (course == "scm") {
-      data = SwimSplitCalculator.ratiosScm[gender]?[stroke];
-    } else if (course == "lcm") {
-      data = SwimSplitCalculator.ratiosLcmRaw[gender]?[stroke];
-    }
-
-    if (data != null) {
-      final distances = data.keys.map((k) => int.tryParse(k) ?? 0).toList();
-      distances.sort();
-      return distances;
-    }
-
-    return [];
-  }
-}
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+//
+// // ------------------- SPLIT ITEM -------------------
+// class SplitItem {
+//   final int distance;
+//   final double splitTime;
+//   final double total;
+//
+//   SplitItem({
+//     required this.distance,
+//     required this.splitTime,
+//     required this.total,
+//   });
+// }
+//
+// // ------------------- SWIM SPLIT CALCULATOR -------------------
+// class SwimSplitCalculator {
+//   // ---------------- NORMALIZE ----------------
+//   static List<double> normalize(List<double> r) {
+//     final sum = r.reduce((a, b) => a + b);
+//     return r.map((e) => e / sum).toList();
+//   }
+//
+//   // ---------------- SCY RATIOS ----------------
+//   static final Map<String, dynamic> ratiosScy = {
+//     "men": {
+//       "free": {
+//         "50": normalize([0.4828, 0.5172]),
+//         "100": normalize([0.2233, 0.2508, 0.2618, 0.2641]),
+//         "200": normalize([0.2297, 0.2527, 0.2569, 0.2607]),
+//         "500": normalize([0.0912, 0.1, 0.1015, 0.1019, 0.1021, 0.1021, 0.1016, 0.1013, 0.1004, 0.0979]),
+//       },
+//     },
+//     "women": {
+//       "free": {
+//         "50": normalize([0.4845, 0.5155]),
+//         "100": normalize([0.2264, 0.2521, 0.2596, 0.2619]),
+//         "200": normalize([0.2346, 0.2542, 0.2552, 0.256]),
+//         "500": normalize([0.0927, 0.0999, 0.1009, 0.1015, 0.1015, 0.1014, 0.1014, 0.101, 0.1008, 0.0989]),
+//       },
+//     },
+//   };
+//
+//   // ---------------- SCM & LCM RATIOS (placeholder) ----------------
+//   static final Map<String, dynamic> ratiosScm = ratiosScy;
+//   static final Map<String, dynamic> ratiosLcmRaw = ratiosScy;
+//
+//   // ---------------- NORMALIZE LCM ----------------
+//   static Map<String, dynamic> normalizeAll(Map<String, dynamic> data) {
+//     final result = <String, dynamic>{};
+//     data.forEach((gender, strokes) {
+//       result[gender] = {};
+//       strokes.forEach((stroke, distances) {
+//         result[gender]![stroke] = {};
+//         distances.forEach((distance, values) {
+//           result[gender]![stroke]![distance] = normalize(List<double>.from(values));
+//         });
+//       });
+//     });
+//     return result;
+//   }
+//
+//   static final Map<String, dynamic> ratiosLcm = normalizeAll(ratiosLcmRaw);
+//
+//   // ---------------- 50M FINAL RATIOS ----------------
+//   static Map<String, double> getScy50FinalRatios(String gender) =>
+//       gender.toLowerCase() == "men"
+//           ? {"15m": 0.248, "25m": 0.454, "35m": 0.666}
+//           : {"15m": 0.254, "25m": 0.463, "35m": 0.674};
+//
+//   static Map<String, double> getScm50FinalRatios(String gender) =>
+//       gender.toLowerCase() == "men"
+//           ? {"15m": 0.247, "25m": 0.455, "35m": 0.667}
+//           : {"15m": 0.254, "25m": 0.464, "35m": 0.674};
+//
+//   static Map<String, double> getLcm50FinalRatios(String gender) =>
+//       gender.toLowerCase() == "men"
+//           ? {"25m": 0.46, "50m": 1.0} // LCM only 25/50
+//           : {"25m": 0.465, "50m": 1.0};
+//
+//   // ---------------- GET RATIOS ----------------
+//   static List<double>? getRatios(String course, String gender, String stroke, String distance) {
+//     final lowerCourse = course.toLowerCase();
+//     final source = lowerCourse == "scy"
+//         ? ratiosScy
+//         : lowerCourse == "scm"
+//         ? ratiosScm
+//         : ratiosLcm;
+//     return source?[gender]?[stroke]?[distance];
+//   }
+//
+//   // ---------------- GET DISTANCES ----------------
+//   static List<int> getDistances(String course, String stroke, String gender) {
+//     final lowerCourse = course.toLowerCase();
+//     final lowerStroke = stroke.toLowerCase();
+//     final lowerGender = gender.toLowerCase();
+//
+//     Map<String, dynamic>? data;
+//
+//     if (lowerCourse == "scy") {
+//       data = ratiosScy[lowerGender]?[lowerStroke];
+//     } else if (lowerCourse == "scm") {
+//       data = ratiosScm[lowerGender]?[lowerStroke];
+//     } else {
+//       data = ratiosLcmRaw[lowerGender]?[lowerStroke];
+//     }
+//
+//     if (data != null) {
+//       final distances = data.keys.map((k) => int.tryParse(k) ?? 0).toList();
+//       distances.sort();
+//       return distances;
+//     }
+//
+//     return [];
+//   }
+// }
