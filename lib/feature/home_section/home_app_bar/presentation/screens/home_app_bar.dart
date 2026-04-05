@@ -59,7 +59,7 @@ class HomeNavBarScreen extends ConsumerWidget {
                 imagePath: IconPath.calculatorActiveIcon,
               )
                   : SvgPicture.asset(IconPath.calculatorInActiveIcon),
-              label: AppLocalizations.of(context)!.calculator,
+              label: AppLocalizations.of(context)!.splitCalculator,
             ),
             BottomNavigationBarItem(
               icon: currentIndex == 1

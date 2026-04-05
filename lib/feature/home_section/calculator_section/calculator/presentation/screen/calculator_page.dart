@@ -189,9 +189,12 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                   Consumer(
                                     builder: (context, ref, child) {
-
                                       final state = ref.watch(splitCalcProvider);
-                                      final selected = state.course.toUpperCase(); // get updated value
+
+                                      /// ✅ SAFE VALUE
+                                      final course = state.course.trim().toUpperCase();
+                                      const validCourses = ["SCY", "SCM", "LCM"];
+                                      final selected = validCourses.contains(course) ? course : "SCY";
 
                                       return Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -208,226 +211,243 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               Icons.keyboard_arrow_down,
                                               color: Color(0xFFB8892D),
                                             ),
-                                            dropdownColor: isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
+                                            dropdownColor:
+                                            isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
                                             style: TextStyle(
                                               color: const Color(0xFFB8892D),
                                               fontSize: getAdjustedFontSize(12, fontOption).sp,
                                               fontWeight: FontWeight.w500,
                                             ),
-                                            items: [
-                                              DropdownMenuItem(
-                                                value: "SCY",
-                                                child: CustomText(
-                                                  text: AppLocalizations.of(context)!.scy,
-                                                  fontSize: getAdjustedFontSize(12, fontOption).sp,
-                                                ),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: "SCM",
-                                                child: CustomText(
-                                                  text: AppLocalizations.of(context)!.scm,
-                                                  fontSize: getAdjustedFontSize(12, fontOption).sp,
-                                                ),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: "LCM",
-                                                child: CustomText(
-                                                  text: AppLocalizations.of(context)!.lcm,
-                                                  fontSize: getAdjustedFontSize(12, fontOption).sp,
-                                                ),
-                                              ),
+
+                                            /// ✅ ITEMS (UNCHANGED)
+                                            items: const [
+                                              DropdownMenuItem(value: "SCY", child: Text("SCY")),
+                                              DropdownMenuItem(value: "SCM", child: Text("SCM")),
+                                              DropdownMenuItem(value: "LCM", child: Text("LCM")),
                                             ],
+
+                                            /// ✅ SAFE UPDATE
                                             onChanged: (value) {
+                                              if (value == null) return;
+
                                               ref
                                                   .read(splitCalcProvider.notifier)
-                                                  .setCourse((value ?? 'SCY').toLowerCase());
+                                                  .setCourse(value.toLowerCase());
                                             },
                                           ),
                                         ),
                                       );
                                     },
-                                  )
+                                  ),
                                 ],
                               ),
                               SizedBox(height: 20.h),
 
                               /// GENDER, STROKE, DIST
-                              SizedBox(
-                                width: double.infinity,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(context)!.gender,
-                                            fontSize: 16.sp,
-                                            color: AppColors.primary,
-                                          ),
-                                          SizedBox(height: 6.h),
-
-
-
-                                          Consumer(builder: (context, ref, child) {
-
-                                            final state = ref.watch(
-                                              splitCalcProvider,
-                                            );
-
-                                            // Define items
-                                            const items = ["men", "women"];
-                                            String capitalize(String s) =>
-                                                s.isNotEmpty
-                                                    ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
-                                                    : s;
-                                            return SplitCalculatorSelector(
-                                              items: items
-                                                  .map(capitalize)
-                                                  .toList(), // display first letter uppercase
-                                              selectedValue: capitalize(
-                                                state.gender,
-                                              ),
-                                              onChanged: (value) {
-                                                final lowerCaseValue = value
-                                                    .toLowerCase();
-                                                ref
-                                                    .read(
-                                                  splitCalcProvider
-                                                      .notifier,
-                                                )
-                                                    .setGender(lowerCaseValue );
-                                              },
-                                            );
-                                          },)
-
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(context)!.stroke,
-                                            fontSize: 16.sp,
-                                            color: AppColors.primary,
-                                          ),
-                                          SizedBox(height: 6.h),
-
-
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final state = ref.watch(splitCalcProvider);
-                                              final course = state.course.toLowerCase();
-                                              final gender = state.gender.toLowerCase();
-
-                                              // ✅ FIX: Proper cast
-                                              final Map<String, dynamic>? strokesMap = (course == 'scy'
-                                                  ? SwimSplitCalculator1.ratiosScy[gender]
-                                                  : course == 'scm'
-                                                  ? SwimSplitCalculator1.ratiosScm[gender]
-                                                  : SwimSplitCalculator1.ratiosLcm[gender])
-                                              as Map<String, dynamic>?;
-
-                                              // ✅ FIX: Safe conversion
-                                              List<String> availableStrokes =
-                                              (strokesMap?.keys.toList() ?? [])
-                                                  .map((e) => e.toString().toLowerCase())
-                                                  .toList();
-
-                                              const strokeOrder = ['fly', 'back', 'breast', 'free', 'im'];
-
-                                              availableStrokes.sort((a, b) {
-                                                final indexA = strokeOrder.indexOf(a);
-                                                final indexB = strokeOrder.indexOf(b);
-                                                return (indexA == -1 ? 99 : indexA)
-                                                    .compareTo(indexB == -1 ? 99 : indexB);
-                                              });
-
-                                              String formatStroke(String s) =>
-                                                  s == 'im' ? 'IM' : '${s[0].toUpperCase()}${s.substring(1)}';
-
-                                              final selectedStroke =
-                                              availableStrokes.contains(state.stroke.toLowerCase())
-                                                  ? state.stroke.toLowerCase()
-                                                  : (availableStrokes.isNotEmpty ? availableStrokes.first : '');
-
-                                              return SplitCalculatorSelector(
-                                                items: availableStrokes.map(formatStroke).toList(),
-                                                selectedValue: formatStroke(selectedStroke),
-                                                onChanged: (value) {
-                                                  ref.read(splitCalcProvider.notifier).setStroke(value.toLowerCase());
-                                                },
-                                              );
-                                            },
-                                          ),
-
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(context)!.dist,
-                                            fontSize: 16.sp,
-                                            color: AppColors.primary,
-                                          ),
-                                          SizedBox(height: 6.h),
-
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final state = ref.watch(splitCalcProvider);
-
-                                              final distances = getDistances(
-                                                state.course,
-                                                state.stroke,
-                                                state.gender,
-                                              );
-
-                                              final currentDistance = int.tryParse(state.distance);
-
-                                              // ✅ Validate distance safely
-                                              final isValid = currentDistance != null &&
-                                                  distances.contains(currentDistance);
-
-                                              // ✅ FIX: update only once when invalid
-                                              if (!isValid && distances.isNotEmpty) {
-                                                Future.microtask(() {
-                                                  final newDistance = distances.first.toString();
-
-                                                  // prevent unnecessary updates
-                                                  if (ref.read(splitCalcProvider).distance != newDistance) {
-                                                    ref
-                                                        .read(splitCalcProvider.notifier)
-                                                        .setDistance(newDistance);
-                                                  }
-                                                });
-                                              }
-
-                                              return DistanceWheelSelector(
-                                                items: distances,
-
-                                                // ✅ Always show valid value
-                                                selectedValue: isValid
-                                                    ? currentDistance
-                                                    : (distances.isNotEmpty ? distances.first : 0),
-
-                                                onChanged: (value) {
-                                                  ref
-                                                      .read(splitCalcProvider.notifier)
-                                                      .setDistance(value.toString());
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        /// ===================== GENDER =====================
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(
+                                text: AppLocalizations.of(context)!.gender,
+                                fontSize: 16.sp,
+                                color: AppColors.primary,
                               ),
+                              SizedBox(height: 6.h),
+
+                              Consumer(
+                                builder: (context, ref, child) {
+                                  final state = ref.watch(splitCalcProvider);
+
+                                  const rawItems = ["men", "women"];
+
+                                  String capitalize(String s) =>
+                                      s.isNotEmpty
+                                          ? '${s[0].toUpperCase()}${s.substring(1)}'
+                                          : s;
+
+                                  /// ✅ VALIDATE STATE
+                                  final current = state.gender.toLowerCase();
+                                  final isValid = rawItems.contains(current);
+                                  final safeGender = isValid ? current : rawItems.first;
+
+                                  /// 🔥 FORCE SYNC
+                                  if (!isValid) {
+                                    Future.microtask(() {
+                                      ref.read(splitCalcProvider.notifier).setGender(safeGender);
+                                    });
+                                  }
+
+                                  return SplitCalculatorSelector(
+                                    items: rawItems.map(capitalize).toList(),
+                                    selectedValue: capitalize(safeGender),
+                                    onChanged: (value) {
+                                      ref
+                                          .read(splitCalcProvider.notifier)
+                                          .setGender(value.toLowerCase());
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(width: 12.w),
+
+                        /// ===================== STROKE =====================
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(
+                                text: AppLocalizations.of(context)!.stroke,
+                                fontSize: 16.sp,
+                                color: AppColors.primary,
+                              ),
+                              SizedBox(height: 6.h),
+
+                              Consumer(
+                                builder: (context, ref, child) {
+                                  final state = ref.watch(splitCalcProvider);
+                                  final course = state.course.toLowerCase();
+                                  final gender = state.gender.toLowerCase();
+
+                                  final Map<String, dynamic>? strokesMap =
+                                  (course == 'scy'
+                                      ? SwimSplitCalculator1.ratiosScy[gender]
+                                      : course == 'scm'
+                                      ? SwimSplitCalculator1.ratiosScm[gender]
+                                      : SwimSplitCalculator1.ratiosLcm[gender])
+                                  as Map<String, dynamic>?;
+
+                                  List<String> availableStrokes =
+                                  (strokesMap?.keys.toList() ?? [])
+                                      .map((e) => e.toString().toLowerCase())
+                                      .toSet()
+                                      .toList();
+
+                                  const strokeOrder = [
+                                    'fly',
+                                    'back',
+                                    'breast',
+                                    'free',
+                                    'im'
+                                  ];
+
+                                  availableStrokes.sort((a, b) {
+                                    final indexA = strokeOrder.indexOf(a);
+                                    final indexB = strokeOrder.indexOf(b);
+                                    return (indexA == -1 ? 99 : indexA)
+                                        .compareTo(indexB == -1 ? 99 : indexB);
+                                  });
+
+                                  if (availableStrokes.isEmpty) {
+                                    return const SizedBox();
+                                  }
+
+                                  /// ✅ VALIDATE STATE
+                                  final current = state.stroke.toLowerCase();
+                                  final isValid = availableStrokes.contains(current);
+                                  final safeStroke =
+                                  isValid ? current : availableStrokes.first;
+
+                                  /// 🔥 FORCE SYNC
+                                  if (!isValid) {
+                                    Future.microtask(() {
+                                      ref
+                                          .read(splitCalcProvider.notifier)
+                                          .setStroke(safeStroke);
+                                    });
+                                  }
+
+                                  String formatStroke(String s) {
+                                    if (s.isEmpty) return '';
+                                    return s == 'im'
+                                        ? 'IM'
+                                        : '${s[0].toUpperCase()}${s.substring(1)}';
+                                  }
+
+                                  return SplitCalculatorSelector(
+                                    items: availableStrokes.map(formatStroke).toList(),
+                                    selectedValue: formatStroke(safeStroke),
+                                    onChanged: (value) {
+                                      ref
+                                          .read(splitCalcProvider.notifier)
+                                          .setStroke(value.toLowerCase());
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(width: 12.w),
+
+                        /// ===================== DISTANCE =====================
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomText(
+                                text: AppLocalizations.of(context)!.dist,
+                                fontSize: 16.sp,
+                                color: AppColors.primary,
+                              ),
+                              SizedBox(height: 6.h),
+
+                              Consumer(
+                                builder: (context, ref, child) {
+                                  final state = ref.watch(splitCalcProvider);
+
+                                  final distances = getDistances(
+                                    state.course,
+                                    state.stroke,
+                                    state.gender,
+                                  );
+
+                                  if (distances.isEmpty) {
+                                    return const SizedBox();
+                                  }
+
+                                  final currentDistance = int.tryParse(state.distance);
+
+                                  final safeDistance =
+                                  (currentDistance != null && distances.contains(currentDistance))
+                                      ? currentDistance
+                                      : distances.first;
+
+                                  /// ✅ ONLY update when really needed (NO rebuild loop)
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    final current = ref.read(splitCalcProvider).distance;
+                                    if (current != safeDistance.toString()) {
+                                      ref
+                                          .read(splitCalcProvider.notifier)
+                                          .setDistance(safeDistance.toString());
+                                    }
+                                  });
+
+                                  return DistanceWheelSelector(
+                                    key: ValueKey(safeDistance), // 🔥 VERY IMPORTANT FIX
+                                    items: distances,
+                                    selectedValue: safeDistance,
+                                    onChanged: (value) {
+                                      ref
+                                          .read(splitCalcProvider.notifier)
+                                          .setDistance(value.toString());
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                             ],
                           ),
                         
@@ -459,27 +479,31 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            fixedSize:  Size(double.infinity, 52.h), // width = full, height = 50
+                            fixedSize: Size(double.infinity, 52.h),
                           ),
-                          onPressed: (){
-                            if(isHaptic == true){
-                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                            }
+                          onPressed: () {
+                            if (isHaptic) HapticFeedback.lightImpact();
 
                             ref.read(splitCalcProvider.notifier).calculate();
                             ref.read(showCourseSectionProvider.notifier).state = false;
-
-                            debugPrint(ref.watch(splitCalcProvider).output);
                           },
-                          child: Center(child:  Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(IconPath.calculatorSplitIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-                              SizedBox(width: 6.w,),
-                              CustomText(text: AppLocalizations.of(context)!.calculateSplit,fontSize: getAdjustedFontSize(14, fontOption).sp,fontWeight: FontWeight.w600),
-                            ],
-                          )),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  IconPath.calculatorSplitIcon,
+                                  colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                                ),
+                                SizedBox(width: 6.w),
+                                CustomText(
+                                  text: AppLocalizations.of(context)!.calculateSplit,
+                                  fontSize: getAdjustedFontSize(14, fontOption).sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
 
 
@@ -565,28 +589,68 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                  //      },
                  //    ),
                  //  ),
-                if(ref.watch(splitCalcProvider).output.isNotEmpty)
-                  Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                // if(ref.watch(splitCalcProvider).output.isNotEmpty)
+                //   Column(
+                //     children: [
+                //       Container(
+                //         width: double.infinity,
+                //         padding: const EdgeInsets.all(16),
+                //
+                //         decoration: BoxDecoration(
+                //           color: isDark ? Color(0xff0C3156) : Colors.white,
+                //           borderRadius: BorderRadius.circular(20),
+                //           border: Border.all(
+                //             width: 1,
+                //             color: Color(0xff2DA8F0),
+                //           ),
+                //           boxShadow: const [
+                //             BoxShadow(blurRadius: 12, color: Colors.black12),
+                //           ],
+                //         ),
+                //         child: Text(ref.watch(splitCalcProvider.select((s)=>s.output))),),
+                //       SizedBox(height: 16.h),
+                //     ],
+                //   ),
 
-                        decoration: BoxDecoration(
-                          color: isDark ? Color(0xff0C3156) : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            width: 1,
-                            color: Color(0xff2DA8F0),
-                          ),
-                          boxShadow: const [
-                            BoxShadow(blurRadius: 12, color: Colors.black12),
-                          ],
-                        ),
-                        child: Text(ref.watch(splitCalcProvider.select((s)=>s.output))),),
-                      SizedBox(height: 16.h),
-                    ],
-                  ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final history = ref.watch(splitCalcProvider).history;
+
+                    if (history.isEmpty) return const SizedBox();
+
+                    // Reverse the history to show the latest first
+                    final reversedHistory = history.reversed.toList();
+
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(width: 1, color: Color(0xff2DA8F0)),
+                        boxShadow: const [BoxShadow(blurRadius: 12, color: Colors.black12)],
+                      ),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: reversedHistory.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 30), // 30px gap
+                        itemBuilder: (context, index) {
+                          final item = reversedHistory[index];
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(item.output),
+                              const SizedBox(height: 8),
+                              ...item.splits.map((s) => Text(s.toString())).toList(),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
 
 
 
@@ -594,59 +658,59 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
 
                 /// ACTION BUTTONS
-                 if(ref.watch(splitCalcProvider).output.isNotEmpty)
-                   Row(
-                     children: [
-                       Expanded(
-                         child: ElevatedButton(
-                           style: ElevatedButton.styleFrom(
-                               backgroundColor:Color(0xff234B6E),
-                               side: BorderSide(color: Color(0xff234B6E))
-                           ),
-                           onPressed: () {
-                             if(isHaptic == true){
-                               HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                             }
-                             ref.watch(splitCalcProvider.notifier).clear();
-                           },
-                           child: Center(
-                             child: Row(
-                               mainAxisAlignment: MainAxisAlignment.center,
-                               children: [
-                                 SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
-                                 SizedBox(width: 6.w,),
-                                 CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: getAdjustedFontSize(16, fontOption).sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
-                               ],
-                             ),
-                           ),
-                         ),
-                       ),
-                       SizedBox(width: 12.w),
-                       Expanded(
-                         child: ElevatedButton(
-                           style: ElevatedButton.styleFrom(
-                             backgroundColor:AppColors.primary,
-                           ),
-                           onPressed: () {
-                             if(isHaptic == true){
-                               HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                             }
-                             exportOutputAsPdf(context, ref.watch(splitCalcProvider).output);
-                           },
-                           child: Row(
-                             mainAxisAlignment: MainAxisAlignment.center,
-                             children: [
-                               SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-                               SizedBox(width: 6.w,),
-                               CustomText(text:  AppLocalizations.of(context)!.export,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w700,),
-                             ],
-                           ),
-                         ),
-                       ),
-                     ],
-                   ),
+                //  if(ref.watch(splitCalcProvider).output.isNotEmpty)
+                //    Row(
+                //      children: [
+                //        Expanded(
+                //          child: ElevatedButton(
+                //            style: ElevatedButton.styleFrom(
+                //                backgroundColor:Color(0xff234B6E),
+                //                side: BorderSide(color: Color(0xff234B6E))
+                //            ),
+                //            onPressed: () {
+                //              if(isHaptic == true){
+                //                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+                //
+                //              }
+                //              ref.watch(splitCalcProvider.notifier).clear();
+                //            },
+                //            child: Center(
+                //              child: Row(
+                //                mainAxisAlignment: MainAxisAlignment.center,
+                //                children: [
+                //                  SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
+                //                  SizedBox(width: 6.w,),
+                //                  CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: getAdjustedFontSize(16, fontOption).sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                //                ],
+                //              ),
+                //            ),
+                //          ),
+                //        ),
+                //        SizedBox(width: 12.w),
+                //        Expanded(
+                //          child: ElevatedButton(
+                //            style: ElevatedButton.styleFrom(
+                //              backgroundColor:AppColors.primary,
+                //            ),
+                //            onPressed: () {
+                //              if(isHaptic == true){
+                //                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+                //
+                //              }
+                //              exportOutputAsPdf(context, ref.watch(splitCalcProvider).output);
+                //            },
+                //            child: Row(
+                //              mainAxisAlignment: MainAxisAlignment.center,
+                //              children: [
+                //                SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+                //                SizedBox(width: 6.w,),
+                //                CustomText(text:  AppLocalizations.of(context)!.export,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w700,),
+                //              ],
+                //            ),
+                //          ),
+                //        ),
+                //      ],
+                //    ),
 
               ],
             ),

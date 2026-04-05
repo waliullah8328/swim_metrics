@@ -4,14 +4,22 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import 'calculations.dart';
 
+
+
+class SplitResult {
+  final String output;
+  final List<dynamic> splits;
+
+  SplitResult({required this.output, required this.splits});
+}
+
 class SplitCalcState {
   final String course;
   final String gender;
   final String stroke;
   final String distance;
   final String goalTime;
-  final String output;
-  final List<dynamic> splits;
+  final List<SplitResult> history; // store all results
 
   const SplitCalcState({
     this.course = '',
@@ -19,8 +27,7 @@ class SplitCalcState {
     this.stroke = '',
     this.distance = '',
     this.goalTime = '',
-    this.output = '',
-    this.splits = const [],
+    this.history = const [],
   });
 
   SplitCalcState copyWith({
@@ -29,8 +36,7 @@ class SplitCalcState {
     String? stroke,
     String? distance,
     String? goalTime,
-    String? output,
-    List<dynamic>? splits,
+    List<SplitResult>? history,
   }) {
     return SplitCalcState(
       course: course ?? this.course,
@@ -38,8 +44,7 @@ class SplitCalcState {
       stroke: stroke ?? this.stroke,
       distance: distance ?? this.distance,
       goalTime: goalTime ?? this.goalTime,
-      output: output ?? this.output,
-      splits: splits ?? this.splits,
+      history: history ?? this.history,
     );
   }
 }
@@ -54,9 +59,8 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
   void setDistance(String v) => state = state.copyWith(distance: v);
   void setGoalTime(String v) => state = state.copyWith(goalTime: v);
 
-  void clear() => state = state.copyWith(splits: [], output: '');
+  void clearHistory() => state = state.copyWith(history: []);
 
-  /// 🚀 MAIN FUNCTION
   void calculate() {
     try {
       final result = SwimSplitCalculator1.calculateSplits(
@@ -69,21 +73,25 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
 
       final decoded = jsonDecode(result);
 
-      if (decoded['success'] == true) {
-        state = state.copyWith(
-          output: decoded['formatted_text'] ?? '',
-          splits: decoded['splits'] ?? [],
-        );
-      } else {
-        state = state.copyWith(
-          output: decoded['error'] ?? 'Something went wrong',
-          splits: [],
-        );
-      }
+      final newResult = decoded['success'] == true
+          ? SplitResult(
+        output: decoded['formatted_text'] ?? '',
+        splits: List.from(decoded['splits'] ?? []),
+      )
+          : SplitResult(
+        output: decoded['error'] ?? 'Something went wrong',
+        splits: [],
+      );
+
+      state = state.copyWith(
+        history: [...state.history, newResult], // append to history
+      );
     } catch (e) {
       state = state.copyWith(
-        output: 'Error: ${e.toString()}',
-        splits: [],
+        history: [
+          ...state.history,
+          SplitResult(output: 'Error: ${e.toString()}', splits: []),
+        ],
       );
     }
   }
@@ -91,5 +99,5 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
 
 final splitCalcProvider =
 StateNotifierProvider<SplitCalcNotifier, SplitCalcState>(
-      (ref) => SplitCalcNotifier(),
-);
+        (ref) => SplitCalcNotifier());
+
