@@ -47,6 +47,8 @@ class SplitCalculatorPage extends ConsumerWidget {
     final fontOption = ref.watch(settingsProvider).fontSize;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionProvider);
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -100,7 +102,7 @@ class SplitCalculatorPage extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SvgPicture.asset(IconPath.pullIcon),
-                              CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: getAdjustedFontSize(14, fontOption).sp,color: Color(0xffC7C7C7),)
+                              CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions,fontSize: getAdjustedFontSize(currentLanguageCode != 'en'? 11:14, fontOption).sp,color: Color(0xffC7C7C7),)
                             ],
                           ),
                           SizedBox(height: 20.h,)

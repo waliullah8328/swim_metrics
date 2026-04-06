@@ -224,7 +224,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               text: AppLocalizations.of(
                                 context,
                               )!.pullDownToSeeOptions,
-                              fontSize: getAdjustedFontSize(14, fontOption).sp,
+                              fontSize: getAdjustedFontSize(currentLanguageCode!= 'en'?11:14, fontOption).sp,
                               color: Color(0xffC7C7C7),
                             ),
                           ],
@@ -263,7 +263,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                               text: AppLocalizations.of(
                                 context,
                               )!.pullDownToSeeOptions,
-                              fontSize: getAdjustedFontSize(14, fontOption).sp,
+                              fontSize: getAdjustedFontSize(currentLanguageCode!= 'en'?11:14, fontOption).sp,
                               color: Color(0xffC7C7C7),
                             ),
                           ],
@@ -578,7 +578,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                           .toString() !=
                                                       "en"
                                                   ? getAdjustedFontSize(
-                                                      12,
+                                                      10,
                                                       fontOption,
                                                     ).sp
                                                   : getAdjustedFontSize(
@@ -636,7 +636,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                                           .toString() !=
                                                       "en"
                                                   ? getAdjustedFontSize(
-                                                      12,
+                                                      10,
                                                       fontOption,
                                                     ).sp
                                                   : getAdjustedFontSize(

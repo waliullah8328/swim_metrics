@@ -14,6 +14,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 import '../../../../../../../core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import '../../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../../auth/sign_up_section/payment/river_pod/payment_controller.dart';
+import '../../riverpod/setting_controller.dart';
 import '../../riverpod/user_plan_controller.dart';
 
 
@@ -31,6 +32,8 @@ class SubscriptionScreen extends ConsumerWidget {
         .of(context)
         .brightness == Brightness.dark;
     final payment = ref.watch(getUserPaymentProvider);
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
 
 
     return Scaffold(
@@ -179,13 +182,15 @@ class SubscriptionScreen extends ConsumerWidget {
                         children: [
                           Column(
 
+
                             children: [
                               Row(
+
                                 children: [
                                   SvgPicture.asset(IconPath.calenderIconOne),
                                   SizedBox(width: 10.w,),
                                   CustomText(text: AppLocalizations.of(context)!.planStarted,
-                                    fontSize: 14.sp,
+                                    fontSize: currentLanguageCode != "en"?11:14.sp,
                                     fontWeight: FontWeight.w600,),
                                 ],
                               ),
@@ -202,6 +207,7 @@ class SubscriptionScreen extends ConsumerWidget {
                             ],
                           ),
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
 
                             children: [
                               Row(
@@ -211,7 +217,7 @@ class SubscriptionScreen extends ConsumerWidget {
                                         Color(0xffC8AA52), BlendMode.srcIn),),
                                   SizedBox(width: 10.w,),
                                   CustomText(text: AppLocalizations.of(context)!.nextRenewal,
-                                    fontSize: 14.sp,
+                                    fontSize: currentLanguageCode != "en"?11:14.sp,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xffC8AA52,),
                                   )

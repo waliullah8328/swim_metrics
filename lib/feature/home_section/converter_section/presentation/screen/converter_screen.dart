@@ -62,6 +62,8 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionConverter);
     final fontOption = ref.watch(settingsProvider).fontSize;
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
 
     return Scaffold(
       key: scaffoldKey,
@@ -118,7 +120,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             text: AppLocalizations.of(
                               context,
                             )!.pullDownToSeeOptions,
-                            fontSize: getAdjustedFontSize(14, fontOption).sp,
+                            fontSize: getAdjustedFontSize(currentLanguageCode != "en"?11:14, fontOption).sp,
                             color: Color(0xffC7C7C7),
                           ),
                         ],
