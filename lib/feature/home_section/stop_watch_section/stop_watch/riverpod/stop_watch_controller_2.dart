@@ -137,28 +137,33 @@ class StopwatchController2 extends ChangeNotifier {
     if (!t.running) return;
 
     final now = DateTime.now();
-    final totalElapsed = elapsed();
+    final totalElapsed = elapsed(); // total elapsed seconds
     final lapElapsed = t.lastSplitWall == null
         ? totalElapsed
         : now.difference(t.lastSplitWall!).inMilliseconds / 1000.0;
+
+    // Update last split wall
     t.lastSplitWall = now;
+
+    // Add total elapsed to splits
     t.splits.add(totalElapsed);
-    final lapNo = t.splits.length;
+
+    final lapNo = t.splits.length; // lap number is always last
 
     String text;
 
     if (activeMode == 'Converter') {
-      double factor = _simpleConversionFactor(fromCourse.toUpperCase(), toCourse.toUpperCase());
+      double factor =
+      _simpleConversionFactor(fromCourse.toUpperCase(), toCourse.toUpperCase());
       double converted = totalElapsed * factor;
+
       text =
       'Lap $lapNo: ${TimeUtils1.formatSeconds(totalElapsed)} $fromCourse → ${TimeUtils1.formatSeconds(converted)} $toCourse';
       _appendConverterSplit(text);
-    }
-    else if (activeMode == 'Predictor') {
+    } else if (activeMode == 'Predictor') {
       text = _processPredictorLap(t, lapElapsed, lapNo);
       _appendPredictorSplit(text);
-    }
-    else {
+    } else {
       text =
       'Lap $lapNo: ${TimeUtils1.formatSeconds(lapElapsed)} / ${TimeUtils1.formatSeconds(totalElapsed)}';
       _appendLog(text);
@@ -167,27 +172,40 @@ class StopwatchController2 extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// =======================
+  /// Undo last split: always removes last lap first
+  /// =======================
   void undoLastSplit() {
     final t = current;
     if (t.splits.isEmpty) return;
+
+    // Remove last lap (always last)
     t.splits.removeLast();
 
-    if (activeMode == 'Predictor' && progressiveActive && course.toLowerCase() == 'lcm' && distance == '50') {
+    // Handle Predictor LCM 50 progressive logic
+    if (activeMode == 'Predictor' &&
+        progressiveActive &&
+        course.toLowerCase() == 'lcm' &&
+        distance == '50') {
       if (splitSize == '25') splitSize = '15';
       else if (splitSize == '35') splitSize = '25';
       else splitSize = '35';
     }
 
+    // Recalculate lastSplitWall
     double prevCum = t.splits.isNotEmpty ? t.splits.last : 0.0;
     if (t.running) {
       final now = DateTime.now();
       final delta = elapsed() - prevCum;
-      t.lastSplitWall = now.subtract(Duration(milliseconds: (delta * 1000).round()));
+      t.lastSplitWall =
+          now.subtract(Duration(milliseconds: (delta * 1000).round()));
     } else {
       t.lastSplitWall = null;
     }
 
+    // Remove last split line from logs
     _popLatestSplitLogLine();
+
     notifyListeners();
   }
 
