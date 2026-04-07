@@ -739,11 +739,14 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
   Future<void> exportHistoryAsPdf(BuildContext context, List history) async {
     final pdf = pw.Document();
 
-    // Load your logo from assets
+    // Load logo
     final ByteData logoData = await rootBundle.load('assets/images/app_logo.png');
     final Uint8List logoBytes = logoData.buffer.asUint8List();
 
-    // Create PDF pages
+    // Load Merriweather TTF font
+    final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
+    final ttf = pw.Font.ttf(fontData);
+
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
@@ -752,13 +755,15 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
           return pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Text('Page ${context.pageNumber}', style: pw.TextStyle(fontSize: 12)),
+              pw.Text('Page ${context.pageNumber}', style: pw.TextStyle(font: ttf, fontSize: 12)),
               pw.Image(pw.MemoryImage(logoBytes), width: 50, height: 50),
             ],
           );
         },
         build: (pw.Context context) {
           return history.reversed.map<pw.Widget>((item) {
+            final lines = item.output?.split('\n') ?? [];
+
             return pw.Container(
               margin: const pw.EdgeInsets.only(bottom: 16),
               padding: const pw.EdgeInsets.all(12),
@@ -769,9 +774,15 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.Text(item.output ?? '', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-                  pw.SizedBox(height: 6),
-                  ...List<pw.Widget>.from(item.splits.map((s) => pw.Text(s.toString(), style: pw.TextStyle(fontSize: 12)))),
+                  ...lines.map((line) {
+                    // Replace spaces with non-breaking spaces to preserve alignment
+                    final formattedLine = line.replaceAll(' ', '\u00A0');
+                    return pw.Text(
+                      formattedLine,
+                      style: pw.TextStyle(font: ttf, fontSize: 12),
+                      softWrap: true,
+                    );
+                  }).toList(),
                 ],
               ),
             );
@@ -780,10 +791,30 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
       ),
     );
 
-    // Preview or print PDF
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-    );
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/swim_converter_output.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: CustomText(
+            text: '${AppLocalizations.of(context)!.pDFSavedAt}: ${file.path}',
+          ),
+        ),
+      );
+
+      await OpenFile.open(file.path);
+    } catch (e) {
+      debugPrint("PDF export error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: CustomText(
+            text: AppLocalizations.of(context)!.failedToExportPDF,
+          ),
+        ),
+      );
+    }
   }
 
   static List<int> getDistances(String course, String stroke, String gender) {

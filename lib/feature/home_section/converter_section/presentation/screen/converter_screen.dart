@@ -785,9 +785,9 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     final ByteData logoData = await rootBundle.load('assets/images/app_logo.png');
     final Uint8List logoBytes = logoData.buffer.asUint8List();
 
-    // // Load a TrueType font that supports Unicode
-    // final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
-    // final ttf = pw.Font.ttf(fontData);
+    // Load a TrueType font that supports Unicode
+    final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
+    final ttf = pw.Font.ttf(fontData);
 
     pdf.addPage(
       pw.MultiPage(
@@ -797,7 +797,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
           return pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Text('Page ${context.pageNumber}', style: pw.TextStyle(fontSize: 12, )),
+              pw.Text('Page ${context.pageNumber}', style: pw.TextStyle(fontSize: 12,font: ttf )),
               pw.Image(pw.MemoryImage(logoBytes), width: 50, height: 50),
             ],
           );
@@ -813,7 +813,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                 final formattedLine = line.replaceAll(' ', '\u00A0');
                 return pw.Text(
                   formattedLine,
-                  style: pw.TextStyle( fontSize: 12),
+                  style: pw.TextStyle( fontSize: 12,font: ttf),
                   softWrap: true,
                 );
               }).toList(),

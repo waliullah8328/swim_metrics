@@ -83,6 +83,7 @@ flutter:
     - assets/icons/
     - .env
     - assets/audio/stop_watch_audio.mp3
+    - assets/font/Merriweather-font.ttf
 
 
   # example:
