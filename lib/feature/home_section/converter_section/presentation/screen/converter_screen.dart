@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_file/open_file.dart';
+import 'package:pdf/pdf.dart';
 
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
@@ -301,43 +302,34 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     builder: (context, ref, child) {
                                       const items = ["SCY", "SCM", "LCM"];
 
-                                      final course = ref.watch(
-                                        converterProvider1.select(
-                                          (s) => s.course,
-                                        ),
-                                      );
+                                      final state = ref.watch(converterProvider1);
+                                      final course = state.course;
+                                      final stroke = state.stroke;
 
-                                      final controller = ref.read(
-                                        converterProvider1.notifier,
-                                      );
+                                      final controller = ref.read(converterProvider1.notifier);
 
                                       final selectedValue = items.firstWhere(
-                                        (item) => item.toLowerCase() == course,
+                                            (item) => item.toLowerCase() == course,
                                         orElse: () => items.first,
                                       );
 
                                       return SplitCalculatorSelectorOne(
                                         items: items,
                                         selectedValue: selectedValue,
-
                                         onChanged: (selected) {
-                                          final newCourse = selected
-                                              .toLowerCase();
+                                          final newCourse = selected.toLowerCase();
 
-                                          // 🔥 update distance based on course
-                                          final distances =
-                                              getDistancesByCourse(newCourse);
+                                          // ✅ use BOTH course + stroke
+                                         // final distances = getDistances(newCourse, stroke);
 
                                           controller.setCourse(newCourse);
 
-                                          // ✅ reset invalid distance
-                                          controller.setDistance(
-                                            distances.first,
-                                          );
+                                          // reset distance safely
+                                         // controller.setDistance(distances.first);
                                         },
                                       );
                                     },
-                                  ),
+                                  )
                                 ],
                               ),
                             ),
@@ -363,28 +355,26 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                   Consumer(
                                     builder: (context, ref, child) {
-                                      final state = ref.watch(
-                                        converterProvider1,
-                                      );
-                                      final controller = ref.read(
-                                        converterProvider1.notifier,
-                                      );
+                                      final state = ref.watch(converterProvider1);
+                                      final controller = ref.read(converterProvider1.notifier);
 
-                                      // 🔥 dynamic distances
-                                      final distances = getDistancesByCourse(
+                                      // ✅ use BOTH course + stroke
+                                      final distances = getDistances(
                                         state.course,
+                                        state.stroke,
                                       );
 
                                       // ✅ ensure valid selection
-                                      final selectedDistance =
-                                          distances.contains(state.distance)
+                                      final selectedDistance = distances.contains(state.distance)
                                           ? state.distance
                                           : distances.first;
 
                                       return SplitCalculatorSelectorOne(
                                         items: distances,
                                         selectedValue: selectedDistance,
-                                        onChanged: controller.setDistance,
+                                        onChanged: (value) {
+                                          controller.setDistance(value);
+                                        },
                                       );
                                     },
                                   ),
@@ -714,16 +704,67 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     );
   }
 
-  List<String> getDistancesByCourse(String course) {
-    switch (course.toLowerCase()) {
-      case 'scy':
-        return ["50", "100", "200", "500", "1000", "1650"];
-      case 'scm':
-      case 'lcm':
-        return ["50", "100", "200", "400", "800", "1500"];
-      default:
-        return ["50"];
+  List<String> getDistances(String course, String stroke) {
+    course = course.toLowerCase();
+    stroke = stroke.toLowerCase();
+
+    final Map<String, List<String>> scy = {
+      "fly": ["50", "100", "200"],
+      "back": ["50", "100", "200"],
+      "breast": ["50", "100", "200"],
+      "free": ["50", "100", "200", "500", "1000", "1650"],
+      "im": ["200", "400"],
+    };
+
+    final Map<String, List<String>> scmLcm = {
+      "fly": ["50", "100", "200"],
+      "back": ["50", "100", "200"],
+      "breast": ["50", "100", "200"],
+      "free": ["50", "100", "200", "400", "800", "1500"],
+      "im": ["200", "400"],
+    };
+
+    if (course == "scy") {
+      return scy[stroke] ?? ["50"];
+    } else if (course == "scm" || course == "lcm") {
+      return scmLcm[stroke] ?? ["50"];
+    } else {
+      return ["50"];
     }
+  }
+
+
+
+
+  List<String> getDistancesByCourseAndStroke(String course, String stroke) {
+    course = course.toLowerCase().trim();
+    stroke = stroke.toLowerCase().trim();
+
+    // Common strokes (Fly, Back, Breast)
+    const sprintStrokes = ["fly", "back", "breast"];
+
+    if (course == 'lcm' || course == 'scm') {
+      if (sprintStrokes.contains(stroke)) {
+        return ["50", "100", "200"];
+      } else if (stroke == "free") {
+        return ["50", "100", "200", "400", "800", "1500"];
+      } else if (stroke == "im") {
+        return ["200", "400"];
+      }
+    }
+
+    if (course == 'scy') {
+      if (sprintStrokes.contains(stroke)) {
+        return ["50", "100", "200"];
+      } else if (stroke == "free") {
+        return ["50", "100", "200", "500", "1000", "1650"];
+      } else if (stroke == "im") {
+        return ["200", "400"];
+      }
+    }
+
+    // fallback
+    return ["50"];
   }
 
   Future<void> exportOutputAsPdf(BuildContext context, String output) async {
@@ -740,16 +781,44 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
     final pdf = pw.Document();
 
+    // Load logo from assets
+    final ByteData logoData = await rootBundle.load('assets/images/app_logo.png');
+    final Uint8List logoBytes = logoData.buffer.asUint8List();
+
+    // // Load a TrueType font that supports Unicode
+    // final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
+    // final ttf = pw.Font.ttf(fontData);
+
     pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Container(
-            padding: const pw.EdgeInsets.all(16),
-            child: pw.Text(
-              output,
-              style: pw.TextStyle(font: pw.Font.courier()),
-            ),
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(32),
+        header: (context) {
+          return pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text('Page ${context.pageNumber}', style: pw.TextStyle(fontSize: 12, )),
+              pw.Image(pw.MemoryImage(logoBytes), width: 50, height: 50),
+            ],
           );
+        },
+        build: (pw.Context context) {
+          // Preserve spacing by splitting by line breaks
+          final lines = output.split('\n');
+          return [
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: lines.map((line) {
+                // Replace normal spaces with non-breaking spaces to preserve spacing
+                final formattedLine = line.replaceAll(' ', '\u00A0');
+                return pw.Text(
+                  formattedLine,
+                  style: pw.TextStyle( fontSize: 12),
+                  softWrap: true,
+                );
+              }).toList(),
+            ),
+          ];
         },
       ),
     );
@@ -767,7 +836,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
         ),
       );
 
-      // Open the PDF
       await OpenFile.open(file.path);
     } catch (e) {
       debugPrint("PDF export error: $e");

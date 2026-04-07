@@ -120,21 +120,25 @@ class ConverterController extends Notifier<ConverterState> {
 
     if ([s.course, s.gender, s.stroke, s.distance, s.timeText]
         .any((e) => e.isEmpty)) {
-      state = s.copyWith(output: AppLocalizations.of(context)!.pleaseFillAllFields);
-      return;
-    }
-
-    double total;
-
-    try {
-      total = TimeUtils1.parseToSeconds(s.timeText);
-    } catch (_) {
       state = s.copyWith(
-        output: AppLocalizations.of(context)!.invalidTimeFormat,
+        output: (AppLocalizations.of(context)!.pleaseFillAllFields) +
+            (s.output.isEmpty ? '' : '\n\n' + s.output),
       );
       return;
     }
 
+    double total;
+    try {
+      total = TimeUtils1.parseToSeconds(s.timeText);
+    } catch (_) {
+      state = s.copyWith(
+        output: (AppLocalizations.of(context)!.invalidTimeFormat) +
+            (s.output.isEmpty ? '' : '\n\n' + s.output),
+      );
+      return;
+    }
+
+    // New conversion results
     final resBasic = <String>['=== Conversion Results ==='];
     final resSplits = <String>[];
 
@@ -143,7 +147,6 @@ class ConverterController extends Notifier<ConverterState> {
     }
 
     final allowed = allowedTargets();
-
     final listTargets = s.targets.isEmpty
         ? allowed
         : allowed.where((e) => s.targets.contains(e)).toList();
@@ -174,62 +177,35 @@ class ConverterController extends Notifier<ConverterState> {
           : s.stroke[0].toUpperCase() + s.stroke.substring(1);
 
       resBasic.add(
-          '${s.gender[0].toUpperCase()}${s.gender.substring(1)} '
-              '${s.distance} $strokeLabel ${s.timeText} '
-              '${s.course.toUpperCase()} → '
-              '$displayDistance $strokeLabel ${to.toUpperCase()}: $convertedStr');
+        '${s.gender[0].toUpperCase()}${s.gender.substring(1)} '
+            '${s.distance} $strokeLabel ${s.timeText} '
+            '${s.course.toUpperCase()} → '
+            '$displayDistance $strokeLabel ${to.toUpperCase()}: $convertedStr',
+      );
 
-      /// SPLITS
       if (s.showSplits) {
-        if (to == 'lcm' && displayDistance == '50') {
-          final cum = Ratios1.lcm50Cum[s.gender] as Map<String, double>;
+        final r = SplitsCore1.getRatios(to, s.gender, s.stroke, displayDistance) ?? [];
+        final splitsText = SplitsCore1.calculateSplits(
+          converted,
+          r,
+          int.parse(displayDistance),
+          targetCourse: to,
+        );
 
-          final t15 =
-          TimeUtils1.formatSeconds(converted * cum['15']!);
-          final t25 =
-          TimeUtils1.formatSeconds(converted * cum['25']!);
-          final t35 =
-          TimeUtils1.formatSeconds(converted * cum['35']!);
-
-          resSplits.addAll([
-            '${s.gender[0].toUpperCase()}${s.gender.substring(1)} '
-                '$displayDistance $strokeLabel ${to.toUpperCase()}: $convertedStr',
-            '--- Splits ---',
-            '15m: $t15',
-            '25m: $t25',
-            '35m: $t35',
-            '50m: $convertedStr',
-            '',
-          ]);
-        } else {
-          final r = SplitsCore1.getRatios(
-            to,
-            s.gender,
-            s.stroke,
-            displayDistance,
-          ) ??
-              [];
-
-          final splitsText = SplitsCore1.calculateSplits(
-            converted,
-            r,
-            int.parse(displayDistance),
-            targetCourse: to,
-          );
-
-          resSplits.addAll([
-            '${s.gender[0].toUpperCase()}${s.gender.substring(1)} '
-                '$displayDistance $strokeLabel ${to.toUpperCase()}: $convertedStr',
-            splitsText,
-            '',
-          ]);
-        }
+        resSplits.addAll([
+          '${s.gender[0].toUpperCase()}${s.gender.substring(1)} '
+              '$displayDistance $strokeLabel ${to.toUpperCase()}: $convertedStr',
+          splitsText,
+          '',
+        ]);
       }
     }
 
-    state = s.copyWith(
-      output: (resBasic + [''] + resSplits).join('\n'),
-    );
+    // PREPEND new results to previous output
+    final newOutput = (resBasic + [''] + resSplits).join('\n') +
+        (s.output.isEmpty ? '' : '\n\n' + s.output);
+
+    state = s.copyWith(output: newOutput);
   }
 
   void reset() {
