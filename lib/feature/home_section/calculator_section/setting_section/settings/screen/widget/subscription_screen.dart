@@ -14,6 +14,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 import '../../../../../../../core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import '../../../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../../auth/sign_up_section/payment/river_pod/payment_controller.dart';
+import '../../riverpod/setting_controller.dart';
 import '../../riverpod/user_plan_controller.dart';
 
 
@@ -31,6 +32,8 @@ class SubscriptionScreen extends ConsumerWidget {
         .of(context)
         .brightness == Brightness.dark;
     final payment = ref.watch(getUserPaymentProvider);
+    final settings = ref.watch(settingsProvider);
+    final currentLanguageCode = settings.language.code;
 
 
     return Scaffold(
@@ -185,7 +188,7 @@ class SubscriptionScreen extends ConsumerWidget {
                                   SvgPicture.asset(IconPath.calenderIconOne),
                                   SizedBox(width: 10.w,),
                                   CustomText(text: AppLocalizations.of(context)!.planStarted,
-                                    fontSize: 14.sp,
+                                    fontSize: currentLanguageCode == 'en'?12.sp:11.sp,
                                     fontWeight: FontWeight.w600,),
                                 ],
                               ),
@@ -211,7 +214,7 @@ class SubscriptionScreen extends ConsumerWidget {
                                         Color(0xffC8AA52), BlendMode.srcIn),),
                                   SizedBox(width: 10.w,),
                                   CustomText(text: AppLocalizations.of(context)!.nextRenewal,
-                                    fontSize: 14.sp,
+                                    fontSize: currentLanguageCode == 'en'?12.sp:11.sp,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xffC8AA52,),
                                   )
@@ -300,22 +303,35 @@ class _FeatureItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding:  EdgeInsets.symmetric(vertical: 6.h),
+      padding: EdgeInsets.symmetric(vertical: 6.h),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start, // ✅ র‍্যাপ হলে আইকন ও টেক্সট উপরে অ্যালাইন থাকবে
         children: [
-          SvgPicture.asset(IconPath.ticMarkIcon,colorFilter: ColorFilter.mode(isDark?Color(0xffBABABA):Colors.black, BlendMode.srcIn),),
+          // ✅ আইকনটি যেন টেক্সটের প্রথম লাইনের সাথে মিলে থাকে
+          Padding(
+            padding: EdgeInsets.only(top: 2.h),
+            child: SvgPicture.asset(
+              IconPath.ticMarkIcon,
+              colorFilter: ColorFilter.mode(isDark ? const Color(0xffBABABA) : Colors.black, BlendMode.srcIn),
+            ),
+          ),
           SizedBox(width: 8.w),
           Expanded(
-            child: CustomText(
-              text:
+            child: Text(
               text,
+              softWrap: true,                 // ✅ belongs to Text
+              maxLines: null,                 // ✅ belongs to Text
+              overflow: TextOverflow.visible, // ✅ belongs to Text
+              textAlign: TextAlign.left,      // ✅ belongs to Text
 
-
-              fontSize: 14.sp,
-              color: isDark?Color(0xffF7F9FA):Color(0xff82888E),
-
+              style: TextStyle(               // ✅ ONLY styling here
+                fontSize: 14.sp,
+                color: isDark
+                    ? const Color(0xffF7F9FA)
+                    : const Color(0xff82888E),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

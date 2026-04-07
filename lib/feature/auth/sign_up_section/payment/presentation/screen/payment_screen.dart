@@ -323,17 +323,24 @@ class _FeatureItem extends StatelessWidget {
         children: [
           SvgPicture.asset(IconPath.ticMarkIcon,colorFilter: ColorFilter.mode(isDark?Color(0xffBABABA):Colors.black, BlendMode.srcIn),),
           SizedBox(width: 8.w),
+
           Expanded(
-            child: CustomText(
-              text:
+            child: Text(
               text,
+              softWrap: true,                 // ✅ belongs to Text
+              maxLines: null,                 // ✅ belongs to Text
+              overflow: TextOverflow.visible, // ✅ belongs to Text
+              textAlign: TextAlign.left,      // ✅ belongs to Text
 
-
-              fontSize: 14.sp,
-              color: isDark?Color(0xffF7F9FA):Color(0xff82888E),
-
+              style: TextStyle(               // ✅ ONLY styling here
+                fontSize: 14.sp,
+                color: isDark
+                    ? const Color(0xffF7F9FA)
+                    : const Color(0xff82888E),
+              ),
             ),
-          )
+          ),
+
         ],
       ),
     );
