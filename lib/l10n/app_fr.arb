@@ -8,7 +8,7 @@
 "textSize": "Taille du texte",
 "small": "PETITE",
 "medium": "MOYENNE",
-"big": "GRANDE",
+"big": "GRAND",
 "accessibility": "ACCESSIBILITÉ",
 "language": "Langue",
 "stopWatchSound": "Son du chronomètre",
@@ -66,7 +66,7 @@
 "converter": "Convertisseur",
 
 "splitCalculator": "Calculateur de splits",
-"pullDownToSeeOptions": "Faites glisser vers le bas pour voir les options",
+"pullDownToSeeOptions": "Appuyez pour plus d'options",
 "course": "Parcours",
 "scy": "SCY",
 "scm": "SCM",

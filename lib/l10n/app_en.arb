@@ -6,7 +6,7 @@
 "textSize": "Text Size",
 "small": "SMALL",
 "medium": "MEDIUM",
-"big": "BIG",
+"big": "Large",
 "accessibility": "ACCESSIBILITY",
 "language": "Language",
 "stopWatchSound": "Stopwatch Sound",
@@ -67,7 +67,7 @@
 
 
 "splitCalculator": "Split Calculator",
-"pullDownToSeeOptions": "Pull Down To See Options",
+"pullDownToSeeOptions": "Tap for more options",
 "course": "Course",
 "scy": "SCY",
 "scm": "SCM",

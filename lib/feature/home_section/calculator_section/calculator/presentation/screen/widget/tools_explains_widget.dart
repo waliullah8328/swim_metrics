@@ -85,7 +85,7 @@ class _ToolsHeaderState extends State<ToolsHeader> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: AppLocalizations.of(context)!.splitCalculation,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
+                    CustomText(text: AppLocalizations.of(context)!.splitCalculator,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
                     Divider(),
                     CustomText(text: AppLocalizations.of(context)!.courseConversion,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize:getAdjustedFontSize(12, widget.fontSizeOption).sp,),
                     Divider(),

@@ -22,7 +22,7 @@ class SplitCalcState {
   final List<SplitResult> history; // store all results
 
   const SplitCalcState({
-    this.course = '',
+    this.course = 'SCY',
     this.gender = '',
     this.stroke = '',
     this.distance = '',

@@ -30,7 +30,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medium => 'MEDIUM';
 
   @override
-  String get big => 'BIG';
+  String get big => 'Large';
 
   @override
   String get accessibility => 'ACCESSIBILITY';
@@ -182,7 +182,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splitCalculator => 'Split Calculator';
 
   @override
-  String get pullDownToSeeOptions => 'Pull Down To See Options';
+  String get pullDownToSeeOptions => 'Tap for more options';
 
   @override
   String get course => 'Course';

@@ -183,8 +183,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get splitCalculator => 'Calcolatore degli split';
 
   @override
-  String get pullDownToSeeOptions =>
-      'Scorri verso il basso per vedere le opzioni';
+  String get pullDownToSeeOptions => 'Tocca per altre opzioni';
 
   @override
   String get course => 'Corso';

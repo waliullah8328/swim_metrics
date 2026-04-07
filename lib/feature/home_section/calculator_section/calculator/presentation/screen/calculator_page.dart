@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_file/open_file.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
@@ -191,10 +193,17 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                     builder: (context, ref, child) {
                                       final state = ref.watch(splitCalcProvider);
 
-                                      /// ✅ SAFE VALUE
+                                      // ✅ Ensure safe value and default to SCY
                                       final course = state.course.trim().toUpperCase();
                                       const validCourses = ["SCY", "SCM", "LCM"];
                                       final selected = validCourses.contains(course) ? course : "SCY";
+
+                                      // Dropdown display names (localized if needed)
+                                      final displayItems = {
+                                        "SCY": AppLocalizations.of(context)?.scy ?? "SCY",
+                                        "SCM": AppLocalizations.of(context)?.scm ?? "SCM",
+                                        "LCM": AppLocalizations.of(context)?.lcm ?? "LCM",
+                                      };
 
                                       return Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -211,28 +220,23 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               Icons.keyboard_arrow_down,
                                               color: Color(0xFFB8892D),
                                             ),
-                                            dropdownColor:
-                                            isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
+                                            dropdownColor: isDark ? const Color(0xff033A5E) : const Color(0xFFD9D9D9),
                                             style: TextStyle(
                                               color: const Color(0xFFB8892D),
                                               fontSize: getAdjustedFontSize(12, fontOption).sp,
                                               fontWeight: FontWeight.w500,
                                             ),
-
-                                            /// ✅ ITEMS (UNCHANGED)
-                                            items: const [
-                                              DropdownMenuItem(value: "SCY", child: Text("SCY")),
-                                              DropdownMenuItem(value: "SCM", child: Text("SCM")),
-                                              DropdownMenuItem(value: "LCM", child: Text("LCM")),
-                                            ],
-
-                                            /// ✅ SAFE UPDATE
+                                            items: validCourses
+                                                .map((c) => DropdownMenuItem<String>(
+                                              value: c,
+                                              child: Text(displayItems[c]!),
+                                            ))
+                                                .toList(),
                                             onChanged: (value) {
                                               if (value == null) return;
 
-                                              ref
-                                                  .read(splitCalcProvider.notifier)
-                                                  .setCourse(value.toLowerCase());
+                                              // ✅ Update provider safely
+                                              ref.read(splitCalcProvider.notifier).setCourse(value.toLowerCase());
                                             },
                                           ),
                                         ),
@@ -658,59 +662,70 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
 
                 /// ACTION BUTTONS
-                //  if(ref.watch(splitCalcProvider).output.isNotEmpty)
-                //    Row(
-                //      children: [
-                //        Expanded(
-                //          child: ElevatedButton(
-                //            style: ElevatedButton.styleFrom(
-                //                backgroundColor:Color(0xff234B6E),
-                //                side: BorderSide(color: Color(0xff234B6E))
-                //            ),
-                //            onPressed: () {
-                //              if(isHaptic == true){
-                //                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-                //
-                //              }
-                //              ref.watch(splitCalcProvider.notifier).clear();
-                //            },
-                //            child: Center(
-                //              child: Row(
-                //                mainAxisAlignment: MainAxisAlignment.center,
-                //                children: [
-                //                  SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
-                //                  SizedBox(width: 6.w,),
-                //                  CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: getAdjustedFontSize(16, fontOption).sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
-                //                ],
-                //              ),
-                //            ),
-                //          ),
-                //        ),
-                //        SizedBox(width: 12.w),
-                //        Expanded(
-                //          child: ElevatedButton(
-                //            style: ElevatedButton.styleFrom(
-                //              backgroundColor:AppColors.primary,
-                //            ),
-                //            onPressed: () {
-                //              if(isHaptic == true){
-                //                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-                //
-                //              }
-                //              exportOutputAsPdf(context, ref.watch(splitCalcProvider).output);
-                //            },
-                //            child: Row(
-                //              mainAxisAlignment: MainAxisAlignment.center,
-                //              children: [
-                //                SvgPicture.asset(IconPath.exportIcon,colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),),
-                //                SizedBox(width: 6.w,),
-                //                CustomText(text:  AppLocalizations.of(context)!.export,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w700,),
-                //              ],
-                //            ),
-                //          ),
-                //        ),
-                //      ],
-                //    ),
+                 if(ref.watch(splitCalcProvider).history.isNotEmpty)
+                   Padding(
+                     padding:  EdgeInsets.only(top: 16.h),
+                     child: Row(
+                       children: [
+                         Expanded(
+                           child: ElevatedButton(
+                             style: ElevatedButton.styleFrom(
+                                 backgroundColor:Color(0xff234B6E),
+                                 side: BorderSide(color: Color(0xff234B6E))
+                             ),
+                             onPressed: () {
+                               if(isHaptic == true){
+                                 HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                               }
+                               ref.watch(splitCalcProvider.notifier).clearHistory();
+                             },
+                             child: Center(
+                               child: Row(
+                                 mainAxisAlignment: MainAxisAlignment.center,
+                                 children: [
+                                   SvgPicture.asset(IconPath.clearIcon,colorFilter: ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn),),
+                                   SizedBox(width: 6.w,),
+                                   CustomText(text:  AppLocalizations.of(context)!.clear,fontSize: getAdjustedFontSize(16, fontOption).sp,color: AppColors.textWhite,fontWeight: FontWeight.w700,),
+                                 ],
+                               ),
+                             ),
+                           ),
+                         ),
+                         SizedBox(width: 12.w),
+                         Expanded(
+                           child: ElevatedButton(
+                             style: ElevatedButton.styleFrom(
+                               backgroundColor: AppColors.primary,
+                             ),
+                             onPressed: () {
+                               if (isHaptic == true) {
+                                 HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+                               }
+
+                               final history = ref.read(splitCalcProvider).history;
+                               exportHistoryAsPdf(context, history);
+                             },
+                             child: Row(
+                               mainAxisAlignment: MainAxisAlignment.center,
+                               children: [
+                                 SvgPicture.asset(
+                                   IconPath.exportIcon,
+                                   colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                                 ),
+                                 SizedBox(width: 6.w),
+                                 CustomText(
+                                   text: AppLocalizations.of(context)!.export,
+                                   fontSize: getAdjustedFontSize(16, fontOption).sp,
+                                   fontWeight: FontWeight.w700,
+                                 ),
+                               ],
+                             ),
+                           ),
+                         ),
+                       ],
+                     ),
+                   ),
 
               ],
             ),
@@ -721,82 +736,54 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
 
 
-  Future<void> exportOutputAsPdf(
-      BuildContext context,
-      String output,
-      ) async {
-    if (output.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("No output to export"),
-        ),
-      );
-      return;
-    }
-
+  Future<void> exportHistoryAsPdf(BuildContext context, List history) async {
     final pdf = pw.Document();
 
+    // Load your logo from assets
+    final ByteData logoData = await rootBundle.load('assets/images/app_logo.png');
+    final Uint8List logoBytes = logoData.buffer.asUint8List();
+
+    // Create PDF pages
     pdf.addPage(
-      pw.Page(
-        margin: const pw.EdgeInsets.all(24),
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(32),
+        header: (context) {
+          return pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-
-              /// Title
-              pw.Text(
-                "Swim Split Calculation",
-                style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-
-              pw.SizedBox(height: 12),
-
-              /// Divider
-              pw.Divider(),
-
-              pw.SizedBox(height: 12),
-
-              /// Output text (monospace like console)
-              pw.Text(
-                output,
-                style: pw.TextStyle(
-                  font: pw.Font.courier(),
-                  fontSize: 12,
-                ),
-              ),
+              pw.Text('Page ${context.pageNumber}', style: pw.TextStyle(fontSize: 12)),
+              pw.Image(pw.MemoryImage(logoBytes), width: 50, height: 50),
             ],
           );
+        },
+        build: (pw.Context context) {
+          return history.reversed.map<pw.Widget>((item) {
+            return pw.Container(
+              margin: const pw.EdgeInsets.only(bottom: 16),
+              padding: const pw.EdgeInsets.all(12),
+              decoration: pw.BoxDecoration(
+                border: pw.Border.all(color: PdfColors.blue, width: 1),
+                borderRadius: pw.BorderRadius.circular(8),
+              ),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(item.output ?? '', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(height: 6),
+                  ...List<pw.Widget>.from(item.splits.map((s) => pw.Text(s.toString(), style: pw.TextStyle(fontSize: 12)))),
+                ],
+              ),
+            );
+          }).toList();
         },
       ),
     );
 
-    try {
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/swim_split_output.pdf');
-
-      await file.writeAsBytes(await pdf.save());
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("PDF saved at: ${file.path}"),
-        ),
-      );
-
-      await OpenFile.open(file.path);
-
-    } catch (e) {
-      debugPrint("PDF export error: $e");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Failed to export PDF"),
-        ),
-      );
-    }
+    // Preview or print PDF
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
   }
 
   static List<int> getDistances(String course, String stroke, String gender) {

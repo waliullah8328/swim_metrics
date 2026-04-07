@@ -147,7 +147,7 @@ abstract class AppLocalizations {
   /// No description provided for @big.
   ///
   /// In en, this message translates to:
-  /// **'BIG'**
+  /// **'Large'**
   String get big;
 
   /// No description provided for @accessibility.
@@ -447,7 +447,7 @@ abstract class AppLocalizations {
   /// No description provided for @pullDownToSeeOptions.
   ///
   /// In en, this message translates to:
-  /// **'Pull Down To See Options'**
+  /// **'Tap for more options'**
   String get pullDownToSeeOptions;
 
   /// No description provided for @course.

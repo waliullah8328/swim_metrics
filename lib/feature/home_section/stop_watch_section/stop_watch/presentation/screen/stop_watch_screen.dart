@@ -226,7 +226,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                             text: mode,
 
                             fontWeight: FontWeight.w600,
-                            fontSize: getAdjustedFontSize(17, fontOption).sp,
+                            fontSize: getAdjustedFontSize(14, fontOption).sp,
                             color: isActive
                                 ? Colors.black
                                 : const Color(0xFF82888E),
