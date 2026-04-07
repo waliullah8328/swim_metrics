@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:open_file/open_file.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
-
 import '../../../../../../config/route/routes_name.dart';
 import '../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../core/common/widgets/new_custon_widgets/split_calculator_selector_one.dart';
@@ -21,147 +19,90 @@ import '../../../../calculator_section/calculator/riverpod/audio_controller.dart
 import '../../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
-
 import '../../riverpod/stop_watch_controller_2.dart';
 
 enum StopwatchStatus { initial, running, stopped }
 
 class StopwatchController1 extends StateNotifier<StopwatchStatus> {
   StopwatchController1() : super(StopwatchStatus.initial);
-
-  void start() {
-    state = StopwatchStatus.running;
-  }
-
-  void stop() {
-    state = StopwatchStatus.stopped;
-  }
-
-  void resume() {
-    state = StopwatchStatus.running;
-  }
-
-  void clear() {
-    state = StopwatchStatus.initial;
-  }
+  void start() => state = StopwatchStatus.running;
+  void stop() => state = StopwatchStatus.stopped;
+  void resume() => state = StopwatchStatus.running;
+  void clear() => state = StopwatchStatus.initial;
 }
 
-final stopwatchProvider1 =
-    StateNotifierProvider<StopwatchController1, StopwatchStatus>(
+final stopwatchProvider1 = StateNotifierProvider<StopwatchController1, StopwatchStatus>(
       (ref) => StopwatchController1(),
-    );
-
+);
 final showCourseSectionStopWatchProvider = StateProvider<bool>((ref) => true);
 final showCourseSectionStopWatchProvider2 = StateProvider<bool>((ref) => true);
 
 class StopwatchScreen extends ConsumerStatefulWidget {
   const StopwatchScreen({super.key});
-
   @override
   ConsumerState<StopwatchScreen> createState() => _StopwatchScreenState();
 }
 
 class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
-    // TODO: implement initState
     checkPlanExpiry(context);
     super.initState();
   }
 
   Future<void> checkPlanExpiry(BuildContext context) async {
     final planEndDate = await TokenStorage.getPlanEndDate();
-
-
     if (planEndDate == null) return;
-
     if (DateTime.now().isAfter(planEndDate)) {
-      // ❌ Plan expired → logout
       await TokenStorage.clearAll();
       await TokenStorage.deleteLoginFlag();
-
-      // Navigate to login
-      context.go(RouteNames.loginScreen);
+      if (context.mounted) context.go(RouteNames.loginScreen);
     }
   }
 
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
-  int selectedIndex = 0;
-
   double getAdjustedFontSize(double baseSize, FontSizeOption option) {
     switch (option) {
-      case FontSizeOption.small:
-        return baseSize - 2;
-      case FontSizeOption.medium:
-        return baseSize;
-      case FontSizeOption.big:
-        return baseSize + 2;
+      case FontSizeOption.small: return baseSize - 2;
+      case FontSizeOption.medium: return baseSize;
+      case FontSizeOption.big: return baseSize + 2;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    // ✅ FIX 1: activeMode defined properly at the top of build()
+    final activeMode = ref.watch(stopwatchProvider2.select((s) => s.activeMode));
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final status = ref.watch(stopwatchProvider1);
-
     final settings = ref.watch(settingsProvider);
     final currentLanguageCode = settings.language.code;
     final showCourse = ref.watch(showCourseSectionStopWatchProvider);
     final showCourse2 = ref.watch(showCourseSectionStopWatchProvider2);
+    final fontOption = settings.fontSize;
+    final isHaptic = ref.watch(settingsProvider.select((s) => s.haptic));
+    final isStopWatch = ref.watch(settingsProvider.select((s) => s.stopwatchSound));
+
+    // ✅ Optimized logs (only update when log string actually changes)
     final log = ref.watch(stopwatchProvider2.select((s) => s.logStopwatch));
     final log2 = ref.watch(stopwatchProvider2.select((s) => s.logConverter));
     final log3 = ref.watch(stopwatchProvider2.select((s) => s.logPredictor));
-    final fontOption = ref.watch(settingsProvider).fontSize;
-    final isHaptic = ref.watch(settingsProvider.select((s)=>s.haptic));
-    final isStopWatch = ref.watch(settingsProvider.select((s)=>s.stopwatchSound));
-
     final modes = ["Stopwatch", "Converter", "Predictor"];
-    final activeMode = ref.watch(
-      stopwatchProvider2.select((s) => s.activeMode),
-    );
-
-    debugPrint("build");
 
     return Scaffold(
-      key: scaffoldKey,
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: CustomText(
-          text: AppLocalizations.of(context)!.stopWatch,
-          fontSize: getAdjustedFontSize(24, fontOption).sp,
-          fontWeight: FontWeight.w600,
-        ),
+        title: CustomText(text: AppLocalizations.of(context)!.stopWatch, fontSize: getAdjustedFontSize(24, fontOption).sp, fontWeight: FontWeight.w600),
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
-            if(isHaptic == true){
-              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-            }
-            scaffoldKey.currentState?.openDrawer();
+            if (isHaptic) HapticFeedback.lightImpact();
+            _scaffoldKey.currentState?.openDrawer();
           },
-          child: Padding(
-            padding: EdgeInsets.only(left: 18.w),
-            child: SvgPicture.asset(
-              IconPath.lightModeDrawerIcon,
-              height: 48.h,
-              width: 48.w,
-              fit: BoxFit.contain,
-            ),
-          ),
+          child: Padding(padding: EdgeInsets.only(left: 18.w), child: SvgPicture.asset(IconPath.lightModeDrawerIcon, height: 48.h, width: 48.w, fit: BoxFit.contain)),
         ),
-
-        /// Divider below AppBar
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1),
-          child: Divider(
-            height: 1,
-            thickness: 1,
-            color: isDark ? Color(0xffDADADA) : Colors.grey.shade300,
-          ),
-        ),
+        bottom: PreferredSize(preferredSize: Size.fromHeight(1), child: Divider(height: 1, thickness: 1, color: isDark ? const Color(0xffDADADA) : Colors.grey.shade300)),
       ),
       drawer: CustomDrawer(),
       body: SingleChildScrollView(
@@ -169,2520 +110,46 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              /// Top Buttons
-              CustomText(
-                text: AppLocalizations.of(context)!.mode,
-                fontSize: getAdjustedFontSize(18, fontOption).sp,
-                fontWeight: FontWeight.w600,
-                color: Color(0xffE3D99B),
-              ),
+              CustomText(text: AppLocalizations.of(context)!.mode, fontSize: getAdjustedFontSize(18, fontOption).sp, fontWeight: FontWeight.w600, color: const Color(0xffE3D99B)),
               SizedBox(height: 10.h),
-
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isDark ? Color(0xff153250) : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: const [
-                    BoxShadow(
-                      blurRadius: 8,
-                      spreadRadius: 1,
-                      offset: Offset(0, 4),
-                      color: Colors.black12,
-                    ),
-                  ],
-                ),
+                decoration: BoxDecoration(color: isDark ? const Color(0xff153250) : Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(blurRadius: 8, spreadRadius: 1, offset: Offset(0, 4), color: Colors.black12)]),
                 child: Row(
                   children: List.generate(modes.length * 2 - 1, (index) {
-                    if (index.isOdd) {
-                      return SizedBox(width: 6.w);
-                    }
-
+                    if (index.isOdd) return SizedBox(width: 6.w);
                     final itemIndex = index ~/ 2;
                     final mode = modes[itemIndex];
                     final isActive = activeMode == mode;
-
                     return Expanded(
                       child: GestureDetector(
                         onTap: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
                           ref.read(stopwatchProvider2.notifier).setMode(mode);
                           ref.read(stopwatchProvider1.notifier).clear();
                           ref.read(stopwatchProvider2.notifier).stop();
-                          if(isHaptic == true){
-                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                          }
+                          if (isHaptic) HapticFeedback.lightImpact();
                         },
                         child: Container(
                           alignment: Alignment.center,
                           height: 45.h,
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? const Color(0xFFC9A84C)
-                                : const Color(0xFFEAEDF1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: CustomText(
-                            text: mode,
-
-                            fontWeight: FontWeight.w600,
-                            fontSize: getAdjustedFontSize(14, fontOption).sp,
-                            color: isActive
-                                ? Colors.black
-                                : const Color(0xFF82888E),
-                          ),
+                          decoration: BoxDecoration(color: isActive ? const Color(0xFFC9A84C) : const Color(0xFFEAEDF1), borderRadius: BorderRadius.circular(10)),
+                          child: CustomText(text: mode, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp, color: isActive ? Colors.black : const Color(0xFF82888E)),
                         ),
                       ),
                     );
                   }),
                 ),
               ),
-
               SizedBox(height: 20.h),
-              if (!showCourse && activeMode == 'Converter')
-                Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      ref
-                              .read(showCourseSectionStopWatchProvider.notifier)
-                              .state =
-                          true;
-                      if(isHaptic == true){
-                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        SizedBox(height: 10.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(IconPath.pullIcon),
-                            CustomText(
-                              text: AppLocalizations.of(
-                                context,
-                              )!.pullDownToSeeOptions,
-                              fontSize: getAdjustedFontSize(14, fontOption).sp,
-                              color: Color(0xffC7C7C7),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20.h),
-                      ],
-                    ),
-                  ),
-                  // child: IconButton(
-                  //   icon: const Icon(Icons.keyboard_arrow_down, size: 32),
-                  //   onPressed: () {
-                  //     ref.read(showCourseSectionProvider.notifier).state = true;
-                  //   },
-                  // ),
-                ),
+              if (!showCourse && activeMode == 'Converter') _pullDownHint(isHaptic, fontOption, context, () => ref.read(showCourseSectionStopWatchProvider.notifier).state = true),
+              if (!showCourse2 && activeMode == 'Predictor') _pullDownHint(isHaptic, fontOption, context, () => ref.read(showCourseSectionStopWatchProvider2.notifier).state = true),
 
-              if (!showCourse2 && activeMode == 'Predictor')
-                Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      ref
-                              .read(
-                                showCourseSectionStopWatchProvider2.notifier,
-                              )
-                              .state =
-                          true;
-                      if(isHaptic == true){
-                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        SizedBox(height: 10.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(IconPath.pullIcon),
-                            CustomText(
-                              text: AppLocalizations.of(
-                                context,
-                              )!.pullDownToSeeOptions,
-                              fontSize: getAdjustedFontSize(14, fontOption).sp,
-                              color: Color(0xffC7C7C7),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20.h),
-                      ],
-                    ),
-                  ),
-                ),
-
-              /// Main Content
-              activeMode == 'Stopwatch'
-                  ? Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? Color(0xff0C3156)
-                                : Color(0xffFFFFFF),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 8,
-                                spreadRadius: 1,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-
-                          child: Column(
-                            children: [
-                              Consumer(
-                                builder: (context, ref, child) {
-                                  var time = ref.watch(
-                                    stopwatchProvider2.select(
-                                      (s) => s.elapsed(),
-                                    ),
-                                  );
-
-                                  return Card(
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(24.0),
-                                        child: CustomText(
-                                          text: _formatElapsed(time),
-                                          fontSize: getAdjustedFontSize(
-                                            35,
-                                            fontOption,
-                                          ).sp,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 20.h),
-
-                              /// INITIAL STATE
-                              if (status == StopwatchStatus.initial)
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    fixedSize: Size(double.infinity, 52.h),
-                                    backgroundColor: isDark
-                                        ? Color(0xffC69C3F)
-                                        : null,
-                                  ),
-                                  onPressed: () {
-                                    ref
-                                        .read(stopwatchProvider2.notifier)
-                                        .start();
-                                    ref
-                                        .read(stopwatchProvider1.notifier)
-                                        .start();
-                                    if(isHaptic == true){
-                                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                    }
-                                    if(isStopWatch == true){
-                                      /// ▶️ PLAY AUDIO
-                                      ref.read(audioProvider.notifier).play();
-                                    }
-
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SvgPicture.asset(
-                                        IconPath.startIcon,
-                                        colorFilter: ColorFilter.mode(
-                                          Colors.black,
-                                          BlendMode.srcIn,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10.w),
-                                      CustomText(
-                                        text: AppLocalizations.of(
-                                          context,
-                                        )!.start,
-
-                                        fontSize: getAdjustedFontSize(
-                                          14,
-                                          fontOption,
-                                        ).sp,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                              /// RUNNING STATE
-                              if (status == StopwatchStatus.running)
-                                Column(
-                                  children: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        fixedSize: Size(double.infinity, 52.h),
-                                        backgroundColor: Color(0xff2DA8F0),
-                                        side: BorderSide(
-                                          color: Color(0xff2DA8F0),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        ref
-                                            .read(stopwatchProvider1.notifier)
-                                            .start();
-                                        ref
-                                            .read(stopwatchProvider2.notifier)
-                                            .split();
-                                        if(isHaptic == true){
-                                          HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                        }
-                                      },
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              IconPath.splitIcon,
-                                              colorFilter: ColorFilter.mode(
-                                                Colors.black,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                            SizedBox(width: 6.w),
-                                            CustomText(
-                                              text: AppLocalizations.of(
-                                                context,
-                                              )!.split,
-                                              fontSize: getAdjustedFontSize(
-                                                16,
-                                                fontOption,
-                                              ).sp,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                    SizedBox(height: 20.h),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              fixedSize: Size(
-                                                double.infinity,
-                                                52.h,
-                                              ),
-                                              backgroundColor: Color(
-                                                0xff475569,
-                                              ),
-                                              side: BorderSide(
-                                                color: Color(0xff475569),
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              ref
-                                                  .read(
-                                                    stopwatchProvider1.notifier,
-                                                  )
-                                                  .start();
-                                              ref
-                                                  .read(
-                                                    stopwatchProvider2.notifier,
-                                                  )
-                                                  .undoLastSplit();
-                                              if(isHaptic == true){
-                                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                              }
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                SvgPicture.asset(
-                                                  IconPath.undoIcon,
-                                                  colorFilter: ColorFilter.mode(
-                                                    AppColors.textWhite,
-                                                    BlendMode.srcIn,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 6.w),
-                                                CustomText(
-                                                  text: AppLocalizations.of(
-                                                    context,
-                                                  )!.undoSplit,
-                                                  color: AppColors.textWhite,
-                                                  fontSize: getAdjustedFontSize(
-                                                    12,
-                                                    fontOption,
-                                                  ).sp,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 10.w),
-
-                                        Expanded(
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              fixedSize: Size(
-                                                double.infinity,
-                                                52.h,
-                                              ),
-                                              backgroundColor: Color(
-                                                0xffFE484C,
-                                              ),
-                                              side: BorderSide(
-                                                color: Color(0xffFE484C),
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              ref
-                                                  .read(
-                                                    stopwatchProvider1.notifier,
-                                                  )
-                                                  .stop();
-                                              ref
-                                                  .read(
-                                                    stopwatchProvider2.notifier,
-                                                  )
-                                                  .pause();
-                                              if(isHaptic == true){
-                                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                              }
-                                              if(isStopWatch == true){
-                                                /// ▶️ PLAY AUDIO
-                                                ref.read(audioProvider.notifier).stop();
-                                              }
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                SvgPicture.asset(
-                                                  IconPath.stopIcon,
-                                                  colorFilter: ColorFilter.mode(
-                                                    AppColors.textWhite,
-                                                    BlendMode.srcIn,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 6.w),
-                                                CustomText(
-                                                  text: AppLocalizations.of(
-                                                    context,
-                                                  )!.stop,
-                                                  color: AppColors.textWhite,
-                                                  fontSize: getAdjustedFontSize(
-                                                    12,
-                                                    fontOption,
-                                                  ).sp,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-
-                              /// STOPPED STATE
-                              if (status == StopwatchStatus.stopped)
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          fixedSize: Size(
-                                            double.infinity,
-                                            52.h,
-                                          ),
-                                          backgroundColor: AppColors.primary,
-                                          side: BorderSide(
-                                            color: AppColors.primary,
-                                          ),
-                                        ),
-
-                                        onPressed: () {
-                                          ref
-                                              .read(stopwatchProvider2.notifier)
-                                              .start();
-                                          ref
-                                              .read(stopwatchProvider1.notifier)
-                                              .resume();
-                                          if(isHaptic == true){
-                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                          }
-                                          if(isStopWatch == true){
-                                            /// ▶️ PLAY AUDIO
-                                            ref.read(audioProvider.notifier).play();
-                                          }
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              IconPath.startIcon,
-                                              colorFilter: ColorFilter.mode(
-                                                Colors.black,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                            SizedBox(width: 6.w),
-                                            CustomText(
-                                              text: AppLocalizations.of(
-                                                context,
-                                              )!.resume,
-                                              color: Colors.black,
-                                              fontSize:
-                                                  currentLanguageCode
-                                                          .toString() !=
-                                                      "en"
-                                                  ? getAdjustedFontSize(
-                                                      12,
-                                                      fontOption,
-                                                    ).sp
-                                                  : getAdjustedFontSize(
-                                                      16,
-                                                      fontOption,
-                                                    ).sp.sp,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                    SizedBox(width: 10.w),
-
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          fixedSize: Size(
-                                            double.infinity,
-                                            52.h,
-                                          ),
-                                          backgroundColor: Color(0xff6F35CA),
-                                          side: BorderSide(
-                                            color: Color(0xff6F35CA),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          ref
-                                              .read(stopwatchProvider1.notifier)
-                                              .clear();
-                                          ref
-                                              .read(stopwatchProvider2.notifier)
-                                              .reset();
-                                          if(isHaptic == true){
-                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                          }
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              IconPath.clearIcon,
-                                              colorFilter: ColorFilter.mode(
-                                                AppColors.textWhite,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                            SizedBox(width: 6.w),
-                                            CustomText(
-                                              text: AppLocalizations.of(
-                                                context,
-                                              )!.clearTime,
-                                              color: AppColors.textWhite,
-                                              fontSize:
-                                                  currentLanguageCode
-                                                          .toString() !=
-                                                      "en"
-                                                  ? getAdjustedFontSize(
-                                                      12,
-                                                      fontOption,
-                                                    ).sp
-                                                  : getAdjustedFontSize(
-                                                      16,
-                                                      fontOption,
-                                                    ).sp,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                              SizedBox(height: 20.h),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20.h),
-
-                        if (log.isNotEmpty)
-                          Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? Color(0xff0C3156)
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    width: 1.w,
-                                    color: Color(0xff2DA8F0),
-                                  ),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      blurRadius: 12,
-                                      color: Colors.black12,
-                                    ),
-                                  ],
-                                ),
-                                child: SingleChildScrollView(
-                                  child: Consumer(
-                                    builder: (context, ref, child) {
-                                      final controller = ref.watch(stopwatchProvider2);
-
-                                      return CustomText(
-                                        text: _activeLog(controller), // ✅ reactive now
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 16.h),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xff234B6E),
-                                        side: BorderSide(
-                                          color: Color(0xff234B6E),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        ref
-                                            .watch(
-                                          stopwatchProvider2
-                                              .notifier,
-                                        )
-                                            .clearLog();
-                                        if(isStopWatch == true){
-                                          /// ▶️ PLAY AUDIO
-                                          ref.read(audioProvider.notifier).stop();
-                                        }
-                                        ref
-                                            .read(stopwatchProvider2.notifier)
-                                            .pause(); // you need a method to clear log
-                                        if(isHaptic == true){
-                                          HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                        }
-                                      },
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              IconPath.clearIcon,
-                                              colorFilter: ColorFilter.mode(
-                                                AppColors.textWhite,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                            SizedBox(width: 6.w),
-                                            CustomText(
-                                              text: AppLocalizations.of(
-                                                context,
-                                              )!.clear,
-                                              fontSize: getAdjustedFontSize(
-                                                16,
-                                                fontOption,
-                                              ).sp,
-                                              color: AppColors.textWhite,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.primary,
-                                      ),
-                                      onPressed: () {
-                                        exportOutputAsPdf1(context, ref);
-                                        if(isHaptic == true){
-                                          HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                        }
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SvgPicture.asset(
-                                            IconPath.exportIcon,
-                                            colorFilter: ColorFilter.mode(
-                                              Colors.black,
-                                              BlendMode.srcIn,
-                                            ),
-                                          ),
-                                          SizedBox(width: 6.w),
-                                          CustomText(
-                                            text: AppLocalizations.of(
-                                              context,
-                                            )!.export,
-                                            fontSize: getAdjustedFontSize(
-                                              16,
-                                              fontOption,
-                                            ).sp,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                      ],
-                    )
-                  : activeMode == 'Converter'
-                  ? Container(
-                      padding: const EdgeInsets.all(16),
-
-                      decoration: BoxDecoration(
-                        color: isDark ? Color(0xff0C3156) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(blurRadius: 6, color: Colors.black12),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          if (showCourse)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    children: [
-                                      CustomText(
-                                        text: AppLocalizations.of(
-                                          context,
-                                        )!.from,
-
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: getAdjustedFontSize(
-                                          14,
-                                          fontOption,
-                                        ).sp,
-                                      ),
-                                      SizedBox(height: 8.h),
-
-                                      Consumer(
-                                        builder: (context, ref, child) {
-                                          const items = ["SCY", "SCM", "LCM"];
-
-                                          final state = ref.watch(stopwatchProvider2);
-                                          final course = state.fromCourse;
-
-
-                                          final controller = ref.read(stopwatchProvider2.notifier);
-
-                                          final selectedValue = items.firstWhere(
-                                                (item) => item.toLowerCase() == course,
-                                            orElse: () => items.first,
-                                          );
-
-                                          return SplitCalculatorSelectorOne(
-                                            items: items,
-                                            selectedValue: selectedValue,
-                                            onChanged: (selected) {
-                                              final newCourse = selected.toLowerCase();
-
-                                              // ✅ use BOTH course + stroke
-                                              // final distances = getDistances(newCourse, stroke);
-
-                                              controller.setConverterCourses(
-                                                from: newCourse,
-                                              );
-                                              if(isHaptic == true){
-                                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                              }
-
-                                              // reset distance safely
-                                              // controller.setDistance(distances.first);
-                                            },
-                                          );
-                                        },
-                                      )
-
-                                    ],
-                                  ),
-                                ),
-
-                                Expanded(
-                                  child: Column(
-                                    children: [
-                                      CustomText(
-                                        text: AppLocalizations.of(context)!.to,
-
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: getAdjustedFontSize(
-                                          14,
-                                          fontOption,
-                                        ).sp,
-                                      ),
-                                      SizedBox(height: 8.h),
-
-
-                                      Consumer(
-                                        builder: (context, ref, child) {
-                                          const items = ["SCY", "SCM", "LCM"];
-
-                                          final state = ref.watch(stopwatchProvider2);
-                                          final course = state.toCourse;
-
-
-                                          final controller = ref.read(stopwatchProvider2.notifier);
-
-                                          final selectedValue = items.firstWhere(
-                                                (item) => item.toLowerCase() == course,
-                                            orElse: () => items.first,
-                                          );
-
-                                          return SplitCalculatorSelectorOne(
-                                            items: items,
-                                            selectedValue: selectedValue,
-                                            onChanged: (selected) {
-                                              final newCourse = selected.toLowerCase();
-
-                                              // ✅ use BOTH course + stroke
-                                              // final distances = getDistances(newCourse, stroke);
-
-                                              controller.setConverterCourses(
-                                                to: newCourse,
-                                              );
-                                              if(isHaptic == true){
-                                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                              }
-
-                                              // reset distance safely
-                                              // controller.setDistance(distances.first);
-                                            },
-                                          );
-                                        },
-                                      )
-
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? Color(0xff0C3156)
-                                  : Color(0xffFFFFFF),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-
-                            child: Column(
-                              children: [
-                                Consumer(
-                                  builder: (context, ref, child) {
-                                    var time = ref.watch(
-                                      stopwatchProvider2.select(
-                                        (s) => s.elapsed(),
-                                      ),
-                                    );
-
-                                    return Card(
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(24.0),
-                                          child: CustomText(
-                                            text: _formatElapsed(time),
-                                            fontSize: getAdjustedFontSize(
-                                              35,
-                                              fontOption,
-                                            ).sp,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                SizedBox(height: 20.h),
-
-                                /// INITIAL STATE
-                                if (status == StopwatchStatus.initial &&
-                                    activeMode == 'Converter')
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      fixedSize: Size(double.infinity, 52.h),
-                                      backgroundColor: isDark
-                                          ? Color(0xffC69C3F)
-                                          : null,
-                                    ),
-                                    onPressed: () {
-                                      ref
-                                          .read(stopwatchProvider2.notifier)
-                                          .start();
-                                      ref
-                                          .read(stopwatchProvider1.notifier)
-                                          .start();
-
-                                      ref
-                                              .read(
-                                                showCourseSectionStopWatchProvider
-                                                    .notifier,
-                                              )
-                                              .state =
-                                          false;
-                                      if(isHaptic == true){
-                                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                      }
-                                      if(isStopWatch == true){
-                                        /// ▶️ PLAY AUDIO
-                                        ref.read(audioProvider.notifier).play();
-                                      }
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                          IconPath.startIcon,
-                                          colorFilter: ColorFilter.mode(
-                                            Colors.black,
-                                            BlendMode.srcIn,
-                                          ),
-                                        ),
-                                        SizedBox(width: 10.w),
-                                        CustomText(
-                                          text: AppLocalizations.of(
-                                            context,
-                                          )!.start,
-
-                                          fontSize: getAdjustedFontSize(
-                                            14,
-                                            fontOption,
-                                          ).sp,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                /// RUNNING STATE
-                                if (status == StopwatchStatus.running &&
-                                    activeMode == 'Converter')
-                                  Column(
-                                    children: [
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          fixedSize: Size(
-                                            double.infinity,
-                                            52.h,
-                                          ),
-                                          backgroundColor: Color(0xff2DA8F0),
-                                          side: BorderSide(
-                                            color: Color(0xff2DA8F0),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          ref
-                                              .read(stopwatchProvider1.notifier)
-                                              .start();
-                                          ref
-                                              .read(stopwatchProvider2.notifier)
-                                              .split();
-                                          if(isHaptic == true){
-                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                          }
-                                        },
-                                        child: Center(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                IconPath.splitIcon,
-                                                colorFilter: ColorFilter.mode(
-                                                  Colors.black,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                              SizedBox(width: 6.w),
-                                              CustomText(
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.split,
-                                                fontSize: getAdjustedFontSize(
-                                                  16,
-                                                  fontOption,
-                                                ).sp,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 20.h),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                fixedSize: Size(
-                                                  double.infinity,
-                                                  52.h,
-                                                ),
-                                                backgroundColor: Color(
-                                                  0xff475569,
-                                                ),
-                                                side: BorderSide(
-                                                  color: Color(0xff475569),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                ref
-                                                    .read(
-                                                      stopwatchProvider1
-                                                          .notifier,
-                                                    )
-                                                    .start();
-                                                ref
-                                                    .read(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .undoLastSplit();
-                                                if(isHaptic == true){
-                                                  HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                                }
-                                              },
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    IconPath.undoIcon,
-                                                    colorFilter:
-                                                        ColorFilter.mode(
-                                                          AppColors.textWhite,
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                  ),
-                                                  SizedBox(width: 6.w),
-                                                  CustomText(
-                                                    text: AppLocalizations.of(
-                                                      context,
-                                                    )!.undoSplit,
-                                                    color: AppColors.textWhite,
-                                                    fontSize:
-                                                        getAdjustedFontSize(
-                                                          12,
-                                                          fontOption,
-                                                        ).sp,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 10.w),
-
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                fixedSize: Size(
-                                                  double.infinity,
-                                                  52.h,
-                                                ),
-                                                backgroundColor: Color(
-                                                  0xffFE484C,
-                                                ),
-                                                side: BorderSide(
-                                                  color: Color(0xffFE484C),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                ref
-                                                    .read(
-                                                      stopwatchProvider1
-                                                          .notifier,
-                                                    )
-                                                    .stop();
-                                                ref
-                                                    .read(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .pause();
-                                                if(isHaptic == true){
-                                                  HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                                }
-                                                if(isStopWatch == true){
-                                                  /// ▶️ PLAY AUDIO
-                                                  ref.read(audioProvider.notifier).stop();
-                                                }
-                                              },
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    IconPath.stopIcon,
-                                                    colorFilter:
-                                                        ColorFilter.mode(
-                                                          AppColors.textWhite,
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                  ),
-                                                  SizedBox(width: 6.w),
-                                                  CustomText(
-                                                    text: AppLocalizations.of(
-                                                      context,
-                                                    )!.stop,
-                                                    color: AppColors.textWhite,
-                                                    fontSize:
-                                                        getAdjustedFontSize(
-                                                          12,
-                                                          fontOption,
-                                                        ).sp,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-
-                                /// STOPPED STATE
-                                if (status == StopwatchStatus.stopped &&
-                                    activeMode == 'Converter')
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            fixedSize: Size(
-                                              double.infinity,
-                                              52.h,
-                                            ),
-                                            backgroundColor: AppColors.primary,
-                                            side: BorderSide(
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-
-                                          onPressed: () {
-                                            ref
-                                                .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .start();
-                                            ref
-                                                .read(
-                                                  stopwatchProvider1.notifier,
-                                                )
-                                                .resume();
-                                            if(isHaptic == true){
-                                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                            }
-                                            if(isStopWatch == true){
-                                              /// ▶️ PLAY AUDIO
-                                              ref.read(audioProvider.notifier).play();
-                                            }
-                                          },
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                IconPath.startIcon,
-                                                colorFilter: ColorFilter.mode(
-                                                  Colors.black,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                              SizedBox(width: 6.w),
-                                              CustomText(
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.resume,
-                                                color: Colors.black,
-                                                fontSize:
-                                                    currentLanguageCode
-                                                            .toString() !=
-                                                        "en"
-                                                    ? getAdjustedFontSize(
-                                                        12,
-                                                        fontOption,
-                                                      ).sp
-                                                    : getAdjustedFontSize(
-                                                        16,
-                                                        fontOption,
-                                                      ).sp,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      SizedBox(width: 10.w),
-
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            fixedSize: Size(
-                                              double.infinity,
-                                              52.h,
-                                            ),
-                                            backgroundColor: Color(0xff6F35CA),
-                                            side: BorderSide(
-                                              color: Color(0xff6F35CA),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            ref
-                                                    .watch(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .logConverter =
-                                                '';
-                                            ref
-                                                .read(
-                                                  stopwatchProvider1.notifier,
-                                                )
-                                                .clear();
-                                            ref
-                                                .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .reset();
-                                            if(isHaptic == true){
-                                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                            }
-                                          },
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                IconPath.clearIcon,
-                                                colorFilter: ColorFilter.mode(
-                                                  AppColors.textWhite,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                              SizedBox(width: 6.w),
-                                              CustomText(
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.clearTime,
-                                                color: AppColors.textWhite,
-                                                fontSize:
-                                                    currentLanguageCode
-                                                            .toString() !=
-                                                        "en"
-                                                    ? getAdjustedFontSize(
-                                                       9,
-                                                        fontOption,
-                                                      ).sp
-                                                    : getAdjustedFontSize(
-                                                        16,
-                                                        fontOption,
-                                                      ).sp,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                SizedBox(height: 20.h),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-                          if (log2.isNotEmpty)
-                            Column(
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? Color(0xff0C3156)
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Color(0xff2DA8F0),
-                                    ),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        blurRadius: 12,
-                                        color: Colors.black12,
-                                      ),
-                                    ],
-                                  ),
-                                  child: SingleChildScrollView(
-                                    child: Consumer(
-                                      builder: (context, ref, child) {
-                                        final controller = ref.watch(stopwatchProvider2);
-
-                                        return CustomText(
-                                          text: _activeLog(controller), // ✅ reactive now
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 16.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Color(0xff234B6E),
-                                          side: BorderSide(
-                                            color: Color(0xff234B6E),
-                                          ),
-                                        ),
-                                        onPressed: () {
-
-                                          ref
-                                              .read(stopwatchProvider2.notifier)
-                                              .pause(); // you need a method to clear log
-                                          if(isHaptic == true){
-                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                          }
-                                          ref
-                                              .watch(
-                                            stopwatchProvider2
-                                                .notifier,
-                                          )
-                                              .clearLog();
-                                          if(isStopWatch == true){
-                                            /// ▶️ PLAY AUDIO
-                                            ref.read(audioProvider.notifier).stop();
-                                          }
-                                        },
-                                        child: Center(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                IconPath.clearIcon,
-                                                colorFilter: ColorFilter.mode(
-                                                  AppColors.textWhite,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                              SizedBox(width: 6.w),
-                                              CustomText(
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.clear,
-                                                fontSize: getAdjustedFontSize(
-                                                  16,
-                                                  fontOption,
-                                                ).sp,
-                                                color: AppColors.textWhite,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary,
-                                        ),
-                                        onPressed: () {
-                                          exportOutputAsPdf(context, ref);
-                                          if(isHaptic == true){
-                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                          }
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              IconPath.exportIcon,
-                                              colorFilter: ColorFilter.mode(
-                                                Colors.black,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                            SizedBox(width: 6.w),
-                                            CustomText(
-                                              text: AppLocalizations.of(
-                                                context,
-                                              )!.export,
-                                              fontSize: getAdjustedFontSize(
-                                                16,
-                                                fontOption,
-                                              ).sp,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    )
-                  : Container(
-                      padding: const EdgeInsets.all(16),
-
-                      decoration: BoxDecoration(
-                        color: isDark ? Color(0xff0C3156) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(blurRadius: 6, color: Colors.black12),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          if (showCourse2)
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(
-                                              context,
-                                            )!.gender,
-
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(
-                                              14,
-                                              fontOption,
-                                            ).sp,
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final state1 = ref.watch(
-                                                stopwatchProvider2.select(
-                                                      (s) => s.gender,
-                                                ),
-                                              );
-
-                                              // convert to match UI
-                                              final selectedValue = state1.isNotEmpty
-                                                  ? state1[0].toUpperCase() +
-                                                  state1.substring(1)
-                                                  : "";
-                                              final controller1 = ref.read(
-                                                stopwatchProvider2.notifier,
-                                              );
-                                              debugPrint(state1.toString());
-
-                                              return SplitCalculatorSelectorOne(
-                                                items: const ["Men", "Women"],
-                                                selectedValue:
-                                                selectedValue, // ✅ keep selected after refresh
-                                                onChanged: (v) =>
-                                                    controller1.setPredictorParams(
-                                                      g: v,
-                                                    ),
-                                              );
-                                            },
-                                          ),
-
-                                          // Consumer(
-                                          //   builder: (context, ref, child) {
-                                          //     final state = ref.watch(
-                                          //       stopwatchProvider2,
-                                          //     );
-                                          //
-                                          //     // Define items
-                                          //     const items = ["men", "women"];
-                                          //     String capitalize(String s) =>
-                                          //         s.isNotEmpty
-                                          //         ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
-                                          //         : s;
-                                          //
-                                          //     return SplitCalculatorSelectorOne(
-                                          //       items: items
-                                          //           .map(capitalize)
-                                          //           .toList(), // display first letter uppercase
-                                          //       selectedValue: capitalize(
-                                          //         state.gender,
-                                          //       ), // show selected value capitalized
-                                          //       onChanged: (v) {
-                                          //         // Convert back to lowercase before storing
-                                          //         final lowerCaseValue = v
-                                          //             .toLowerCase();
-                                          //         ref
-                                          //             .read(
-                                          //               stopwatchProvider2
-                                          //                   .notifier,
-                                          //             )
-                                          //             .setPredictorParams(
-                                          //               g: lowerCaseValue,
-                                          //             );
-                                          //       },
-                                          //     );
-                                          //   },
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(
-                                              context,
-                                            )!.stroke,
-
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(
-                                              14,
-                                              fontOption,
-                                            ).sp,
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final items = const [
-                                                "Fly",
-                                                "Back",
-                                                "Breast",
-                                                "Free",
-                                                "IM",
-                                              ];
-
-                                              final state1 = ref.watch(
-                                                stopwatchProvider2.select(
-                                                      (s) => s.stroke,
-                                                ),
-                                              );
-
-                                              // match lowercase state with UI list
-                                              final selectedValue = items.firstWhere(
-                                                    (item) => item.toLowerCase() == state1,
-                                                orElse: () => "",
-                                              );
-
-                                              final controller1 = ref.read(
-                                                stopwatchProvider2.notifier,
-                                              );
-
-                                              return SplitCalculatorSelectorOne(
-                                                items: items,
-                                                selectedValue: selectedValue,
-                                                onChanged: (selected) {
-                                                  controller1.setPredictorParams(
-                                                    s: selected,
-                                                  ); // store lowercase inside
-                                                },
-                                              );
-                                            },
-                                          ),
-
-                                          // Consumer(
-                                          //   builder: (context, ref, child) {
-                                          //     final state = ref.watch(
-                                          //       stopwatchProvider2,
-                                          //     );
-                                          //
-                                          //     const strokes = [
-                                          //       "fly",
-                                          //       "back",
-                                          //       "free",
-                                          //       "breast",
-                                          //       "im",
-                                          //     ];
-                                          //     String formatStroke(String s) {
-                                          //       if (s.toLowerCase() == 'im') {
-                                          //         return 'IM';
-                                          //       }
-                                          //       return s.isNotEmpty
-                                          //           ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
-                                          //           : s;
-                                          //     }
-                                          //
-                                          //     return SplitCalculatorSelectorOne(
-                                          //       items: strokes
-                                          //           .map(formatStroke)
-                                          //           .toList(), // display formatted strokes
-                                          //       selectedValue: formatStroke(
-                                          //         state.stroke,
-                                          //       ), // display current selection formatted
-                                          //       onChanged: (v) {
-                                          //         // Convert back to lowercase for storing
-                                          //         final lowerCaseValue = v
-                                          //             .toLowerCase();
-                                          //         ref
-                                          //             .read(
-                                          //               stopwatchProvider2
-                                          //                   .notifier,
-                                          //             )
-                                          //             .setPredictorParams(
-                                          //               s: lowerCaseValue,
-                                          //             );
-                                          //       },
-                                          //     );
-                                          //   },
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10.h),
-                                Row(
-                                  children: [
-                                    /// ================= COURSE =================
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(
-                                              context,
-                                            )!.course,
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(
-                                              16,
-                                              fontOption,
-                                            ).sp,
-                                          ),
-                                          SizedBox(height: 8.h),
-
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              const items = ["SCY", "SCM", "LCM"];
-
-                                              final state = ref.watch(stopwatchProvider2);
-                                              final course = state.course;
-
-
-                                              final controller = ref.read(stopwatchProvider2.notifier);
-
-                                              final selectedValue = items.firstWhere(
-                                                    (item) => item.toLowerCase() == course,
-                                                orElse: () => items.first,
-                                              );
-
-                                              return SplitCalculatorSelectorOne(
-                                                items: items,
-                                                selectedValue: selectedValue,
-                                                onChanged: (selected) {
-                                                  final newCourse = selected.toLowerCase();
-                                                  final distances =
-                                                  getDistancesByCourse(
-                                                    newCourse,
-                                                  );
-
-                                                  // ✅ use BOTH course + stroke
-                                                  // final distances = getDistances(newCourse, stroke);
-
-                                                  controller.setPredictorParams(
-                                                    c: newCourse,
-
-                                                    // ✅ Reset distance safely
-                                                    d: distances.first,
-                                                  );
-
-                                                  // reset distance safely
-                                                  // controller.setDistance(distances.first);
-                                                },
-                                              );
-                                            },
-                                          ),
-
-                                          // Consumer(
-                                          //   builder: (context, ref, child) {
-                                          //     final state = ref.watch(
-                                          //       stopwatchProvider2,
-                                          //     );
-                                          //
-                                          //     const items = [
-                                          //       "scy",
-                                          //       "scm",
-                                          //       "lcm",
-                                          //     ];
-                                          //
-                                          //     return SplitCalculatorSelectorOne(
-                                          //       items: items
-                                          //           .map((e) => e.toUpperCase())
-                                          //           .toList(),
-                                          //
-                                          //       selectedValue: state.course
-                                          //           .toUpperCase(),
-                                          //
-                                          //       onChanged: (v) {
-                                          //         final newCourse = v
-                                          //             .toLowerCase();
-                                          //
-                                          //         // 🔥 Get valid distances for new course
-                                          //         final distances =
-                                          //             getDistancesByCourse(
-                                          //               newCourse,
-                                          //             );
-                                          //
-                                          //         ref
-                                          //             .read(
-                                          //               stopwatchProvider2
-                                          //                   .notifier,
-                                          //             )
-                                          //             .setPredictorParams(
-                                          //               c: newCourse,
-                                          //
-                                          //               // ✅ Reset distance safely
-                                          //               d: distances.first,
-                                          //             );
-                                          //       },
-                                          //     );
-                                          //   },
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-
-
-
-                                    /// ================= DISTANCE =================
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(
-                                              context,
-                                            )!.distance,
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(
-                                              14,
-                                              fontOption,
-                                            ).sp,
-                                          ),
-                                          SizedBox(height: 8.h),
-
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final state = ref.watch(stopwatchProvider2);
-                                              final controller = ref.read(stopwatchProvider2.notifier);
-
-                                              // ✅ use BOTH course + stroke
-                                              final distances = getDistances(
-                                                state.course,
-                                                state.stroke,
-                                              );
-
-                                              // ✅ ensure valid selection
-                                              final selectedDistance = distances.contains(state.distance)
-                                                  ? state.distance
-                                                  : distances.first;
-
-                                              return SplitCalculatorSelectorOne(
-                                                items: distances,
-                                                selectedValue: selectedDistance,
-                                                onChanged: (value) {
-                                                  controller.setPredictorParams(d: value);
-                                                },
-                                              );
-                                            },
-                                          ),
-
-                                          // Consumer(
-                                          //   builder: (context, ref, child) {
-                                          //     final state = ref.watch(
-                                          //       stopwatchProvider2,
-                                          //     );
-                                          //
-                                          //     // 🔥 Dynamic distances
-                                          //     final distances =
-                                          //         getDistancesByCourse(
-                                          //           state.course,
-                                          //         );
-                                          //
-                                          //     // ✅ Fix invalid selection automatically
-                                          //     final selectedDistance =
-                                          //         distances.contains(
-                                          //           state.distance,
-                                          //         )
-                                          //         ? state.distance
-                                          //         : distances.first;
-                                          //
-                                          //     return SplitCalculatorSelectorOne(
-                                          //       items: distances,
-                                          //
-                                          //       selectedValue: selectedDistance,
-                                          //
-                                          //       onChanged: (v) {
-                                          //         ref
-                                          //             .read(
-                                          //               stopwatchProvider2
-                                          //                   .notifier,
-                                          //             )
-                                          //             .setPredictorParams(d: v);
-                                          //       },
-                                          //     );
-                                          //   },
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10.h),
-
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(context)!.splitSize,
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(14, fontOption).sp,
-                                          ),
-                                          SizedBox(height: 8.h),
-
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final state = ref.watch(stopwatchProvider2);
-
-                                              // 🔥 dynamic splits
-                                              final splits = getSplitSizes(
-                                                course: state.course,
-                                                distance: state.distance,
-                                              );
-
-                                              // ✅ safe selected value
-                                              final selectedSplit = splits.contains(state.splitSize)
-                                                  ? state.splitSize
-                                                  : splits.first;
-
-                                              return SplitCalculatorSelectorOne(
-                                                items: splits,
-                                                selectedValue: selectedSplit,
-                                                onChanged: (v) {
-                                                  ref
-                                                      .read(stopwatchProvider2.notifier)
-                                                      .setPredictorParams(split: v);
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          CustomText(
-                                            text: AppLocalizations.of(
-                                              context,
-                                            )!.startType,
-
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: getAdjustedFontSize(
-                                              14,
-                                              fontOption,
-                                            ).sp,
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Consumer(
-                                            builder: (context, ref, child) {
-                                              final state = ref.watch(
-                                                stopwatchProvider2,
-                                              );
-
-                                              return SplitCalculatorSelectorOne(
-                                                items: const [
-                                                  "From Start",
-                                                  "From Push",
-                                                ],
-                                                selectedValue: state
-                                                    .startType, // ✅ keep selected after refresh
-                                                onChanged: (v) => ref
-                                                    .read(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .setPredictorParams(
-                                                      start: v,
-                                                    ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? Color(0xff0C3156)
-                                  : Color(0xffFFFFFF),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-
-                            child: Column(
-                              children: [
-                                Consumer(
-                                  builder: (context, ref, child) {
-                                    var time = ref.watch(
-                                      stopwatchProvider2.select(
-                                        (s) => s.elapsed(),
-                                      ),
-                                    );
-
-                                    return Card(
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(24.0),
-                                          child: CustomText(
-                                            text: _formatElapsed(time),
-                                            fontSize: 35.sp,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                SizedBox(height: 20.h),
-
-                                /// INITIAL STATE
-                                if (status == StopwatchStatus.initial)
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      fixedSize: Size(double.infinity, 52.h),
-                                      backgroundColor: isDark
-                                          ? Color(0xffC69C3F)
-                                          : null,
-                                    ),
-                                    onPressed: () {
-                                      ref
-                                          .read(stopwatchProvider2.notifier)
-                                          .start();
-                                      ref
-                                          .read(stopwatchProvider1.notifier)
-                                          .start();
-                                      ref
-                                              .read(
-                                                showCourseSectionStopWatchProvider2
-                                                    .notifier,
-                                              )
-                                              .state =
-                                          false;
-                                      if(isHaptic == true){
-                                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                      }
-                                      if(isStopWatch == true){
-                                        /// ▶️ PLAY AUDIO
-                                        ref.read(audioProvider.notifier).play();
-                                      }
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                          IconPath.startIcon,
-                                          colorFilter: ColorFilter.mode(
-                                            Colors.black,
-                                            BlendMode.srcIn,
-                                          ),
-                                        ),
-                                        SizedBox(width: 10.w),
-                                        CustomText(
-                                          text: AppLocalizations.of(
-                                            context,
-                                          )!.start,
-
-                                          fontSize: getAdjustedFontSize(
-                                            14,
-                                            fontOption,
-                                          ).sp,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                /// RUNNING STATE
-                                if (status == StopwatchStatus.running)
-                                  Column(
-                                    children: [
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          fixedSize: Size(
-                                            double.infinity,
-                                            52.h,
-                                          ),
-                                          backgroundColor: Color(0xff2DA8F0),
-                                          side: BorderSide(
-                                            color: Color(0xff2DA8F0),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          ref
-                                              .read(stopwatchProvider1.notifier)
-                                              .start();
-                                          ref
-                                              .read(stopwatchProvider2.notifier)
-                                              .split();
-                                          if(isHaptic == true){
-                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                          }
-                                        },
-                                        child: Center(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                IconPath.splitIcon,
-                                                colorFilter: ColorFilter.mode(
-                                                  Colors.black,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                              SizedBox(width: 6.w),
-                                              CustomText(
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.split,
-                                                fontSize: getAdjustedFontSize(
-                                                  16,
-                                                  fontOption,
-                                                ).sp,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 20.h),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                fixedSize: Size(
-                                                  double.infinity,
-                                                  52.h,
-                                                ),
-                                                backgroundColor: Color(
-                                                  0xff475569,
-                                                ),
-                                                side: BorderSide(
-                                                  color: Color(0xff475569),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                ref
-                                                    .read(
-                                                      stopwatchProvider1
-                                                          .notifier,
-                                                    )
-                                                    .start();
-                                                ref
-                                                    .read(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .undoLastSplit();
-                                                if(isHaptic == true){
-                                                  HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                                }
-                                              },
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    IconPath.undoIcon,
-                                                    colorFilter:
-                                                        ColorFilter.mode(
-                                                          AppColors.textWhite,
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                  ),
-                                                  SizedBox(width: 6.w),
-                                                  CustomText(
-                                                    text: AppLocalizations.of(
-                                                      context,
-                                                    )!.undoSplit,
-                                                    color: AppColors.textWhite,
-                                                    fontSize:
-                                                        getAdjustedFontSize(
-                                                          12,
-                                                          fontOption,
-                                                        ).sp,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 10.w),
-
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                fixedSize: Size(
-                                                  double.infinity,
-                                                  52.h,
-                                                ),
-                                                backgroundColor: Color(
-                                                  0xffFE484C,
-                                                ),
-                                                side: BorderSide(
-                                                  color: Color(0xffFE484C),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                ref
-                                                    .read(
-                                                      stopwatchProvider1
-                                                          .notifier,
-                                                    )
-                                                    .stop();
-                                                ref
-                                                    .read(
-                                                      stopwatchProvider2
-                                                          .notifier,
-                                                    )
-                                                    .pause();
-                                                if(isHaptic == true){
-                                                  HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                                }
-                                                if(isStopWatch == true){
-                                                  /// ▶️ PLAY AUDIO
-                                                  ref.read(audioProvider.notifier).stop();
-                                                }
-                                              },
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    IconPath.stopIcon,
-                                                    colorFilter:
-                                                        ColorFilter.mode(
-                                                          AppColors.textWhite,
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                  ),
-                                                  SizedBox(width: 6.w),
-                                                  CustomText(
-                                                    text: AppLocalizations.of(
-                                                      context,
-                                                    )!.stop,
-                                                    color: AppColors.textWhite,
-                                                    fontSize:
-                                                        getAdjustedFontSize(
-                                                          12,
-                                                          fontOption,
-                                                        ).sp,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-
-                                /// STOPPED STATE
-                                if (status == StopwatchStatus.stopped)
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            fixedSize: Size(
-                                              double.infinity,
-                                              52.h,
-                                            ),
-                                            backgroundColor: AppColors.primary,
-                                            side: BorderSide(
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-
-                                          onPressed: () {
-                                            ref
-                                                .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .start();
-                                            ref
-                                                .read(
-                                                  stopwatchProvider1.notifier,
-                                                )
-                                                .resume();
-                                            if(isHaptic == true){
-                                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                            }
-                                            /// ▶️ PLAY AUDIO
-                                            if(isStopWatch == true){
-                                              /// ▶️ PLAY AUDIO
-                                              ref.read(audioProvider.notifier).play();
-                                            }
-                                          },
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                IconPath.startIcon,
-                                                colorFilter: ColorFilter.mode(
-                                                  Colors.black,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                              SizedBox(width: 6.w),
-                                              CustomText(
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.resume,
-                                                color: Colors.black,
-                                                fontSize:
-                                                    currentLanguageCode
-                                                            .toString() !=
-                                                        "en"
-                                                    ? getAdjustedFontSize(
-                                                        12,
-                                                        fontOption,
-                                                      ).sp
-                                                    : getAdjustedFontSize(
-                                                        16,
-                                                        fontOption,
-                                                      ).sp,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      SizedBox(width: 10.w),
-
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            fixedSize: Size(
-                                              double.infinity,
-                                              52.h,
-                                            ),
-                                            backgroundColor: Color(0xff6F35CA),
-                                            side: BorderSide(
-                                              color: Color(0xff6F35CA),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            ref
-                                                .read(
-                                                  stopwatchProvider1.notifier,
-                                                )
-                                                .clear();
-                                            ref
-                                                .read(
-                                                  stopwatchProvider2.notifier,
-                                                )
-                                                .reset();
-                                            if(isHaptic == true){
-                                              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                            }
-                                            ref.read(audioProvider.notifier).stop();
-                                          },
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                IconPath.clearIcon,
-                                                colorFilter: ColorFilter.mode(
-                                                  AppColors.textWhite,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                              SizedBox(width: 6.w),
-                                              CustomText(
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.clearTime,
-                                                color: AppColors.textWhite,
-                                                fontSize:
-                                                    currentLanguageCode
-                                                            .toString() !=
-                                                        "en"
-                                                    ? getAdjustedFontSize(
-                                                        9,
-                                                        fontOption,
-                                                      ).sp
-                                                    : getAdjustedFontSize(
-                                                        16,
-                                                        fontOption,
-                                                      ).sp,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                SizedBox(height: 20.h),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-                          if (log3.isNotEmpty)
-                            Column(
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? Color(0xff0C3156)
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Color(0xff2DA8F0),
-                                    ),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        blurRadius: 12,
-                                        color: Colors.black12,
-                                      ),
-                                    ],
-                                  ),
-                                  child: SingleChildScrollView(
-                                    child: Consumer(
-                                      builder: (context, ref, child) {
-                                        final controller = ref.watch(stopwatchProvider2);
-
-                                        return CustomText(
-                                          text: _activeLog(controller), // ✅ reactive now
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 16.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Color(0xff234B6E),
-                                          side: BorderSide(
-                                            color: Color(0xff234B6E),
-                                          ),
-                                        ),
-                                        onPressed: () {
-
-                                          ref
-                                              .read(stopwatchProvider2.notifier)
-                                              .pause(); // you need a method to clear log
-                                          if(isHaptic == true){
-                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                          }
-                                          ref
-                                              .watch(
-                                            stopwatchProvider2
-                                                .notifier,
-                                          )
-                                              .clearLog();
-                                          if(isStopWatch == true){
-                                            /// ▶️ PLAY AUDIO
-                                            ref.read(audioProvider.notifier).stop();
-                                          }
-                                        },
-                                        child: Center(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                IconPath.clearIcon,
-                                                colorFilter: ColorFilter.mode(
-                                                  AppColors.textWhite,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                              SizedBox(width: 6.w),
-                                              CustomText(
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.clear,
-                                                fontSize: getAdjustedFontSize(
-                                                  16,
-                                                  fontOption,
-                                                ).sp,
-                                                color: AppColors.textWhite,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary,
-                                        ),
-                                        onPressed: () {
-                                          exportOutputAsPdf3(context, ref);
-                                          if(isHaptic == true){
-                                            HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                          }
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              IconPath.exportIcon,
-                                              colorFilter: ColorFilter.mode(
-                                                Colors.black,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                            SizedBox(width: 6.w),
-                                            CustomText(
-                                              text: AppLocalizations.of(
-                                                context,
-                                              )!.export,
-                                              fontSize: getAdjustedFontSize(
-                                                16,
-                                                fontOption,
-                                              ).sp,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    ),
+              /// Main Content Switcher
+              if (activeMode == 'Stopwatch') _stopwatchSection(isDark, fontOption, status, isHaptic, isStopWatch, context, log, activeMode),
+              if (activeMode == 'Converter') _converterSection(isDark, fontOption, status, isHaptic, isStopWatch, context, showCourse, log2, activeMode),
+              if (activeMode == 'Predictor') _predictorSection(isDark, fontOption, status, isHaptic, isStopWatch, context, showCourse2, log3, activeMode),
             ],
           ),
         ),
@@ -2690,229 +157,435 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     );
   }
 
-  List<String> getSplitSizes({
-    required String course,
-    required String distance,
-  }) {
-    int dist = int.tryParse(distance) ?? 0;
-
-    // 🏊 SCY
-    if (course == "scy") {
-      switch (dist) {
-        case 50:
-          return ["25"];
-        case 100:
-          return ["25", "50"];
-        default:
-          return ["50"];
-      }
-    }
-
-    // 🏊 LCM special progressive
-    if (course == "lcm" && dist == 50) {
-      return ["15", "25", "35", "50"]; // progressive + normal
-    }
-
-    // 🏊 SCM + other LCM
-    return ["50"];
+  // ✅ Reusable Pull Down Hint
+  Widget _pullDownHint(bool isHaptic, FontSizeOption fontOption, BuildContext context, VoidCallback onTap) {
+    return Center(
+      child: GestureDetector(
+        onTap: () { FocusManager.instance.primaryFocus?.unfocus(); onTap(); if(isHaptic) HapticFeedback.lightImpact(); },
+        child: Column(children: [
+          SizedBox(height: 10.h),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [SvgPicture.asset(IconPath.pullIcon), CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions, fontSize: getAdjustedFontSize(14, fontOption).sp, color: const Color(0xffC7C7C7))]),
+          SizedBox(height: 20.h),
+        ]),
+      ),
+    );
   }
 
+  // ✅ Stopwatch Section
+  Widget _stopwatchSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, String log, String activeMode) {
+    return Column(children: [
+      _timerCard(isDark, fontOption, context),
+      SizedBox(height: 20.h),
+      _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, activeMode),
+      if (log.isNotEmpty) _logSection(log, isDark, fontOption, isHaptic, isStopWatch, context, 1),
+    ]);
+  }
+
+  // ✅ Converter Section
+  Widget _converterSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, bool showCourse, String log2, String activeMode) {
+    return Column(children: [
+      if (showCourse) _converterSelector(context, fontOption, isHaptic),
+      SizedBox(height: 10.h),
+      _timerCard(isDark, fontOption, context),
+      SizedBox(height: 20.h),
+      _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, activeMode, isConverter: true),
+      if (log2.isNotEmpty) _logSection(log2, isDark, fontOption, isHaptic, isStopWatch, context, 2),
+    ]);
+  }
+
+  // ✅ Predictor Section
+  Widget _predictorSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, bool showCourse2, String log3, String activeMode) {
+    return Column(children: [
+      if (showCourse2) _predictorSelector(context, fontOption),
+      SizedBox(height: 10.h),
+      _timerCard(isDark, fontOption, context),
+      SizedBox(height: 20.h),
+      _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, activeMode),
+      if (log3.isNotEmpty) _logSection(log3, isDark, fontOption, isHaptic, isStopWatch, context, 3),
+    ]);
+  }
+
+  Widget _timerCard(bool isDark, FontSizeOption fontOption, BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: isDark ? const Color(0xff0C3156) : const Color(0xffFFFFFF), borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, spreadRadius: 1, offset: const Offset(0, 4))]),
+      child: Consumer(
+        builder: (context, ref, child) {
+          var time = ref.watch(stopwatchProvider2.select((s) => s.elapsed()));
+          return Card(child: Center(child: Padding(padding: const EdgeInsets.all(24.0), child: CustomText(text: _formatElapsed(time), fontSize: getAdjustedFontSize(35, fontOption).sp, fontWeight: FontWeight.w700))));
+        },
+      ),
+    );
+  }
+
+  Widget _statusButtons(StopwatchStatus status, bool isDark, FontSizeOption fontOption, BuildContext context, bool isHaptic, bool isStopWatch, String activeMode, {bool isConverter = false}) {
+    return Column(
+      children: [
+        if (status == StopwatchStatus.initial)
+          _buildButton(bg: isDark ? const Color(0xffC69C3F) : null, children: [SvgPicture.asset(IconPath.startIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))], text: AppLocalizations.of(context)!.start, fontSize: 14, context: context, fontOption: fontOption, onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            ref.read(stopwatchProvider2.notifier).start();
+            ref.read(stopwatchProvider1.notifier).start();
+            if (isConverter) ref.read(showCourseSectionStopWatchProvider.notifier).state = false;
+            if (activeMode == 'Predictor') ref.read(showCourseSectionStopWatchProvider2.notifier).state = false;
+            if (isHaptic) HapticFeedback.lightImpact();
+            if (isStopWatch) ref.read(audioProvider.notifier).play();
+          }),
+        if (status == StopwatchStatus.running) Column(children: [
+          _buildButton(bg: const Color(0xff2DA8F0), side: const BorderSide(color: Color(0xff2DA8F0)), children: [SvgPicture.asset(IconPath.splitIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))], text: AppLocalizations.of(context)!.split, fontSize: 16, context: context, fontOption: fontOption, onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).split(); if(isHaptic) HapticFeedback.lightImpact();
+          }),
+          SizedBox(height: 20.h),
+          Row(children: [
+            Expanded(child: _buildButton(bg: const Color(0xff475569), side: const BorderSide(color: Color(0xff475569)), children: [SvgPicture.asset(IconPath.undoIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))], text: AppLocalizations.of(context)!.undoSplit, fontSize: 12, context: context, fontOption: fontOption, onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).undoLastSplit(); if(isHaptic) HapticFeedback.lightImpact();
+            }, textColor: AppColors.textWhite)),
+            SizedBox(width: 10.w),
+            Expanded(child: _buildButton(bg: const Color(0xffFE484C), side: const BorderSide(color: Color(0xffFE484C)), children: [SvgPicture.asset(IconPath.stopIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))], text: AppLocalizations.of(context)!.stop, fontSize: 12, context: context, fontOption: fontOption, onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider1.notifier).stop(); ref.read(stopwatchProvider2.notifier).pause(); if(isHaptic) HapticFeedback.lightImpact(); if(isStopWatch) ref.read(audioProvider.notifier).stop();
+            }, textColor: AppColors.textWhite)),
+          ]),
+        ]),
+        if (status == StopwatchStatus.stopped) Row(children: [
+          Expanded(child: _buildButton(bg: AppColors.primary, side: const BorderSide(color: AppColors.primary), children: [SvgPicture.asset(IconPath.startIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))], text: AppLocalizations.of(context)!.resume, fontSize: 12, context: context, fontOption: fontOption, onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).start(); ref.read(stopwatchProvider1.notifier).resume(); if(isHaptic) HapticFeedback.lightImpact(); if(isStopWatch) ref.read(audioProvider.notifier).play();
+          }, textColor: Colors.black)),
+          SizedBox(width: 10.w),
+          Expanded(child: _buildButton(bg: const Color(0xff6F35CA), side: const BorderSide(color: Color(0xff6F35CA)), children: [SvgPicture.asset(IconPath.clearIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))], text: AppLocalizations.of(context)!.clearTime, fontSize: 12, context: context, fontOption: fontOption, onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider1.notifier).clear(); ref.read(stopwatchProvider2.notifier).reset(); if (activeMode == 'Converter') ref.read(stopwatchProvider2.notifier).logConverter = ''; if(isHaptic) HapticFeedback.lightImpact(); if(isStopWatch) ref.read(audioProvider.notifier).stop();
+          }, textColor: AppColors.textWhite)),
+        ]),
+      ],
+    );
+  }
+
+  // ✅ FIX 2: bg changed to Color? to accept null
+  Widget _buildButton({
+    required Color? bg,
+    BorderSide? side,
+    required List<Widget> children,
+    required String text,
+    required double fontSize,
+    required BuildContext context,
+    required FontSizeOption fontOption,
+    required VoidCallback onTap,
+    Color? textColor,
+  }) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(fixedSize: Size(double.infinity, 52.h), backgroundColor: bg, side: side),
+      onPressed: onTap,
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [...children, SizedBox(width: 6.w), CustomText(text: text, fontSize: getAdjustedFontSize(fontSize, fontOption).sp, fontWeight: FontWeight.w700, color: textColor)]),
+    );
+  }
+
+  Widget _logSection(String logText, bool isDark, FontSizeOption fontOption, bool isHaptic, bool isStopWatch, BuildContext context, int type) {
+    return Column(children: [
+      SizedBox(height: 16.h),
+      Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: isDark ? const Color(0xff0C3156) : Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(width: 1.w, color: const Color(0xff2DA8F0)), boxShadow: const [BoxShadow(blurRadius: 12, color: Colors.black12)]),
+          child: SingleChildScrollView(child: CustomText(text: logText))),
+      SizedBox(height: 16.h),
+      Row(children: [
+        Expanded(child: _buildButton(bg: const Color(0xff234B6E), side: const BorderSide(color: Color(0xff234B6E)), children: [SvgPicture.asset(IconPath.clearIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))], text: AppLocalizations.of(context)!.clear, fontSize: 16, context: context, fontOption: fontOption, onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).clearLog(); if(isStopWatch) ref.read(audioProvider.notifier).stop(); ref.read(stopwatchProvider2.notifier).pause(); if(isHaptic) HapticFeedback.lightImpact();
+        }, textColor: AppColors.textWhite)),
+        SizedBox(width: 12.w),
+        Expanded(child: _buildButton(bg: AppColors.primary, children: [SvgPicture.asset(IconPath.exportIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))], text: AppLocalizations.of(context)!.export, fontSize: 16, context: context, fontOption: fontOption, onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          if (type == 1) exportOutputAsPdf1(context, ref); else if (type == 2) exportOutputAsPdf(context, ref); else exportOutputAsPdf3(context, ref);
+          if (isHaptic) HapticFeedback.lightImpact();
+        }, textColor: Colors.black)),
+      ]),
+    ]);
+  }
+
+  Widget _converterSelector(BuildContext context, FontSizeOption fontOption, bool isHaptic) {
+    return Row(children: [
+      Expanded(child: Column(children: [
+        CustomText(text: AppLocalizations.of(context)!.from, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+        SizedBox(height: 8.h),
+        Consumer(builder: (context, ref, child) {
+          const items = ["SCY", "SCM", "LCM"];
+          final course = ref.watch(stopwatchProvider2.select((s) => s.fromCourse));
+          final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.first);
+          return SplitCalculatorSelectorOne(items: items, selectedValue: selected, onChanged: (s) {
+            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).setConverterCourses(from: s.toLowerCase()); if(isHaptic) HapticFeedback.lightImpact();
+          });
+        })
+      ])),
+      Expanded(child: Column(children: [
+        CustomText(text: AppLocalizations.of(context)!.to, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+        SizedBox(height: 8.h),
+        Consumer(builder: (context, ref, child) {
+          const items = ["SCY", "SCM", "LCM"];
+          final course = ref.watch(stopwatchProvider2.select((s) => s.toCourse));
+          final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.first);
+          return SplitCalculatorSelectorOne(items: items, selectedValue: selected, onChanged: (s) {
+            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).setConverterCourses(to: s.toLowerCase()); if(isHaptic) HapticFeedback.lightImpact();
+          });
+        })
+      ])),
+    ]);
+  }
+
+  Widget _predictorSelector(BuildContext context, FontSizeOption fontOption) {
+    return Column(children: [
+      /// Gender & Stroke Row
+      Row(children: [
+        Expanded(child: Column(children: [
+          CustomText(text: AppLocalizations.of(context)!.gender, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          SizedBox(height: 8.h),
+          Consumer(builder: (context, ref, child) {
+            final gender = ref.watch(stopwatchProvider2.select((s) => s.gender));
+            final selected = gender.isNotEmpty ? "${gender[0].toUpperCase()}${gender.substring(1)}" : "";
+            return SplitCalculatorSelectorOne(items: const ["Men", "Women"], selectedValue: selected, onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(g: v));
+          }),
+        ])),
+        Expanded(child: Column(children: [
+          CustomText(text: AppLocalizations.of(context)!.stroke, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          SizedBox(height: 8.h),
+          Consumer(builder: (context, ref, child) {
+            final items = const ["Fly", "Back", "Breast", "Free", "IM"];
+            final stroke = ref.watch(stopwatchProvider2.select((s) => s.stroke));
+            final selected = items.firstWhere((i) => i.toLowerCase() == stroke, orElse: () => items.first);
+            return SplitCalculatorSelectorOne(items: items, selectedValue: selected, onChanged: (s) {
+              // ✅ When stroke changes, reset distance & splitSize to valid defaults
+              final newStroke = s.toLowerCase();
+              final state = ref.read(stopwatchProvider2);
+              final validDistances = getDistances(state.course, newStroke);
+              final newDistance = validDistances.contains(state.distance) ? state.distance : validDistances.first;
+              final validSplits = getSplitSizes(course: state.course, distance: newDistance, stroke: newStroke);
+              ref.read(stopwatchProvider2.notifier).setPredictorParams(s: newStroke, d: newDistance, split: validSplits.first);
+            });
+          }),
+        ])),
+      ]),
+      SizedBox(height: 10.h),
+
+      /// Course & Distance Row
+      Row(children: [
+        Expanded(child: Column(children: [
+          CustomText(text: AppLocalizations.of(context)!.course, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
+          SizedBox(height: 8.h),
+          Consumer(builder: (context, ref, child) {
+            const items = ["SCY", "SCM", "LCM"];
+            final course = ref.watch(stopwatchProvider2.select((s) => s.course));
+            final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.first);
+            return SplitCalculatorSelectorOne(items: items, selectedValue: selected, onChanged: (s) {
+              // ✅ When course changes, reset stroke, distance & splitSize to valid defaults
+              final newCourse = s.toLowerCase();
+              final state = ref.read(stopwatchProvider2);
+              final validDistances = getDistances(newCourse, state.stroke);
+              final newDistance = validDistances.contains(state.distance) ? state.distance : validDistances.first;
+              final validSplits = getSplitSizes(course: newCourse, distance: newDistance, stroke: state.stroke);
+              ref.read(stopwatchProvider2.notifier).setPredictorParams(c: newCourse, d: newDistance, split: validSplits.first);
+            });
+          }),
+        ])),
+        Expanded(child: Column(children: [
+          CustomText(text: AppLocalizations.of(context)!.distance, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          SizedBox(height: 8.h),
+          Consumer(builder: (context, ref, child) {
+            // ✅ Watch course + stroke + distance tuple for accurate rebuilds
+            final state = ref.watch(stopwatchProvider2.select((s) => (s.course, s.stroke, s.distance)));
+            final distances = getDistances(state.$1, state.$2);
+            final selected = distances.contains(state.$3) ? state.$3 : distances.first;
+            return SplitCalculatorSelectorOne(items: distances, selectedValue: selected, onChanged: (v) {
+              // ✅ When distance changes, reset splitSize to valid default
+              final newDistance = v;
+              final validSplits = getSplitSizes(course: state.$1, distance: newDistance, stroke: state.$2);
+              ref.read(stopwatchProvider2.notifier).setPredictorParams(d: newDistance, split: validSplits.first);
+            });
+          }),
+        ])),
+      ]),
+      SizedBox(height: 10.h),
+
+      /// Split Size & Start Type Row
+      Row(children: [
+        Expanded(child: Column(children: [
+          CustomText(text: AppLocalizations.of(context)!.splitSize, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          SizedBox(height: 8.h),
+          Consumer(builder: (context, ref, child) {
+            // ✅ Watch course + stroke + distance + splitSize for accurate splits
+            final state = ref.watch(stopwatchProvider2.select((s) => (s.course, s.stroke, s.distance, s.splitSize)));
+            final splits = getSplitSizes(course: state.$1, distance: state.$3, stroke: state.$2);
+            final selected = splits.contains(state.$4) ? state.$4 : splits.first;
+            return SplitCalculatorSelectorOne(items: splits, selectedValue: selected, onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(split: v));
+          }),
+        ])),
+        Expanded(child: Column(children: [
+          CustomText(text: AppLocalizations.of(context)!.startType, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          SizedBox(height: 8.h),
+          Consumer(builder: (context, ref, child) {
+            final start = ref.watch(stopwatchProvider2.select((s) => s.startType));
+            return SplitCalculatorSelectorOne(items: const ["From Start", "From Push"], selectedValue: start, onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(start: v));
+          }),
+        ])),
+      ]),
+    ]);
+  }
+
+// ============================================================
+// 📊 COMPLETE PREDICTOR DATA DICTIONARY
+// ============================================================
+  static const Map<String, Map<String, Map<String, List<String>>>> _predictorData = {
+    'scy': {
+      'free': {
+        '50': ['25'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+        '500': ['50', '100'],
+        '1000': ['50', '100'],
+        '1650': ['50', '100'],
+      },
+      'fly': {
+        '50': ['25'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'back': {
+        '50': ['25'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'breast': {
+        '50': ['25'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'im': {
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+        '400': ['50', '100'],
+      },
+    },
+    'scm': {
+      'free': {
+        '50': ['25'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+        '400': ['50', '100'],
+        '800': ['50', '100'],
+        '1500': ['50', '100'],
+      },
+      'fly': {
+        '50': ['25'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'back': {
+        '50': ['25'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'breast': {
+        '50': ['25'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'im': {
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+        '400': ['50', '100'],
+      },
+    },
+    'lcm': {
+      'free': {
+        '50': ['15', '25', '35'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+        '400': ['50', '100'],
+        '800': ['50', '100'],
+        '1500': ['50', '100'],
+      },
+      'fly': {
+        '50': ['15', '25', '35'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'back': {
+        '50': ['15', '25', '35'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'breast': {
+        '50': ['15', '25', '35'],
+        '100': ['25', '50'],
+        '200': ['50', '100'],
+      },
+      'im': {
+        '200': ['50', '100'],
+        '400': ['50', '100'],
+      },
+    },
+  };
+
+  /// ✅ Get valid distances for a given course + stroke
   List<String> getDistances(String course, String stroke) {
     course = course.toLowerCase();
     stroke = stroke.toLowerCase();
 
-    final Map<String, List<String>> scy = {
-      "fly": ["50", "100", "200"],
-      "back": ["50", "100", "200"],
-      "breast": ["50", "100", "200"],
-      "free": ["50", "100", "200", "500", "1000", "1650"],
-      "im": ["200", "400"],
-    };
+    final courseData = _predictorData[course];
+    if (courseData == null) return ['50'];
 
-    final Map<String, List<String>> scmLcm = {
-      "fly": ["50", "100", "200"],
-      "back": ["50", "100", "200"],
-      "breast": ["50", "100", "200"],
-      "free": ["50", "100", "200", "400", "800", "1500"],
-      "im": ["200", "400"],
-    };
+    final strokeData = courseData[stroke];
+    if (strokeData == null) return ['50'];
 
-    if (course == "scy") {
-      return scy[stroke] ?? ["50"];
-    } else if (course == "scm" || course == "lcm") {
-      return scmLcm[stroke] ?? ["50"];
-    } else {
-      return ["50"];
-    }
+    return strokeData.keys.toList();
   }
 
+  /// ✅ Get valid split sizes for course + stroke + distance
+  List<String> getSplitSizes({
+    required String course,
+    required String distance,
+    required String stroke,  // ✅ NEW: stroke is required for accurate splits
+  }) {
+    course = course.toLowerCase();
+    stroke = stroke.toLowerCase();
 
+    final courseData = _predictorData[course];
+    if (courseData == null) return ['50'];
+
+    final strokeData = courseData[stroke];
+    if (strokeData == null) return ['50'];
+
+    final splitSizes = strokeData[distance];
+    return splitSizes ?? ['50'];
+  }
+
+  /// ✅ Get all valid distances for a course (for course dropdown reset)
   List<String> getDistancesByCourse(String course) {
-    switch (course.toLowerCase()) {
-      case 'scy':
-        return ["50", "100", "200", "500", "1000", "1650"];
-      case 'scm':
-      case 'lcm':
-        return ["50", "100", "200", "400", "800", "1500"];
-      default:
-        return ["50"];
+    course = course.toLowerCase();
+    final courseData = _predictorData[course];
+    if (courseData == null) return ['50'];
+
+    // Collect all unique distances across all strokes for this course
+    final distances = <String>{};
+    for (final strokeData in courseData.values) {
+      distances.addAll(strokeData.keys);
     }
+    return distances.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
   }
 
-  Future<void> exportOutputAsPdf(BuildContext context, WidgetRef ref) async {
-    final log2 = ref.read(stopwatchProvider2).logConverter;
+  Future<void> exportOutputAsPdf(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logConverter, 'swim_converter_output.pdf', context);
+  Future<void> exportOutputAsPdf3(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logPredictor, 'swim_predictor_output.pdf', context);
+  Future<void> exportOutputAsPdf1(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logStopwatch, 'swim_stopwatch_output.pdf', context);
 
-    print(log2);
-
-    if (log2.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No output to export!')));
-      return;
-    }
-
+  Future<void> _exportPdf(String log, String fileName, BuildContext context) async {
+    if (log.isEmpty) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No output to export!'))); return; }
     final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Container(
-            padding: const pw.EdgeInsets.all(16),
-            child: pw.Text(log2, style: pw.TextStyle(font: pw.Font.courier())),
-          );
-        },
-      ),
-    );
-
+    pdf.addPage(pw.Page(build: (pw.Context c) => pw.Container(padding: const pw.EdgeInsets.all(16), child: pw.Text(log, style: pw.TextStyle(font: pw.Font.courier())))));
     try {
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/swim_converter_output.pdf');
+      final file = File('${dir.path}/$fileName');
       await file.writeAsBytes(await pdf.save());
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('PDF saved at: ${file.path}')));
-
-      await OpenFile.open(file.path);
-
-      // ✅ Clear log after export
+      if (context.mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF saved at: ${file.path}'))); await OpenFile.open(file.path); }
     } catch (e) {
-      debugPrint("PDF export error: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to export PDF')));
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to export PDF')));
     }
   }
 
-  Future<void> exportOutputAsPdf3(BuildContext context, WidgetRef ref) async {
-    final log3 = ref.read(stopwatchProvider2).logPredictor;
-
-    print(log3);
-
-    if (log3.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No output to export!')));
-      return;
-    }
-
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Container(
-            padding: const pw.EdgeInsets.all(16),
-            child: pw.Text(log3, style: pw.TextStyle(font: pw.Font.courier())),
-          );
-        },
-      ),
-    );
-
-    try {
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/swim_predictor_output.pdf');
-      await file.writeAsBytes(await pdf.save());
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('PDF saved at: ${file.path}')));
-
-      await OpenFile.open(file.path);
-
-      // Clear logPredictor after export
-      //ref.read(stopwatchProvider2.notifier).clearLogPredictor();
-    } catch (e) {
-      debugPrint("PDF export error: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to export PDF')));
-    }
-  }
-
-  Future<void> exportOutputAsPdf1(BuildContext context, WidgetRef ref) async {
-    final log = ref.read(stopwatchProvider2).logStopwatch;
-
-    print(log);
-
-    if (log.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No output to export!')));
-      return;
-    }
-
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Container(
-            padding: const pw.EdgeInsets.all(16),
-            child: pw.Text(log, style: pw.TextStyle(font: pw.Font.courier())),
-          );
-        },
-      ),
-    );
-
-    try {
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/swim_stopwatch_output.pdf');
-      await file.writeAsBytes(await pdf.save());
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('PDF saved at: ${file.path}')));
-
-      await OpenFile.open(file.path);
-
-      // clear log
-      //ref.read(stopwatchProvider2.notifier).clearLogStopwatch();
-    } catch (e) {
-      debugPrint("PDF export error: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to export PDF')));
-    }
-  }
-
-  static String _activeLog(StopwatchController2 c) {
-    switch (c.activeMode) {
-      case 'Predictor':
-        return c.logPredictor;
-      case 'Converter':
-        return c.logConverter;
-      default:
-        return c.logStopwatch;
-    }
-  }
-
-  static String _formatElapsed(double s) =>
-      '${_twoDigits((s ~/ 60))}:${_secondsPart(s)}';
-  static String _secondsPart(double s) {
-    final secs = s % 60;
-    return secs.toStringAsFixed(2).padLeft(5, '0');
-  }
-
+  static String _formatElapsed(double s) => '${_twoDigits((s ~/ 60))}:${_secondsPart(s)}';
+  static String _secondsPart(double s) { final secs = s % 60; return secs.toStringAsFixed(2).padLeft(5, '0'); }
   static String _twoDigits(int n) => n.toString().padLeft(2, '0');
 }
