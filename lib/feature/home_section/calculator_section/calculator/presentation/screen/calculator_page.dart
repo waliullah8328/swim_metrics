@@ -8,7 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_file/open_file.dart';
 import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
+
 import 'package:swim_metrics/core/common/widgets/custom_text.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
@@ -518,103 +518,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                  SizedBox(height: 20.h),
 
-                /// RESULT TABLE
-                ///
-                // Container(
-                //   padding: EdgeInsets.all(16),
-                //   decoration: BoxDecoration(
-                //     color: isDark?Color(0xff234B6E):Color(0xffEAEDF1),
-                //     borderRadius:BorderRadius.only(
-                //       topRight: Radius.circular(10),
-                //       topLeft: Radius.circular(10)
-                //     )
-                //   ),
-                //   child:Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     children: [
-                //       CustomText(text: AppLocalizations.of(context)!.split,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                //       CustomText(text: AppLocalizations.of(context)!.splitTime,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                //       CustomText(text: AppLocalizations.of(context)!.total,fontSize: getAdjustedFontSize(16, fontOption).sp,fontWeight: FontWeight.w600,color: AppColors.primary,),
-                //
-                //     ],
-                //   ),
-                // ),
-                 // Container(
-                 //   height: 200.h,
-                 //    decoration: BoxDecoration(
-                 //      color: isDark?Color(0xff1B3A5C):Color(0xffFFFFFF),
-                 //
-                 //
-                 //    ),
-                 //    child: ref.watch(splitCalcProvider).splits.isEmpty
-                 //        ?  Center(
-                 //      child: CustomText(text:
-                 //      AppLocalizations.of(context)!.noSplitsYet,
-                 //       color: Colors.grey
-                 //      ),
-                 //    )
-                 //        : ListView.builder(
-                 //      shrinkWrap: true,
-                 //      physics: NeverScrollableScrollPhysics(),
-                 //      itemCount: ref.watch(splitCalcProvider).splits.length,
-                 //      itemBuilder: (context, index) {
-                 //        final split = ref.watch(splitCalcProvider).splits[index];
-                 //
-                 //        // alternate colors: even -> E3F0FF, odd -> FFFFFF
-                 //        final bgColor = index % 2 == 0 ? Color(0xFFE3F0FF) : Color(0xFFFFFFFF);
-                 //
-                 //        return Container(
-                 //          color: bgColor,
-                 //          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
-                 //          child: Row(
-                 //            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                 //            children: [
-                 //              CustomText(
-                 //                text: split.distance.toString(),
-                 //                fontSize: getAdjustedFontSize(14, fontOption).sp,
-                 //                fontWeight: FontWeight.w600,
-                 //                color: AppColors.primary,
-                 //              ),
-                 //              CustomText(
-                 //                text: split.splitTime.toStringAsFixed(2),
-                 //                fontSize: getAdjustedFontSize(14, fontOption).sp,
-                 //                fontWeight: FontWeight.w600,
-                 //                color: AppColors.primary,
-                 //              ),
-                 //              CustomText(
-                 //                text: split.total.toStringAsFixed(2),
-                 //                fontSize: getAdjustedFontSize(14, fontOption).sp,
-                 //                fontWeight: FontWeight.w600,
-                 //                color: AppColors.primary,
-                 //              ),
-                 //            ],
-                 //          ),
-                 //        );
-                 //      },
-                 //    ),
-                 //  ),
-                // if(ref.watch(splitCalcProvider).output.isNotEmpty)
-                //   Column(
-                //     children: [
-                //       Container(
-                //         width: double.infinity,
-                //         padding: const EdgeInsets.all(16),
-                //
-                //         decoration: BoxDecoration(
-                //           color: isDark ? Color(0xff0C3156) : Colors.white,
-                //           borderRadius: BorderRadius.circular(20),
-                //           border: Border.all(
-                //             width: 1,
-                //             color: Color(0xff2DA8F0),
-                //           ),
-                //           boxShadow: const [
-                //             BoxShadow(blurRadius: 12, color: Colors.black12),
-                //           ],
-                //         ),
-                //         child: Text(ref.watch(splitCalcProvider.select((s)=>s.output))),),
-                //       SizedBox(height: 16.h),
-                //     ],
-                //   ),
+
 
                 Consumer(
                   builder: (context, ref, child) {

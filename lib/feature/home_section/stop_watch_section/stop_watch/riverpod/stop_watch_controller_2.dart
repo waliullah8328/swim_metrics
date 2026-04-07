@@ -166,7 +166,7 @@ class StopwatchController2 extends ChangeNotifier {
     } else {
       text =
       'Lap $lapNo: ${TimeUtils1.formatSeconds(lapElapsed)} / ${TimeUtils1.formatSeconds(totalElapsed)}';
-      _appendLog(text);
+      _appendStopWatchSplit(text);
     }
 
     notifyListeners();
@@ -175,25 +175,47 @@ class StopwatchController2 extends ChangeNotifier {
   /// =======================
   /// Undo last split: always removes last lap first
   /// =======================
+  // void undoLastSplit() {
+  //   final t = current;
+  //   if (t.splits.isEmpty) return;
+  //
+  //   // Remove last lap (always last)
+  //   t.splits.removeLast();
+  //
+  //   // Handle Predictor LCM 50 progressive logic
+  //   if (activeMode == 'Predictor' &&
+  //       progressiveActive &&
+  //       course.toLowerCase() == 'lcm' &&
+  //       distance == '50') {
+  //     if (splitSize == '25') splitSize = '15';
+  //     else if (splitSize == '35') splitSize = '25';
+  //     else splitSize = '35';
+  //   }
+  //
+  //   // Recalculate lastSplitWall
+  //   double prevCum = t.splits.isNotEmpty ? t.splits.last : 0.0;
+  //   if (t.running) {
+  //     final now = DateTime.now();
+  //     final delta = elapsed() - prevCum;
+  //     t.lastSplitWall =
+  //         now.subtract(Duration(milliseconds: (delta * 1000).round()));
+  //   } else {
+  //     t.lastSplitWall = null;
+  //   }
+  //
+  //   // Remove last split line from logs
+  //   _popLatestSplitLogLine();
+  //
+  //   notifyListeners();
+  // }
   void undoLastSplit() {
     final t = current;
     if (t.splits.isEmpty) return;
 
-    // Remove last lap (always last)
     t.splits.removeLast();
 
-    // Handle Predictor LCM 50 progressive logic
-    if (activeMode == 'Predictor' &&
-        progressiveActive &&
-        course.toLowerCase() == 'lcm' &&
-        distance == '50') {
-      if (splitSize == '25') splitSize = '15';
-      else if (splitSize == '35') splitSize = '25';
-      else splitSize = '35';
-    }
-
-    // Recalculate lastSplitWall
     double prevCum = t.splits.isNotEmpty ? t.splits.last : 0.0;
+
     if (t.running) {
       final now = DateTime.now();
       final delta = elapsed() - prevCum;
@@ -203,10 +225,96 @@ class StopwatchController2 extends ChangeNotifier {
       t.lastSplitWall = null;
     }
 
-    // Remove last split line from logs
-    _popLatestSplitLogLine();
+    if (activeMode == 'Predictor') {
+      _rebuildPredictorLog(t);
+    } else {
+      _popLatestSplitLogLine();
+    }
 
     notifyListeners();
+  }
+
+  /// ----------------- Predictor -----------------
+  String _processPredictorLap(TimerState t, double lapElapsed, int lapNo) {
+    double totalElapsed = t.splits.last;
+
+    if (progressiveActive &&
+        course.toLowerCase() == 'lcm' &&
+        distance == '50' &&
+        (splitSize == '15' || splitSize == '25' || splitSize == '35')) {
+
+      final pred = SplitsCore1.predictorLCM50(
+        elapsedSeconds: totalElapsed,
+        gender: gender,
+        marker: splitSize,
+        pushStart: startType == 'From Push',
+      );
+
+      return '$splitSize: ${TimeUtils1.formatSeconds(totalElapsed)} / Projected finish ${TimeUtils1.formatSeconds(pred)}';
+    } else {
+      final pred = SplitsCore1.predictorStandard(
+        elapsedSeconds: totalElapsed,
+        splitCount: t.splits.length,
+        gender: gender,
+        stroke: stroke,
+        distance: distance,
+        course: course.toLowerCase(),
+        splitSize: int.tryParse(splitSize) ?? 50,
+        pushStart: startType == 'From Push',
+      );
+
+      return 'Lap $lapNo: ${TimeUtils1.formatSeconds(lapElapsed)} / ${TimeUtils1.formatSeconds(totalElapsed)} / Projected Finish: ${TimeUtils1.formatSeconds(pred)}';
+    }
+  }
+
+  void _rebuildPredictorLog(TimerState t) {
+    logPredictor = _predictorHeader();
+
+    String tempSplit = splitSize;
+
+    for (int i = 0; i < t.splits.length; i++) {
+      final totalElapsed = t.splits[i];
+      final lapElapsed =
+      i == 0 ? totalElapsed : totalElapsed - t.splits[i - 1];
+
+      if (progressiveActive &&
+          course.toLowerCase() == 'lcm' &&
+          distance == '50' &&
+          (tempSplit == '15' || tempSplit == '25' || tempSplit == '35')) {
+
+        final pred = SplitsCore1.predictorLCM50(
+          elapsedSeconds: totalElapsed,
+          gender: gender,
+          marker: tempSplit,
+          pushStart: startType == 'From Push',
+        );
+
+        logPredictor +=
+        '$tempSplit: ${TimeUtils1.formatSeconds(totalElapsed)} / Projected finish ${TimeUtils1.formatSeconds(pred)}\n';
+
+        tempSplit =
+        tempSplit == '15' ? '25' : tempSplit == '25' ? '35' : '15';
+      } else {
+        final pred = SplitsCore1.predictorStandard(
+          elapsedSeconds: totalElapsed,
+          splitCount: i + 1,
+          gender: gender,
+          stroke: stroke,
+          distance: distance,
+          course: course.toLowerCase(),
+          splitSize: int.tryParse(splitSize) ?? 50,
+          pushStart: startType == 'From Push',
+        );
+
+        logPredictor +=
+        'Lap ${i + 1}: ${TimeUtils1.formatSeconds(lapElapsed)} / ${TimeUtils1.formatSeconds(totalElapsed)} / Projected Finish: ${TimeUtils1.formatSeconds(pred)}\n';
+      }
+    }
+  }
+
+  /// ----------------- Logs -----------------
+  void _appendPredictorSplit(String line) {
+    logPredictor = '$line\n$logPredictor';
   }
 
   /// ----------------- Internal Helpers -----------------
@@ -217,31 +325,31 @@ class StopwatchController2 extends ChangeNotifier {
     });
   }
 
-  String _processPredictorLap(TimerState t, double lapElapsed, int lapNo) {
-    double totalElapsed = t.splits.last;
-    if (progressiveActive && course.toLowerCase() == 'lcm' && distance == '50' &&
-        (splitSize == '15' || splitSize == '25' || splitSize == '35')) {
-      final pred = SplitsCore1.predictorLCM50(
-          elapsedSeconds: totalElapsed, gender: gender, marker: splitSize, pushStart: startType == 'From Push');
-      String text =
-          '$splitSize: ${TimeUtils1.formatSeconds(totalElapsed)} / Projected finish ${TimeUtils1.formatSeconds(pred)}';
-
-      // Rotate progressive marker
-      splitSize = splitSize == '15' ? '25' : splitSize == '25' ? '35' : '15';
-      return text;
-    } else {
-      final pred = SplitsCore1.predictorStandard(
-          elapsedSeconds: totalElapsed,
-          splitCount: t.splits.length,
-          gender: gender,
-          stroke: stroke,
-          distance: distance,
-          course: course.toLowerCase(),
-          splitSize: int.tryParse(splitSize) ?? 50,
-          pushStart: startType == 'From Push');
-      return 'Lap $lapNo: ${TimeUtils1.formatSeconds(lapElapsed)} / ${TimeUtils1.formatSeconds(totalElapsed)} / Projected Finish: ${TimeUtils1.formatSeconds(pred)}';
-    }
-  }
+  // String _processPredictorLap(TimerState t, double lapElapsed, int lapNo) {
+  //   double totalElapsed = t.splits.last;
+  //   if (progressiveActive && course.toLowerCase() == 'lcm' && distance == '50' &&
+  //       (splitSize == '15' || splitSize == '25' || splitSize == '35')) {
+  //     final pred = SplitsCore1.predictorLCM50(
+  //         elapsedSeconds: totalElapsed, gender: gender, marker: splitSize, pushStart: startType == 'From Push');
+  //     String text =
+  //         '$splitSize: ${TimeUtils1.formatSeconds(totalElapsed)} / Projected finish ${TimeUtils1.formatSeconds(pred)}';
+  //
+  //     // Rotate progressive marker
+  //     splitSize = splitSize == '15' ? '25' : splitSize == '25' ? '35' : '15';
+  //     return text;
+  //   } else {
+  //     final pred = SplitsCore1.predictorStandard(
+  //         elapsedSeconds: totalElapsed,
+  //         splitCount: t.splits.length,
+  //         gender: gender,
+  //         stroke: stroke,
+  //         distance: distance,
+  //         course: course.toLowerCase(),
+  //         splitSize: int.tryParse(splitSize) ?? 50,
+  //         pushStart: startType == 'From Push');
+  //     return 'Lap $lapNo: ${TimeUtils1.formatSeconds(lapElapsed)} / ${TimeUtils1.formatSeconds(totalElapsed)} / Projected Finish: ${TimeUtils1.formatSeconds(pred)}';
+  //   }
+  // }
 
   double _simpleConversionFactor(String from, String to) {
     if (from == to) return 1.0;
@@ -261,12 +369,15 @@ class StopwatchController2 extends ChangeNotifier {
     else if (activeMode == 'Converter') logConverter = '$line\n$logConverter';
   }
 
-  void _appendPredictorSplit(String line) {
-    logPredictor += '$line\n';
-  }
+  // void _appendPredictorSplit(String line) {
+  //   logPredictor += '$line\n';
+  // }
 
   void _appendConverterSplit(String line) {
     logConverter += '$line\n';
+  }
+  void _appendStopWatchSplit(String line) {
+    logStopwatch += '$line\n';
   }
 
   void _replaceLog(String text) {
