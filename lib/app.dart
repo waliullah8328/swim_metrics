@@ -73,11 +73,11 @@ class _MyAppState extends ConsumerState<MyApp> {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: Locale(settings.language.code),
-          builder: (context, child) {
-            // Set global context for auth error handler
-            //AuthErrorHandler.setGlobalContext(context);
-            return hasConnection ? child! : const NoInternetWidget();
-          },
+          // builder: (context, child) {
+          //   // Set global context for auth error handler
+          //   //AuthErrorHandler.setGlobalContext(context);
+          //   return hasConnection ? child! : const NoInternetWidget();
+          // },
         );
       },
     );
