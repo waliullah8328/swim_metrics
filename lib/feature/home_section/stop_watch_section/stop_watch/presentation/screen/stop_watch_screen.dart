@@ -908,32 +908,46 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ).sp,
                                       ),
                                       SizedBox(height: 8.h),
+
                                       Consumer(
                                         builder: (context, ref, child) {
-                                          final state = ref.watch(
-                                            stopwatchProvider2,
+                                          const items = ["SCY", "SCM", "LCM"];
+
+                                          final state = ref.watch(stopwatchProvider2);
+                                          final course = state.fromCourse;
+
+
+                                          final controller = ref.read(stopwatchProvider2.notifier);
+
+                                          final selectedValue = items.firstWhere(
+                                                (item) => item.toLowerCase() == course,
+                                            orElse: () => items.first,
                                           );
 
                                           return SplitCalculatorSelectorOne(
-                                            items: const ["SCM", "SCY", "LCM"],
-                                            selectedValue: state
-                                                .fromCourse, // ✅ keep selected after refresh
-                                            onChanged: (value) {
-                                              ref
-                                                  .read(
-                                                    stopwatchProvider2.notifier,
-                                                  )
-                                                  .setConverterCourses(
-                                                    from: value,
-                                                  );
+                                            items: items,
+                                            selectedValue: selectedValue,
+                                            onChanged: (selected) {
+                                              final newCourse = selected.toLowerCase();
+
+                                              // ✅ use BOTH course + stroke
+                                              // final distances = getDistances(newCourse, stroke);
+
+                                              controller.setConverterCourses(
+                                                from: newCourse,
+                                              );
                                               if(isHaptic == true){
                                                 HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                                               }
+
+                                              // reset distance safely
+                                              // controller.setDistance(distances.first);
                                             },
                                           );
                                         },
-                                      ),
+                                      )
+
                                     ],
                                   ),
                                 ),
@@ -952,28 +966,47 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                         ).sp,
                                       ),
                                       SizedBox(height: 8.h),
+
+
                                       Consumer(
                                         builder: (context, ref, child) {
-                                          final state = ref.watch(
-                                            stopwatchProvider2,
+                                          const items = ["SCY", "SCM", "LCM"];
+
+                                          final state = ref.watch(stopwatchProvider2);
+                                          final course = state.toCourse;
+
+
+                                          final controller = ref.read(stopwatchProvider2.notifier);
+
+                                          final selectedValue = items.firstWhere(
+                                                (item) => item.toLowerCase() == course,
+                                            orElse: () => items.first,
                                           );
 
                                           return SplitCalculatorSelectorOne(
-                                            items: const ["SCM", "SCY", "LCM"],
-                                            selectedValue: state
-                                                .toCourse, // ✅ keep selected after refresh
-                                            onChanged: (value) {
-                                              ref
-                                                  .read(
-                                                    stopwatchProvider2.notifier,
-                                                  )
-                                                  .setConverterCourses(
-                                                    to: value,
-                                                  );
+                                            items: items,
+                                            selectedValue: selectedValue,
+                                            onChanged: (selected) {
+                                              final newCourse = selected.toLowerCase();
+
+                                              // ✅ use BOTH course + stroke
+                                              // final distances = getDistances(newCourse, stroke);
+
+                                              controller.setConverterCourses(
+                                                to: newCourse,
+                                              );
+                                              if(isHaptic == true){
+                                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                                              }
+
+                                              // reset distance safely
+                                              // controller.setDistance(distances.first);
                                             },
                                           );
                                         },
-                                      ),
+                                      )
+
                                     ],
                                   ),
                                 ),
@@ -1606,43 +1639,72 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             ).sp,
                                           ),
                                           SizedBox(height: 8.h),
-
                                           Consumer(
                                             builder: (context, ref, child) {
-                                              final state = ref.watch(
-                                                stopwatchProvider2,
+                                              final state1 = ref.watch(
+                                                stopwatchProvider2.select(
+                                                      (s) => s.gender,
+                                                ),
                                               );
 
-                                              // Define items
-                                              const items = ["men", "women"];
-                                              String capitalize(String s) =>
-                                                  s.isNotEmpty
-                                                  ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
-                                                  : s;
+                                              // convert to match UI
+                                              final selectedValue = state1.isNotEmpty
+                                                  ? state1[0].toUpperCase() +
+                                                  state1.substring(1)
+                                                  : "";
+                                              final controller1 = ref.read(
+                                                stopwatchProvider2.notifier,
+                                              );
+                                              debugPrint(state1.toString());
 
                                               return SplitCalculatorSelectorOne(
-                                                items: items
-                                                    .map(capitalize)
-                                                    .toList(), // display first letter uppercase
-                                                selectedValue: capitalize(
-                                                  state.gender,
-                                                ), // show selected value capitalized
-                                                onChanged: (v) {
-                                                  // Convert back to lowercase before storing
-                                                  final lowerCaseValue = v
-                                                      .toLowerCase();
-                                                  ref
-                                                      .read(
-                                                        stopwatchProvider2
-                                                            .notifier,
-                                                      )
-                                                      .setPredictorParams(
-                                                        g: lowerCaseValue,
-                                                      );
-                                                },
+                                                items: const ["Men", "Women"],
+                                                selectedValue:
+                                                selectedValue, // ✅ keep selected after refresh
+                                                onChanged: (v) =>
+                                                    controller1.setPredictorParams(
+                                                      g: v,
+                                                    ),
                                               );
                                             },
                                           ),
+
+                                          // Consumer(
+                                          //   builder: (context, ref, child) {
+                                          //     final state = ref.watch(
+                                          //       stopwatchProvider2,
+                                          //     );
+                                          //
+                                          //     // Define items
+                                          //     const items = ["men", "women"];
+                                          //     String capitalize(String s) =>
+                                          //         s.isNotEmpty
+                                          //         ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
+                                          //         : s;
+                                          //
+                                          //     return SplitCalculatorSelectorOne(
+                                          //       items: items
+                                          //           .map(capitalize)
+                                          //           .toList(), // display first letter uppercase
+                                          //       selectedValue: capitalize(
+                                          //         state.gender,
+                                          //       ), // show selected value capitalized
+                                          //       onChanged: (v) {
+                                          //         // Convert back to lowercase before storing
+                                          //         final lowerCaseValue = v
+                                          //             .toLowerCase();
+                                          //         ref
+                                          //             .read(
+                                          //               stopwatchProvider2
+                                          //                   .notifier,
+                                          //             )
+                                          //             .setPredictorParams(
+                                          //               g: lowerCaseValue,
+                                          //             );
+                                          //       },
+                                          //     );
+                                          //   },
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -1662,52 +1724,89 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                                             ).sp,
                                           ),
                                           SizedBox(height: 8.h),
-
                                           Consumer(
                                             builder: (context, ref, child) {
-                                              final state = ref.watch(
-                                                stopwatchProvider2,
+                                              final items = const [
+                                                "Fly",
+                                                "Back",
+                                                "Breast",
+                                                "Free",
+                                                "IM",
+                                              ];
+
+                                              final state1 = ref.watch(
+                                                stopwatchProvider2.select(
+                                                      (s) => s.stroke,
+                                                ),
                                               );
 
-                                              const strokes = [
-                                                "fly",
-                                                "back",
-                                                "free",
-                                                "breast",
-                                                "im",
-                                              ];
-                                              String formatStroke(String s) {
-                                                if (s.toLowerCase() == 'im') {
-                                                  return 'IM';
-                                                }
-                                                return s.isNotEmpty
-                                                    ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
-                                                    : s;
-                                              }
+                                              // match lowercase state with UI list
+                                              final selectedValue = items.firstWhere(
+                                                    (item) => item.toLowerCase() == state1,
+                                                orElse: () => "",
+                                              );
+
+                                              final controller1 = ref.read(
+                                                stopwatchProvider2.notifier,
+                                              );
 
                                               return SplitCalculatorSelectorOne(
-                                                items: strokes
-                                                    .map(formatStroke)
-                                                    .toList(), // display formatted strokes
-                                                selectedValue: formatStroke(
-                                                  state.stroke,
-                                                ), // display current selection formatted
-                                                onChanged: (v) {
-                                                  // Convert back to lowercase for storing
-                                                  final lowerCaseValue = v
-                                                      .toLowerCase();
-                                                  ref
-                                                      .read(
-                                                        stopwatchProvider2
-                                                            .notifier,
-                                                      )
-                                                      .setPredictorParams(
-                                                        s: lowerCaseValue,
-                                                      );
+                                                items: items,
+                                                selectedValue: selectedValue,
+                                                onChanged: (selected) {
+                                                  controller1.setPredictorParams(
+                                                    s: selected,
+                                                  ); // store lowercase inside
                                                 },
                                               );
                                             },
                                           ),
+
+                                          // Consumer(
+                                          //   builder: (context, ref, child) {
+                                          //     final state = ref.watch(
+                                          //       stopwatchProvider2,
+                                          //     );
+                                          //
+                                          //     const strokes = [
+                                          //       "fly",
+                                          //       "back",
+                                          //       "free",
+                                          //       "breast",
+                                          //       "im",
+                                          //     ];
+                                          //     String formatStroke(String s) {
+                                          //       if (s.toLowerCase() == 'im') {
+                                          //         return 'IM';
+                                          //       }
+                                          //       return s.isNotEmpty
+                                          //           ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
+                                          //           : s;
+                                          //     }
+                                          //
+                                          //     return SplitCalculatorSelectorOne(
+                                          //       items: strokes
+                                          //           .map(formatStroke)
+                                          //           .toList(), // display formatted strokes
+                                          //       selectedValue: formatStroke(
+                                          //         state.stroke,
+                                          //       ), // display current selection formatted
+                                          //       onChanged: (v) {
+                                          //         // Convert back to lowercase for storing
+                                          //         final lowerCaseValue = v
+                                          //             .toLowerCase();
+                                          //         ref
+                                          //             .read(
+                                          //               stopwatchProvider2
+                                          //                   .notifier,
+                                          //             )
+                                          //             .setPredictorParams(
+                                          //               s: lowerCaseValue,
+                                          //             );
+                                          //       },
+                                          //     );
+                                          //   },
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -1735,49 +1834,91 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                           Consumer(
                                             builder: (context, ref, child) {
-                                              final state = ref.watch(
-                                                stopwatchProvider2,
+                                              const items = ["SCY", "SCM", "LCM"];
+
+                                              final state = ref.watch(stopwatchProvider2);
+                                              final course = state.course;
+
+
+                                              final controller = ref.read(stopwatchProvider2.notifier);
+
+                                              final selectedValue = items.firstWhere(
+                                                    (item) => item.toLowerCase() == course,
+                                                orElse: () => items.first,
                                               );
 
-                                              const items = [
-                                                "scy",
-                                                "scm",
-                                                "lcm",
-                                              ];
-
                                               return SplitCalculatorSelectorOne(
-                                                items: items
-                                                    .map((e) => e.toUpperCase())
-                                                    .toList(),
-
-                                                selectedValue: state.course
-                                                    .toUpperCase(),
-
-                                                onChanged: (v) {
-                                                  final newCourse = v
-                                                      .toLowerCase();
-
-                                                  // 🔥 Get valid distances for new course
+                                                items: items,
+                                                selectedValue: selectedValue,
+                                                onChanged: (selected) {
+                                                  final newCourse = selected.toLowerCase();
                                                   final distances =
-                                                      getDistancesByCourse(
-                                                        newCourse,
-                                                      );
+                                                  getDistancesByCourse(
+                                                    newCourse,
+                                                  );
 
-                                                  ref
-                                                      .read(
-                                                        stopwatchProvider2
-                                                            .notifier,
-                                                      )
-                                                      .setPredictorParams(
-                                                        c: newCourse,
+                                                  // ✅ use BOTH course + stroke
+                                                  // final distances = getDistances(newCourse, stroke);
 
-                                                        // ✅ Reset distance safely
-                                                        d: distances.first,
-                                                      );
+                                                  controller.setPredictorParams(
+                                                    c: newCourse,
+
+                                                    // ✅ Reset distance safely
+                                                    d: distances.first,
+                                                  );
+
+                                                  // reset distance safely
+                                                  // controller.setDistance(distances.first);
                                                 },
                                               );
                                             },
                                           ),
+
+                                          // Consumer(
+                                          //   builder: (context, ref, child) {
+                                          //     final state = ref.watch(
+                                          //       stopwatchProvider2,
+                                          //     );
+                                          //
+                                          //     const items = [
+                                          //       "scy",
+                                          //       "scm",
+                                          //       "lcm",
+                                          //     ];
+                                          //
+                                          //     return SplitCalculatorSelectorOne(
+                                          //       items: items
+                                          //           .map((e) => e.toUpperCase())
+                                          //           .toList(),
+                                          //
+                                          //       selectedValue: state.course
+                                          //           .toUpperCase(),
+                                          //
+                                          //       onChanged: (v) {
+                                          //         final newCourse = v
+                                          //             .toLowerCase();
+                                          //
+                                          //         // 🔥 Get valid distances for new course
+                                          //         final distances =
+                                          //             getDistancesByCourse(
+                                          //               newCourse,
+                                          //             );
+                                          //
+                                          //         ref
+                                          //             .read(
+                                          //               stopwatchProvider2
+                                          //                   .notifier,
+                                          //             )
+                                          //             .setPredictorParams(
+                                          //               c: newCourse,
+                                          //
+                                          //               // ✅ Reset distance safely
+                                          //               d: distances.first,
+                                          //             );
+                                          //       },
+                                          //     );
+                                          //   },
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -1803,40 +1944,66 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
                                           Consumer(
                                             builder: (context, ref, child) {
-                                              final state = ref.watch(
-                                                stopwatchProvider2,
+                                              final state = ref.watch(stopwatchProvider2);
+                                              final controller = ref.read(stopwatchProvider2.notifier);
+
+                                              // ✅ use BOTH course + stroke
+                                              final distances = getDistances(
+                                                state.course,
+                                                state.stroke,
                                               );
 
-                                              // 🔥 Dynamic distances
-                                              final distances =
-                                                  getDistancesByCourse(
-                                                    state.course,
-                                                  );
-
-                                              // ✅ Fix invalid selection automatically
-                                              final selectedDistance =
-                                                  distances.contains(
-                                                    state.distance,
-                                                  )
+                                              // ✅ ensure valid selection
+                                              final selectedDistance = distances.contains(state.distance)
                                                   ? state.distance
                                                   : distances.first;
 
                                               return SplitCalculatorSelectorOne(
                                                 items: distances,
-
                                                 selectedValue: selectedDistance,
-
-                                                onChanged: (v) {
-                                                  ref
-                                                      .read(
-                                                        stopwatchProvider2
-                                                            .notifier,
-                                                      )
-                                                      .setPredictorParams(d: v);
+                                                onChanged: (value) {
+                                                  controller.setPredictorParams(d: value);
                                                 },
                                               );
                                             },
                                           ),
+
+                                          // Consumer(
+                                          //   builder: (context, ref, child) {
+                                          //     final state = ref.watch(
+                                          //       stopwatchProvider2,
+                                          //     );
+                                          //
+                                          //     // 🔥 Dynamic distances
+                                          //     final distances =
+                                          //         getDistancesByCourse(
+                                          //           state.course,
+                                          //         );
+                                          //
+                                          //     // ✅ Fix invalid selection automatically
+                                          //     final selectedDistance =
+                                          //         distances.contains(
+                                          //           state.distance,
+                                          //         )
+                                          //         ? state.distance
+                                          //         : distances.first;
+                                          //
+                                          //     return SplitCalculatorSelectorOne(
+                                          //       items: distances,
+                                          //
+                                          //       selectedValue: selectedDistance,
+                                          //
+                                          //       onChanged: (v) {
+                                          //         ref
+                                          //             .read(
+                                          //               stopwatchProvider2
+                                          //                   .notifier,
+                                          //             )
+                                          //             .setPredictorParams(d: v);
+                                          //       },
+                                          //     );
+                                          //   },
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -2548,6 +2715,35 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
     // 🏊 SCM + other LCM
     return ["50"];
+  }
+
+  List<String> getDistances(String course, String stroke) {
+    course = course.toLowerCase();
+    stroke = stroke.toLowerCase();
+
+    final Map<String, List<String>> scy = {
+      "fly": ["50", "100", "200"],
+      "back": ["50", "100", "200"],
+      "breast": ["50", "100", "200"],
+      "free": ["50", "100", "200", "500", "1000", "1650"],
+      "im": ["200", "400"],
+    };
+
+    final Map<String, List<String>> scmLcm = {
+      "fly": ["50", "100", "200"],
+      "back": ["50", "100", "200"],
+      "breast": ["50", "100", "200"],
+      "free": ["50", "100", "200", "400", "800", "1500"],
+      "im": ["200", "400"],
+    };
+
+    if (course == "scy") {
+      return scy[stroke] ?? ["50"];
+    } else if (course == "scm" || course == "lcm") {
+      return scmLcm[stroke] ?? ["50"];
+    } else {
+      return ["50"];
+    }
   }
 
 
