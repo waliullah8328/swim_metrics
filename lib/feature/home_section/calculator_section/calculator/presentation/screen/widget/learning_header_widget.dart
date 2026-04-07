@@ -9,6 +9,7 @@ import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../setting_section/settings/riverpod/setting_controller.dart';
+import '../../../../setting_section/settings/screen/idea_for_use.dart';
 import '../../../../setting_section/settings/screen/summary_screen.dart';
 
 
@@ -91,6 +92,7 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                     GestureDetector(
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder: (context) =>  SummaryScreen(),));
+
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,8 +102,19 @@ class _LearningHeaderWidgetState extends State<LearningHeaderWidget> {
                         ],
                       ),
                     ),
-                    CustomText(text: AppLocalizations.of(context)!.ideasForUse,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
-                    Divider(),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>  IdeaForUseScreen (),));
+
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText(text: AppLocalizations.of(context)!.ideasForUse,color:  widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(14, widget.fontSizeOption).sp,),
+                          Divider(),
+                        ],
+                      ),
+                    ),
                     GestureDetector(
                       onTap: (){
                         context.push(RouteNames.fAQScreen);

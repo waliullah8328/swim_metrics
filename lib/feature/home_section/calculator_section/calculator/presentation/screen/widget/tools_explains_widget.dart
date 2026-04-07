@@ -3,10 +3,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/core/utils/constants/icon_path.dart';
+import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/screen/split_calculator.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../setting_section/settings/riverpod/setting_controller.dart';
+import '../../../../setting_section/settings/screen/stop_watch_calulator.dart';
+import '../../../../setting_section/settings/screen/widget/course_conversion.dart';
 
 
 class ToolsHeader extends StatefulWidget {
@@ -85,12 +88,45 @@ class _ToolsHeaderState extends State<ToolsHeader> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(text: AppLocalizations.of(context)!.splitCalculator,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
-                    Divider(),
-                    CustomText(text: AppLocalizations.of(context)!.courseConversion,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize:getAdjustedFontSize(12, widget.fontSizeOption).sp,),
-                    Divider(),
-                    CustomText(text: AppLocalizations.of(context)!.stopWatch,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
-                    SizedBox(height: 16.h,),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>  SplitCalculatorScreen(),));
+
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText(text: AppLocalizations.of(context)!.splitCalculator,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
+                          Divider(),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>  CourseConversionScreen(),));
+
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText(text: AppLocalizations.of(context)!.courseConversion,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize:getAdjustedFontSize(12, widget.fontSizeOption).sp,),
+                          Divider(),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>  StopWatchCalculatorScreen(),));
+
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText(text: AppLocalizations.of(context)!.stopWatch,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
+                          SizedBox(height: 16.h,),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               )
