@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../../../../core/utils/utils/ratios_1.dart';
-import '../../../../../core/utils/utils/split_core_1.dart';
-import '../../../../../core/utils/utils/time_utils_1.dart';
+import '../../../../../core/utils/utils/split_core_1.dart'; // ✅ Removed 'hide SplitsCore4' - use SplitsCore1
+import '../../../../../core/utils/utils/time_utils_1.dart' hide TimeUtils1; // ✅ Added import for exact formatting
 
 final stopwatchProvider2 =
 ChangeNotifierProvider<StopwatchController2>((ref) => StopwatchController2());
@@ -45,7 +45,7 @@ class StopwatchController2 extends ChangeNotifier {
   String toCourse = 'LCM';
 
   StopwatchController2() {
-    initializeRatios1(); // Load ratios
+    initializeRatios1(); // Load ratios at startup
   }
 
   TimerState get current => _timers[activeMode]!;
@@ -136,28 +136,36 @@ class StopwatchController2 extends ChangeNotifier {
     if (!t.running) return;
 
     final now = DateTime.now();
-    final totalElapsed = elapsed();
+    final totalElapsed = elapsed(); // ✅ This is CUMULATIVE time
     final lapElapsed = t.lastSplitWall == null
         ? totalElapsed
         : now.difference(t.lastSplitWall!).inMilliseconds / 1000.0;
 
     t.lastSplitWall = now;
-    t.splits.add(totalElapsed);
+    t.splits.add(totalElapsed); // ✅ Store cumulative
     final lapNo = t.splits.length;
 
     String text;
 
     if (activeMode == 'Converter') {
-      double factor = _simpleConversionFactor(
-          fromCourse.toUpperCase(), toCourse.toUpperCase());
+      // ✅ FIXED: Use uppercase keys + Ratios1.conversionFactors
+      final fromKey = fromCourse.toUpperCase();
+      final toKey = toCourse.toUpperCase();
+      double factor = _simpleConversionFactor(fromKey, toKey);
+
+      // ✅ Convert cumulative time + round to 2 decimals for parity
       double converted = totalElapsed * factor;
-      text = 'Lap $lapNo: ${TimeUtils1.formatSeconds(totalElapsed)} $fromCourse → ${TimeUtils1.formatSeconds(converted)} $toCourse';
+      converted = double.parse(converted.toStringAsFixed(2));
+
+      // ✅ Use TimeUtils1.formatTime for EXACT string match
+      text = 'Lap $lapNo: ${TimeUtils1.formatTime(totalElapsed)} $fromCourse → ${TimeUtils1.formatTime(converted)} ${toCourse.toUpperCase()}';
       _appendConverterSplit(text);
     } else if (activeMode == 'Predictor') {
       text = _processPredictorLap(t, lapElapsed, lapNo);
       _appendPredictorSplit(text);
     } else {
-      text = 'Lap $lapNo: ${TimeUtils1.formatSeconds(lapElapsed)} / ${TimeUtils1.formatSeconds(totalElapsed)}';
+      // ✅ Use TimeUtils1.formatTime for EXACT string match
+      text = 'Lap $lapNo: ${TimeUtils1.formatTime(lapElapsed)} / ${TimeUtils1.formatTime(totalElapsed)}';
       _appendStopWatchSplit(text);
     }
 
@@ -197,93 +205,101 @@ class StopwatchController2 extends ChangeNotifier {
   String _processPredictorLap(TimerState t, double lapElapsed, int lapNo) {
     double totalElapsed = t.splits.last;
 
-    // Format times as :MM.SS (e.g., :10.50)
-    String formatShort(double seconds) {
-      final mins = (seconds ~/ 60).toInt();
-      final secs = (seconds % 60).toStringAsFixed(2).padLeft(5, '0');
-      return mins > 0 ? '$mins:$secs' : ':$secs';
-    }
-
+    // ✅ Progressive LCM 50 mode - EXACT format: "15: 7.5 / Projected Finish 30.24"
     if (progressiveActive &&
         course.toLowerCase() == 'lcm' &&
         distance == '50' &&
-        (splitSize == '15' || splitSize == '25' || splitSize == '35')) {
+        ['15', '25', '35'].contains(splitSize)) {
 
-      final pred = SplitsCore1.predictorLCM50(
+      final pred = SplitsCore4.predictorLCM50( // ✅ Changed from SplitsCore4
         elapsedSeconds: totalElapsed,
         gender: gender,
         marker: splitSize,
         pushStart: startType == 'From Push',
       );
 
-      return 'Lap $lapNo: ${formatShort(lapElapsed)} / ${formatShort(totalElapsed)} / Projected Finish: ${formatShort(pred)}';
-    } else {
-      final pred = SplitsCore1.predictorStandard(
+      // ✅ EXACT format: marker + compact time + projected finish (compact)
+      return '${splitSize}: ${TimeUtils1.formatTimeCompact(totalElapsed)} / Projected Finish ${TimeUtils1.formatTimeCompact(pred ?? 0.0)}';
+    }
+    // ✅ Standard mode - EXACT format: "Lap 1: :08.66 / :08.66 / Projected Finish: :38.70"
+    else {
+      final splitSizeInt = int.tryParse(splitSize) ?? 50;
+      final pred = SplitsCore4.predictorStandard( // ✅ Changed from SplitsCore4
         elapsedSeconds: totalElapsed,
-        splitCount: t.splits.length,
+        splitCount: t.splits.length, // ✅ Lap number (1-based)
         gender: gender,
         stroke: stroke,
         distance: distance,
         course: course.toLowerCase(),
-        splitSize: int.tryParse(splitSize) ?? 50,
+        splitSize: splitSizeInt,
         pushStart: startType == 'From Push',
       );
 
-      return 'Lap $lapNo: ${formatShort(lapElapsed)} / ${formatShort(totalElapsed)} / Projected Finish: ${formatShort(pred)}';
+      String baseLine = "Lap $lapNo: ${TimeUtils1.formatTime(lapElapsed)} / ${TimeUtils1.formatTime(totalElapsed)}";
+      if (pred != null) {
+        baseLine += " / Projected Finish: ${TimeUtils1.formatTime(pred)}";
+      }
+      return baseLine;
     }
   }
 
   void _rebuildPredictorLog(TimerState t) {
     logPredictor = _predictorHeader();
-    String tempSplit = splitSize;
-
-    // Format times as :MM.SS
-    String formatShort(double seconds) {
-      final mins = (seconds ~/ 60).toInt();
-      final secs = (seconds % 60).toStringAsFixed(2).padLeft(5, '0');
-      return mins > 0 ? '$mins:$secs' : ':$secs';
-    }
+    String currentMarker = splitSize; // ✅ Track progressive marker state
 
     for (int i = 0; i < t.splits.length; i++) {
       final totalElapsed = t.splits[i];
       final lapElapsed = i == 0 ? totalElapsed : totalElapsed - t.splits[i - 1];
 
+      // ✅ Progressive LCM 50 mode
       if (progressiveActive &&
           course.toLowerCase() == 'lcm' &&
           distance == '50' &&
-          (tempSplit == '15' || tempSplit == '25' || tempSplit == '35')) {
+          ['15', '25', '35'].contains(currentMarker)) {
 
-        final pred = SplitsCore1.predictorLCM50(
+        final pred = SplitsCore4.predictorLCM50( // ✅ Changed from SplitsCore4
           elapsedSeconds: totalElapsed,
           gender: gender,
-          marker: tempSplit,
+          marker: currentMarker,
           pushStart: startType == 'From Push',
         );
 
-        logPredictor +=
-        'Lap ${i + 1}: ${formatShort(lapElapsed)} / ${formatShort(totalElapsed)} / Projected Finish: ${formatShort(pred)}\n';
+        // ✅ EXACT format for progressive mode
+        logPredictor += '${currentMarker}: ${TimeUtils1.formatTimeCompact(totalElapsed)} / Projected Finish ${TimeUtils1.formatTimeCompact(pred ?? 0.0)}\n';
 
-        tempSplit = tempSplit == '15' ? '25' : tempSplit == '25' ? '35' : '15';
-      } else {
-        final pred = SplitsCore1.predictorStandard(
+        // ✅ Cycle markers: 15→25→35→15 (exact as original Dart)
+        if (currentMarker == '15') {
+          currentMarker = '25';
+        } else if (currentMarker == '25') {
+          currentMarker = '35';
+        } else {
+          currentMarker = '15';
+        }
+      }
+      // ✅ Standard mode
+      else {
+        final splitSizeInt = int.tryParse(splitSize) ?? 50;
+        final pred = SplitsCore4.predictorStandard( // ✅ Changed from SplitsCore4
           elapsedSeconds: totalElapsed,
           splitCount: i + 1,
           gender: gender,
           stroke: stroke,
           distance: distance,
           course: course.toLowerCase(),
-          splitSize: int.tryParse(splitSize) ?? 50,
+          splitSize: splitSizeInt,
           pushStart: startType == 'From Push',
         );
 
-        logPredictor +=
-        'Lap ${i + 1}: ${formatShort(lapElapsed)} / ${formatShort(totalElapsed)} / Projected Finish: ${formatShort(pred)}\n';
+        String line = "Lap ${i + 1}: ${TimeUtils1.formatTime(lapElapsed)} / ${TimeUtils1.formatTime(totalElapsed)}";
+        if (pred != null) {
+          line += " / Projected Finish: ${TimeUtils1.formatTime(pred)}";
+        }
+        logPredictor += '$line\n';
       }
     }
   }
 
   /// ----------------- Logs -----------------
-  /// ✅ FIXED: Append new splits AFTER header (chronological order)
   void _appendPredictorSplit(String line) {
     if (!logPredictor.contains('Split Breakdown:')) {
       logPredictor = _predictorHeader();
@@ -315,17 +331,11 @@ class StopwatchController2 extends ChangeNotifier {
     });
   }
 
+  /// ✅ FIXED: Use Ratios1.conversionFactors + uppercase keys
   double _simpleConversionFactor(String from, String to) {
     if (from == to) return 1.0;
-    Map<String, double> conversion = {
-      'SCY_SCM': 1.11,
-      'SCY_LCM': 1.12,
-      'SCM_SCY': 0.90,
-      'LCM_SCY': 0.89,
-      'SCM_LCM': 1.01,
-      'LCM_SCM': 0.99,
-    };
-    return conversion['${from}_$to'] ?? 1.0;
+    final key = '${from.toUpperCase()}_$to'; // ✅ Ensure uppercase for lookup
+    return Ratios1.conversionFactors[key] ?? 1.0;
   }
 
   void _appendLog(String line) {

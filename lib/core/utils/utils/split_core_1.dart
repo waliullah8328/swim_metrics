@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:swim_metrics/core/utils/utils/ratios_1.dart';
+import 'package:swim_metrics/core/utils/utils/ratios_1.dart' hide TimeUtils1;
 import 'package:swim_metrics/core/utils/utils/time_utils_1.dart';
 
 

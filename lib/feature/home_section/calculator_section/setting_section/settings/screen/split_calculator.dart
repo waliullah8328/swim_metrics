@@ -7,6 +7,7 @@ import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../../core/utils/constants/icon_path.dart';
 
 
+import '../../../../../../l10n/app_localizations.dart';
 import '../../faq/presentation/screen/faq_screen.dart';
 
 class SplitCalculatorScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class SplitCalculatorScreen extends StatelessWidget {
 
       appBar: AppBar(
         title: CustomText(
-          text: "Split Calculator",
+          text: AppLocalizations.of(context)!.splitCalculator,
           fontSize: 24.sp,
           fontWeight: FontWeight.w600,
         ),
