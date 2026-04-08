@@ -85,6 +85,8 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
     }
   }
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final fontOption = ref.watch(settingsProvider).fontSize;
@@ -236,7 +238,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                     );
 
                                     return Container(
-                                      padding:  EdgeInsets.symmetric(
+                                      padding: EdgeInsets.symmetric(
                                         horizontal: 16.w,
                                         vertical: 8.h,
                                       ),
@@ -273,8 +275,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                                   style: TextStyle(
                                                     color: AppColors
                                                         .primary, // 🔥 consistent primary
-                                                    fontSize:
-                                                        14.sp,
+                                                    fontSize: 14.sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
                                                 ),
@@ -619,54 +620,98 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                         color: AppColors.primary,
                       ),
                       SizedBox(height: 16.h),
-                      CustomTextField(
-                        keyboardType: TextInputType.text,
-                        hintText: AppLocalizations.of(context)!.enterYourTime,
-                        onChanged: (value) {
-                          ref
-                              .read(splitCalcProvider.notifier)
-                              .setGoalTime(value);
-                        },
-                        controller: timeController,
-                      ),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(
+                              text: "Time (hh:mm.ss or mm.ss)",
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: getAdjustedFontSize(14, fontOption).sp,
+                            ),
 
-                      SizedBox(height: 16.h),
+                            SizedBox(height: 10.h),
 
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          fixedSize: Size(double.infinity, 52.h),
-                        ),
-                        onPressed: () {
-                          if (isHaptic) HapticFeedback.lightImpact();
+                            /// ✅ TEXT FIELD WITH VALIDATOR
+                            CustomTextField(
+                              keyboardType: TextInputType.text,
+                              hintText: "hh:mm.ss or mm.ss",
+                              controller: timeController,
 
-                          ref.read(splitCalcProvider.notifier).calculate();
-                          ref.read(showCourseSectionProvider.notifier).state =
-                              false;
-                        },
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                IconPath.calculatorSplitIcon,
-                                colorFilter: ColorFilter.mode(
-                                  Colors.black,
-                                  BlendMode.srcIn,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return AppLocalizations.of(context)!.enterYourTime;
+                                }
+
+
+
+                                return null;
+                              },
+
+                              onChanged: (value) {
+                                ref
+                                    .read(splitCalcProvider.notifier)
+                                    .setGoalTime(value);
+                              },
+                            ),
+
+                            SizedBox(height: 16.h),
+
+                            /// ✅ BUTTON WITH FORM VALIDATION
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: Size(double.infinity, 52.h),
+                              ),
+                              onPressed: () {
+                                final isValid = _formKey.currentState!
+                                    .validate();
+
+                                if (!isValid) {
+                                  if (isHaptic) HapticFeedback.heavyImpact();
+                                  return;
+                                }
+
+                                if (isHaptic) HapticFeedback.lightImpact();
+
+                                ref
+                                    .read(splitCalcProvider.notifier)
+                                    .calculate();
+                                ref
+                                        .read(
+                                          showCourseSectionProvider.notifier,
+                                        )
+                                        .state =
+                                    false;
+                              },
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(
+                                      IconPath.calculatorSplitIcon,
+                                      colorFilter: const ColorFilter.mode(
+                                        Colors.black,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6.w),
+                                    CustomText(
+                                      text: AppLocalizations.of(
+                                        context,
+                                      )!.calculateSplit,
+                                      fontSize: getAdjustedFontSize(
+                                        14,
+                                        fontOption,
+                                      ).sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              SizedBox(width: 6.w),
-                              CustomText(
-                                text: AppLocalizations.of(
-                                  context,
-                                )!.calculateSplit,
-                                fontSize: getAdjustedFontSize(
-                                  14,
-                                  fontOption,
-                                ).sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
