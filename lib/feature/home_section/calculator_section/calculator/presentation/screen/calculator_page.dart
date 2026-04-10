@@ -734,7 +734,8 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? AppColors.darkThemeContainerColor
+                        : Color(0xffFFFFFF),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(width: 1, color: Color(0xff2DA8F0)),
                       boxShadow: const [

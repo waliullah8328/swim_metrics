@@ -175,11 +175,20 @@ class SwimSplitCalculator1 {
     distance = distance.trim();
     goalTime = goalTime.trim();
 
+    // ✅ Format display values
+    String displayGender =
+        gender.substring(0, 1).toUpperCase() + gender.substring(1);
+
+    String displayStroke =
+    stroke == "im"
+        ? "IM"
+        : stroke.substring(0, 1).toUpperCase() + stroke.substring(1);
+
     Map<String, dynamic> outputJson = {
       "success": true,
       "course": course.toUpperCase(),
-      "gender": gender.substring(0, 1).toUpperCase() + gender.substring(1),
-      "stroke": stroke.substring(0, 1).toUpperCase() + stroke.substring(1),
+      "gender": displayGender,
+      "stroke": displayStroke,
       "distance": distance,
       "goal_time": goalTime,
       "is_speed_chart": false,
@@ -188,19 +197,27 @@ class SwimSplitCalculator1 {
       "disclaimer": ""
     };
 
-    if (course.isEmpty || gender.isEmpty || stroke.isEmpty || distance.isEmpty || goalTime.isEmpty) {
+    if (course.isEmpty ||
+        gender.isEmpty ||
+        stroke.isEmpty ||
+        distance.isEmpty ||
+        goalTime.isEmpty) {
       outputJson["success"] = false;
       outputJson["error"] = "Please fill all fields.";
       return jsonEncode(outputJson);
     }
 
-    if (course == "lcm" && distance == "50" && ["free", "fly", "back", "breast"].contains(stroke)) {
+    // ✅ Special LCM 50 logic
+    if (course == "lcm" &&
+        distance == "50" &&
+        ["free", "fly", "back", "breast"].contains(stroke)) {
       double targetTime;
       try {
         targetTime = mmssToSeconds(goalTime);
       } catch (e) {
         outputJson["success"] = false;
-        outputJson["error"] = "Please enter a valid time (mm:ss or ss.ss).";
+        outputJson["error"] =
+        "Please enter a valid time (mm:ss or ss.ss).";
         return jsonEncode(outputJson);
       }
 
@@ -221,53 +238,84 @@ class SwimSplitCalculator1 {
         targetTime * ratios["35m"],
         targetTime
       ];
+
       List<String> labels = ["15m", "25m", "35m", "Total time"];
 
       List<String> textOut = [];
       textOut.add("===============");
-      textOut.add("${outputJson["gender"]} 50m ${outputJson["stroke"]} LCM (15/25/35 Avg Model)");
+      textOut.add(
+          "$displayGender 50m $displayStroke LCM (15/25/35 Avg Model)");
       textOut.add("Goal Time: ${targetTime.toStringAsFixed(2)}");
       textOut.add("===============");
 
       List<Map<String, dynamic>> structuredSplits = [];
+
       for (int i = 0; i < labels.length; i++) {
-        textOut.add("${labels[i]}: ${splits[i].toStringAsFixed(2)}");
+        textOut.add(
+            "${labels[i]}: ${splits[i].toStringAsFixed(2)}");
         structuredSplits.add({
           "label": labels[i],
           "split": splits[i].toStringAsFixed(2)
         });
       }
+
       textOut.add("===============");
 
       outputJson["is_speed_chart"] = true;
       outputJson["formatted_text"] = textOut.join("\n");
-      //outputJson["splits"] = structuredSplits;
+      // outputJson["splits"] = structuredSplits;
+
       return jsonEncode(outputJson);
     }
 
+    // ✅ Ratio source selection
     Map<String, dynamic>? ratioSource;
-    if (course == "scy") ratioSource = ratiosScy;
-    else if (course == "scm") ratioSource = ratiosScm;
-    else if (course == "lcm") ratioSource = ratiosLcm;
+    if (course == "scy") {
+      ratioSource = ratiosScy;
+    } else if (course == "scm") {
+      ratioSource = ratiosScm;
+    } else if (course == "lcm") {
+      ratioSource = ratiosLcm;
+    }
 
-    if (ratioSource == null || !ratioSource.containsKey(gender) || !ratioSource[gender].containsKey(stroke) || ratioSource[gender][stroke][distance] == null) {
+    if (ratioSource == null ||
+        !ratioSource.containsKey(gender) ||
+        !ratioSource[gender].containsKey(stroke) ||
+        ratioSource[gender][stroke][distance] == null) {
       outputJson["success"] = false;
-      outputJson["error"] = "Ratios not defined for this event.";
+      outputJson["error"] =
+      "Ratios not defined for this event.";
       return jsonEncode(outputJson);
     }
 
-    List<dynamic> rawRatioList = ratioSource[gender][stroke][distance];
+    List<dynamic> rawRatioList =
+    ratioSource[gender][stroke][distance];
+
     String unit = distance == "50" ? "25" : "50";
 
-    String formattedResult = project(goalTime, rawRatioList, unit, outputJson["course"], distance, outputJson["gender"], outputJson["stroke"], outputJson);
+    // ✅ Pass formatted stroke (IM fix here)
+    String formattedResult = project(
+      goalTime,
+      rawRatioList,
+      unit,
+      outputJson["course"],
+      distance,
+      displayGender,
+      displayStroke,
+      outputJson,
+    );
 
+    // ✅ IM disclaimer
     if (stroke == "im") {
-      String disclaimer = "\n⚠️ Does not account for best/worst stroke.";
+      String disclaimer =
+          "\n⚠️ Does not account for best/worst stroke.";
       formattedResult += disclaimer;
-      outputJson["disclaimer"] = "⚠️ Does not account for best/worst stroke.";
+      outputJson["disclaimer"] =
+      "⚠️ Does not account for best/worst stroke.";
     }
 
     outputJson["formatted_text"] = formattedResult;
+
     return jsonEncode(outputJson);
   }
 }
