@@ -25,7 +25,7 @@ class ConverterState {
   final String output;
 
   const ConverterState({
-    this.course = 'scy',
+    this.course = 'scm',
     this.gender = 'men',
     this.stroke = 'free',
     this.distance = '100',

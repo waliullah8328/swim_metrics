@@ -35,14 +35,14 @@ class StopwatchController2 extends ChangeNotifier {
   String gender = 'men';
   String stroke = 'free';
   String distance = '100';
-  String course = 'scy';
+  String course = 'scm';
   String splitSize = '50';
   String startType = 'From Start';
   bool progressiveActive = false;
 
   // Converter parameters
-  String fromCourse = 'SCY';
-  String toCourse = 'LCM';
+  String fromCourse = 'SCM';
+  String toCourse = 'SCM';
 
   StopwatchController2() {
     initializeRatios1(); // Load ratios at startup
