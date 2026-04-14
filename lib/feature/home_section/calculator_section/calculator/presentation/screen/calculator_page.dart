@@ -252,7 +252,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                           isDense: true,
                                           icon: Icon(
                                             Icons.keyboard_arrow_down,
-                                            color: normalTextColor,
+                                            color: isDark?Colors.yellow:normalTextColor,
                                           ),
 
                                           // ✅ IMPORTANT: match dropdown popup color
@@ -260,7 +260,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                           // ✅ Dropdown list item style
                                           style: TextStyle(
-                                            color: normalTextColor,
+                                            color: isDark?Colors.yellow:normalTextColor,
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -273,8 +273,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                                 child: Text(
                                                   displayItems[c]!,
                                                   style: TextStyle(
-                                                    color: AppColors
-                                                        .primary, // 🔥 consistent primary
+                                                    color: isDark?Colors.yellow:normalTextColor,// 🔥 consistent primary
                                                     fontSize: 14.sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
@@ -292,8 +291,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                                 displayItems[c]!,
                                                 style: TextStyle(
                                                   color: isSelected
-                                                      ? AppColors
-                                                            .primary // ✅ highlight inside dropdown too
+                                                      ? isDark?Colors.yellow:normalTextColor // ✅ highlight inside dropdown too
                                                       : normalTextColor,
                                                   fontWeight: isSelected
                                                       ? FontWeight.w600
@@ -538,72 +536,40 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                         ),
                                         SizedBox(height: 6.h),
 
-                                        Consumer(
-                                          builder: (context, ref, child) {
-                                            final state = ref.watch(
-                                              splitCalcProvider,
-                                            );
+    Consumer(
+    builder: (context, ref, child) {
+    final state = ref.watch(splitCalcProvider);
 
-                                            final distances = getDistances(
-                                              state.course,
-                                              state.stroke,
-                                              state.gender,
-                                            );
+    final distances = getDistances(
+    state.course,
+    state.stroke,
+    state.gender,
+    );
 
-                                            if (distances.isEmpty) {
-                                              return const SizedBox();
-                                            }
+    if (distances.isEmpty) {
+    return const SizedBox();
+    }
 
-                                            final currentDistance =
-                                                int.tryParse(state.distance);
+    /// ✅ Safe distance (NO side effects here)
+    final currentDistance = int.tryParse(state.distance);
 
-                                            final safeDistance =
-                                                (currentDistance != null &&
-                                                    distances.contains(
-                                                      currentDistance,
-                                                    ))
-                                                ? currentDistance
-                                                : distances.first;
+    final safeDistance =
+    (currentDistance != null && distances.contains(currentDistance))
+    ? currentDistance
+        : distances.first;
 
-                                            /// ✅ ONLY update when really needed (NO rebuild loop)
-                                            WidgetsBinding.instance
-                                                .addPostFrameCallback((_) {
-                                                  final current = ref
-                                                      .read(splitCalcProvider)
-                                                      .distance;
-                                                  if (current !=
-                                                      safeDistance.toString()) {
-                                                    ref
-                                                        .read(
-                                                          splitCalcProvider
-                                                              .notifier,
-                                                        )
-                                                        .setDistance(
-                                                          safeDistance
-                                                              .toString(),
-                                                        );
-                                                  }
-                                                });
+    return DistanceWheelSelector(
+    /// ❌ REMOVE THIS → key: ValueKey(safeDistance),
 
-                                            return DistanceWheelSelector(
-                                              key: ValueKey(
-                                                safeDistance,
-                                              ), // 🔥 VERY IMPORTANT FIX
-                                              items: distances,
-                                              selectedValue: safeDistance,
-                                              onChanged: (value) {
-                                                ref
-                                                    .read(
-                                                      splitCalcProvider
-                                                          .notifier,
-                                                    )
-                                                    .setDistance(
-                                                      value.toString(),
-                                                    );
-                                              },
-                                            );
-                                          },
-                                        ),
+    items: distances,
+    selectedValue: safeDistance,
+    onChanged: (value) {
+    ref.read(splitCalcProvider.notifier)
+        .setDistance(value.toString());
+    },
+    );
+    },
+    ),
                                       ],
                                     ),
                                   ),
