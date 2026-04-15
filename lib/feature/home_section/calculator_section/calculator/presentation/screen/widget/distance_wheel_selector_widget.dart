@@ -27,7 +27,10 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
   void initState() {
     super.initState();
     selectedIndex = _getInitialIndex();
-    _controller = FixedExtentScrollController(initialItem: selectedIndex);
+
+    _controller = FixedExtentScrollController(
+      initialItem: selectedIndex,
+    );
   }
 
   @override
@@ -36,15 +39,16 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
 
     final newIndex = _getInitialIndex();
 
+    /// ✅ Only update if actually changed
     if (newIndex != selectedIndex) {
       selectedIndex = newIndex;
 
-      // ✅ FIX: delay scroll update to avoid Riverpod crash
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _controller.jumpToItem(selectedIndex);
-        }
-      });
+      /// 🔥 SMOOTH instead of jump
+      _controller.animateToItem(
+        selectedIndex,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
@@ -78,7 +82,7 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
               perspective: 0.003,
               diameterRatio: 10,
 
-              // ✅ FIXED (Riverpod-safe)
+              /// ✅ CLEAN (no postFrame, no lag)
               onSelectedItemChanged: (index) {
                 if (index == selectedIndex) return;
 
@@ -86,48 +90,45 @@ class _DistanceWheelSelectorState extends State<DistanceWheelSelector> {
                   selectedIndex = index;
                 });
 
-                // ✅ Delay provider update (IMPORTANT)
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    widget.onChanged(widget.items[index]);
-                  }
-                });
+                widget.onChanged(widget.items[index]);
               },
 
               childDelegate: ListWheelChildBuilderDelegate(
+                childCount: widget.items.length,
                 builder: (context, index) {
-                  if (index < 0 || index >= widget.items.length) return null;
-
                   final isSelected = index == selectedIndex;
 
                   return Center(
-                    child: Text(
-                      widget.items[index].toString(),
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
                       style: TextStyle(
-                        fontSize: 19.sp,
+                        fontSize: isSelected ? 20.sp : 16.sp,
                         color: isSelected
                             ? Colors.amber
                             : isDark
                             ? AppColors.textWhite
                             : Colors.black,
-                        fontWeight:
-                        isSelected ? FontWeight.w500 : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
+                      child: Text(widget.items[index].toString()),
                     ),
                   );
                 },
-                childCount: widget.items.length,
               ),
             ),
 
-            // ✅ Center highlight lines
+            /// ✅ Center highlight
             IgnorePointer(
               child: Container(
                 height: itemHeight,
                 decoration: BoxDecoration(
                   border: Border(
-                    top: BorderSide(color: AppColors.primary, width: 0.5),
-                    bottom: BorderSide(color: AppColors.primary, width: 0.5),
+                    top: BorderSide(
+                        color: AppColors.primary, width: 0.6),
+                    bottom: BorderSide(
+                        color: AppColors.primary, width: 0.6),
                   ),
                 ),
               ),

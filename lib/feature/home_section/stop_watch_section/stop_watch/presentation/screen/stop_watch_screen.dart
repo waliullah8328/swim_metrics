@@ -374,8 +374,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         Consumer(builder: (context, ref, child) {
           const items = ["SCY", "SCM", "LCM"];
           final course = ref.watch(stopwatchProvider2.select((s) => s.fromCourse));
-          final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.first);
-          return SplitCalculatorSelectorOne(items: items, selectedValue: selected, onChanged: (s) {
+          //final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.);
+          return SplitCalculatorSelectorOne(items: items, selectedValue: course , onChanged: (s) {
             FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).setConverterCourses(from: s.toLowerCase()); if(isHaptic) HapticFeedback.lightImpact();
           });
         })
@@ -386,8 +386,8 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         Consumer(builder: (context, ref, child) {
           const items = ["SCY", "SCM", "LCM"];
           final course = ref.watch(stopwatchProvider2.select((s) => s.toCourse));
-          final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.first);
-          return SplitCalculatorSelectorOne(items: items, selectedValue: selected, onChanged: (s) {
+         //final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.first);
+          return SplitCalculatorSelectorOne(items: items, selectedValue: course, onChanged: (s) {
             FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).setConverterCourses(to: s.toLowerCase()); if(isHaptic) HapticFeedback.lightImpact();
           });
         })

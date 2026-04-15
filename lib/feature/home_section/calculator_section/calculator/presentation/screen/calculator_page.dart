@@ -213,19 +213,19 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                         .toUpperCase();
                                     const validCourses = ["SCY", "SCM", "LCM"];
                                     final selected =
-                                        validCourses.contains(course)
+                                    validCourses.contains(course)
                                         ? course
                                         : "SCY";
 
                                     final displayItems = {
                                       "SCY":
-                                          AppLocalizations.of(context)?.scy ??
+                                      AppLocalizations.of(context)?.scy ??
                                           "SCY",
                                       "SCM":
-                                          AppLocalizations.of(context)?.scm ??
+                                      AppLocalizations.of(context)?.scm ??
                                           "SCM",
                                       "LCM":
-                                          AppLocalizations.of(context)?.lcm ??
+                                      AppLocalizations.of(context)?.lcm ??
                                           "LCM",
                                     };
 
@@ -252,7 +252,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                           isDense: true,
                                           icon: Icon(
                                             Icons.keyboard_arrow_down,
-                                            color: normalTextColor,
+                                            color: isDark?Colors.yellow:normalTextColor,
                                           ),
 
                                           // ✅ IMPORTANT: match dropdown popup color
@@ -260,7 +260,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                           // ✅ Dropdown list item style
                                           style: TextStyle(
-                                            color: normalTextColor,
+                                            color: isDark?Colors.yellow:normalTextColor,
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -273,8 +273,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                                 child: Text(
                                                   displayItems[c]!,
                                                   style: TextStyle(
-                                                    color: AppColors
-                                                        .primary, // 🔥 consistent primary
+                                                    color: isDark?Colors.yellow:normalTextColor,// 🔥 consistent primary
                                                     fontSize: 14.sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
@@ -292,8 +291,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                                 displayItems[c]!,
                                                 style: TextStyle(
                                                   color: isSelected
-                                                      ? AppColors
-                                                            .primary // ✅ highlight inside dropdown too
+                                                      ? isDark?Colors.yellow:normalTextColor // ✅ highlight inside dropdown too
                                                       : normalTextColor,
                                                   fontWeight: isSelected
                                                       ? FontWeight.w600
@@ -308,8 +306,8 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                             ref
                                                 .read(
-                                                  splitCalcProvider.notifier,
-                                                )
+                                              splitCalcProvider.notifier,
+                                            )
                                                 .setCourse(value.toLowerCase());
                                           },
                                         ),
@@ -349,8 +347,8 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                             String capitalize(String s) =>
                                                 s.isNotEmpty
-                                                ? '${s[0].toUpperCase()}${s.substring(1)}'
-                                                : s;
+                                                    ? '${s[0].toUpperCase()}${s.substring(1)}'
+                                                    : s;
 
                                             /// ✅ VALIDATE STATE
                                             final current = state.gender
@@ -367,9 +365,9 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               Future.microtask(() {
                                                 ref
                                                     .read(
-                                                      splitCalcProvider
-                                                          .notifier,
-                                                    )
+                                                  splitCalcProvider
+                                                      .notifier,
+                                                )
                                                     .setGender(safeGender);
                                               });
                                             }
@@ -384,12 +382,12 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               onChanged: (value) {
                                                 ref
                                                     .read(
-                                                      splitCalcProvider
-                                                          .notifier,
-                                                    )
+                                                  splitCalcProvider
+                                                      .notifier,
+                                                )
                                                     .setGender(
-                                                      value.toLowerCase(),
-                                                    );
+                                                  value.toLowerCase(),
+                                                );
                                               },
                                             );
                                           },
@@ -425,26 +423,26 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                             final Map<String, dynamic>?
                                             strokesMap =
-                                                (course == 'scy'
-                                                        ? SwimSplitCalculator1
-                                                              .ratiosScy[gender]
-                                                        : course == 'scm'
-                                                        ? SwimSplitCalculator1
-                                                              .ratiosScm[gender]
-                                                        : SwimSplitCalculator1
-                                                              .ratiosLcm[gender])
-                                                    as Map<String, dynamic>?;
+                                            (course == 'scy'
+                                                ? SwimSplitCalculator1
+                                                .ratiosScy[gender]
+                                                : course == 'scm'
+                                                ? SwimSplitCalculator1
+                                                .ratiosScm[gender]
+                                                : SwimSplitCalculator1
+                                                .ratiosLcm[gender])
+                                            as Map<String, dynamic>?;
 
                                             List<String> availableStrokes =
-                                                (strokesMap?.keys.toList() ??
-                                                        [])
-                                                    .map(
-                                                      (e) => e
-                                                          .toString()
-                                                          .toLowerCase(),
-                                                    )
-                                                    .toSet()
-                                                    .toList();
+                                            (strokesMap?.keys.toList() ??
+                                                [])
+                                                .map(
+                                                  (e) => e
+                                                  .toString()
+                                                  .toLowerCase(),
+                                            )
+                                                .toSet()
+                                                .toList();
 
                                             const strokeOrder = [
                                               'fly',
@@ -460,11 +458,11 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               final indexB = strokeOrder
                                                   .indexOf(b);
                                               return (indexA == -1
-                                                      ? 99
-                                                      : indexA)
+                                                  ? 99
+                                                  : indexA)
                                                   .compareTo(
-                                                    indexB == -1 ? 99 : indexB,
-                                                  );
+                                                indexB == -1 ? 99 : indexB,
+                                              );
                                             });
 
                                             if (availableStrokes.isEmpty) {
@@ -485,9 +483,9 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               Future.microtask(() {
                                                 ref
                                                     .read(
-                                                      splitCalcProvider
-                                                          .notifier,
-                                                    )
+                                                  splitCalcProvider
+                                                      .notifier,
+                                                )
                                                     .setStroke(safeStroke);
                                               });
                                             }
@@ -509,12 +507,12 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               onChanged: (value) {
                                                 ref
                                                     .read(
-                                                      splitCalcProvider
-                                                          .notifier,
-                                                    )
+                                                  splitCalcProvider
+                                                      .notifier,
+                                                )
                                                     .setStroke(
-                                                      value.toLowerCase(),
-                                                    );
+                                                  value.toLowerCase(),
+                                                );
                                               },
                                             );
                                           },
@@ -540,9 +538,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                         Consumer(
                                           builder: (context, ref, child) {
-                                            final state = ref.watch(
-                                              splitCalcProvider,
-                                            );
+                                            final state = ref.watch(splitCalcProvider);
 
                                             final distances = getDistances(
                                               state.course,
@@ -554,52 +550,22 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               return const SizedBox();
                                             }
 
-                                            final currentDistance =
-                                                int.tryParse(state.distance);
+                                            /// ✅ Safe distance (NO side effects here)
+                                            final currentDistance = int.tryParse(state.distance);
 
                                             final safeDistance =
-                                                (currentDistance != null &&
-                                                    distances.contains(
-                                                      currentDistance,
-                                                    ))
+                                            (currentDistance != null && distances.contains(currentDistance))
                                                 ? currentDistance
                                                 : distances.first;
 
-                                            /// ✅ ONLY update when really needed (NO rebuild loop)
-                                            WidgetsBinding.instance
-                                                .addPostFrameCallback((_) {
-                                                  final current = ref
-                                                      .read(splitCalcProvider)
-                                                      .distance;
-                                                  if (current !=
-                                                      safeDistance.toString()) {
-                                                    ref
-                                                        .read(
-                                                          splitCalcProvider
-                                                              .notifier,
-                                                        )
-                                                        .setDistance(
-                                                          safeDistance
-                                                              .toString(),
-                                                        );
-                                                  }
-                                                });
-
                                             return DistanceWheelSelector(
-                                              key: ValueKey(
-                                                safeDistance,
-                                              ), // 🔥 VERY IMPORTANT FIX
+                                              /// ❌ REMOVE THIS → key: ValueKey(safeDistance),
+
                                               items: distances,
                                               selectedValue: safeDistance,
                                               onChanged: (value) {
-                                                ref
-                                                    .read(
-                                                      splitCalcProvider
-                                                          .notifier,
-                                                    )
-                                                    .setDistance(
-                                                      value.toString(),
-                                                    );
+                                                ref.read(splitCalcProvider.notifier)
+                                                    .setDistance(value.toString());
                                               },
                                             );
                                           },
@@ -626,7 +592,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CustomText(
-                              text: "Time (mm:ss.hh)",
+                              text: "Time (hh:mm.ss)",
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                               fontSize: getAdjustedFontSize(14, fontOption).sp,
@@ -637,7 +603,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                             /// ✅ TEXT FIELD WITH VALIDATOR
                             CustomTextField(
                               keyboardType: TextInputType.text,
-                              hintText: "mm:ss.hh",
+                              hintText: "hh:mm.ss",
                               controller: timeController,
 
                               validator: (value) {
@@ -679,11 +645,11 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                     .read(splitCalcProvider.notifier)
                                     .calculate();
                                 ref
-                                        .read(
-                                          showCourseSectionProvider.notifier,
-                                        )
-                                        .state =
-                                    false;
+                                    .read(
+                                  showCourseSectionProvider.notifier,
+                                )
+                                    .state =
+                                false;
                               },
                               child: Center(
                                 child: Row(
@@ -733,7 +699,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: isDark ? AppColors.darkThemeContainerColor
-                        : Color(0xffFFFFFF),
+                          : Color(0xffFFFFFF),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(width: 1, color: Color(0xff2DA8F0)),
                       boxShadow: const [
@@ -745,7 +711,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: reversedHistory.length,
                       separatorBuilder: (_, __) =>
-                          const SizedBox(height: 30), // 30px gap
+                      const SizedBox(height: 30), // 30px gap
                       itemBuilder: (context, index) {
                         final item = reversedHistory[index];
 
