@@ -51,15 +51,29 @@ class _ToolsHeaderState extends State<ToolsHeader> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    SvgPicture.asset(IconPath.toolsExplainIcon),
-                    SizedBox(width: 6.w,),
-                    Text(
-                      AppLocalizations.of(context)!.toolsExplain,
-                      style: TextStyle(fontSize: getAdjustedFontSize(widget.currentLanguageCode !="en"?14:16, widget.fontSizeOption).sp, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Expanded(
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(IconPath.toolsExplainIcon),
+                      SizedBox(width: 6.w),
+
+                      /// Expanded keeps text inside available space
+                      Expanded(
+                        child: Text(
+                          AppLocalizations.of(context)!.toolsExplain,
+                          maxLines: 1, // single line only
+                          overflow: TextOverflow.ellipsis, // show ...
+                          softWrap: false,
+                          style: TextStyle(
+                            fontSize: getAdjustedFontSize(16,
+                              widget.fontSizeOption,
+                            ).sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 /// Arrow Button

@@ -41,8 +41,6 @@ class StopwatchController2 extends ChangeNotifier {
   String startType = 'From Start';
 
   bool progressiveActive = false;
-
-  // 🔥 progressive runtime marker
   String _marker = '15';
 
   // ================= CONVERTER =================
@@ -125,10 +123,9 @@ class StopwatchController2 extends ChangeNotifier {
     notifyListeners();
   }
 
-  void stop() {
-    pause();
-  }
+  void stop() => pause();
 
+  // ================= ELAPSED =================
   double elapsed() {
     final t = current;
     if (t.running && t.startTime != null) {
@@ -174,16 +171,21 @@ class StopwatchController2 extends ChangeNotifier {
 
     // ================= PREDICTOR =================
     else {
-      final result = _predict(t, lap, lapNo);
+      final projected = _predict(lapNo) ?? 0.0;
 
-      final Object projected = result is double ? result : 0.0;
+      final isProgressive =
+          _shouldEnableProgressive() && progressiveActive;
+
+      // Show 15 / 25 / 35 instead of Lap 1 / Lap 2 / Lap 3
+      final label = isProgressive ? _marker : "Lap $lapNo";
 
       logPredictor +=
-      "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / "
+      "$label: ${TimeUtils1.formatTime(lap)} / "
           "${TimeUtils1.formatTime(total)} / "
-          "Projected: ${TimeUtils1.formatTime((projected is double) ? projected : 0.0)}\n";
+          "Projected: ${TimeUtils1.formatTime(projected)}\n";
 
-      if (_shouldEnableProgressive() && progressiveActive) {
+      // Move next marker
+      if (isProgressive) {
         _marker = _nextMarker(_marker);
       }
     }
@@ -191,11 +193,35 @@ class StopwatchController2 extends ChangeNotifier {
     notifyListeners();
   }
 
-  // =========================
-  // MARKER ROTATION FIX
-  // =========================
+  // ================= PREDICT (FIXED) =================
+  double? _predict(int lapNo) {
+    final total = elapsed(); // ✅ FIX: ALWAYS REAL TIME
+    if (total <= 0) return null;
 
+    if (_shouldEnableProgressive() && progressiveActive) {
+      return SplitsCore4.predictorLCM50(
+        elapsedSeconds: total,
+        gender: gender,
+        marker: _marker,
+        pushStart: startType.toLowerCase() == 'from push',
+      );
+    }
 
+    final split = int.tryParse(splitSize) ?? 50;
+
+    return SplitsCore4.predictorStandard(
+      elapsedSeconds: total,
+      splitCount: lapNo,
+      gender: gender,
+      stroke: stroke,
+      distance: distance,
+      course: course,
+      splitSize: split,
+      pushStart: startType.toLowerCase() == 'from push',
+    );
+  }
+
+  // ================= MARKER =================
   String _nextMarker(String current) {
     switch (current) {
       case '15':
@@ -207,51 +233,7 @@ class StopwatchController2 extends ChangeNotifier {
     }
   }
 
-  // ================= PREDICT =================
-  String _predict(TimerState t, double lap, int lapNo) {
-    final total = t.splits.last;
-
-    // ================= PROGRESSIVE =================
-    if (_shouldEnableProgressive() && progressiveActive) {
-      final result = SplitsCore4.predictorLCM50(
-        elapsedSeconds: total,
-        gender: gender,
-        marker: _marker,
-        pushStart: startType.toLowerCase() == 'from push',
-      );
-
-      final proj = result == null ? 0.0 : result;
-
-      return "$_marker: "
-          "${TimeUtils1.formatTimeCompact(total)} / "
-          "Projected Finish ${TimeUtils1.formatTimeCompact(proj)}";
-    }
-
-    // ================= STANDARD =================
-    final split = int.tryParse(splitSize) ?? 50;
-
-    final result = SplitsCore4.predictorStandard(
-      elapsedSeconds: total,
-      splitCount: t.splits.length,
-      gender: gender,
-      stroke: stroke,
-      distance: distance,
-      course: course,
-      splitSize: split,
-      pushStart: startType.toLowerCase() == 'from push',
-    );
-
-    String line =
-        "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / ${TimeUtils1.formatTime(total)}";
-
-    if (result != null) {
-      line += " / Projected Finish: ${TimeUtils1.formatTime(result)}";
-    }
-
-    return line;
-  }
-
-  // ================= PROGRESSIVE CHECK =================
+  // ================= CHECK =================
   bool _shouldEnableProgressive() {
     return course.toLowerCase() == 'lcm' &&
         distance == '50' &&
@@ -284,7 +266,6 @@ class StopwatchController2 extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ================= CLEAR LOG =================
   void clearLog() {
     if (activeMode == 'Stopwatch') logStopwatch = '';
     if (activeMode == 'Predictor') logPredictor = '';
@@ -292,7 +273,6 @@ class StopwatchController2 extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ================= UNDO =================
   void undoLastSplit() {
     final t = current;
     if (t.splits.isEmpty) return;
@@ -317,7 +297,6 @@ class StopwatchController2 extends ChangeNotifier {
     return lines.join("\n");
   }
 
-  // ================= TICKER =================
   void _startTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(
