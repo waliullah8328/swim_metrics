@@ -158,7 +158,8 @@ class StopwatchController2 extends ChangeNotifier {
     // ================= STOPWATCH =================
     if (activeMode == 'Stopwatch') {
       logStopwatch +=
-      "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / ${TimeUtils1.formatTime(total)}\n";
+      "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / "
+          "${TimeUtils1.formatTime(total)}\n";
     }
 
     // ================= CONVERTER =================
@@ -173,21 +174,37 @@ class StopwatchController2 extends ChangeNotifier {
 
     // ================= PREDICTOR =================
     else {
-      logPredictor += _predict(t, lap, lapNo) + "\n";
+      final result = _predict(t, lap, lapNo);
 
-      // 🔥 ONLY progressive mode rotates marker
+      final Object projected = result is double ? result : 0.0;
+
+      logPredictor +=
+      "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / "
+          "${TimeUtils1.formatTime(total)} / "
+          "Projected: ${TimeUtils1.formatTime((projected is double) ? projected : 0.0)}\n";
+
       if (_shouldEnableProgressive() && progressiveActive) {
-        if (_marker == '15') {
-          _marker = '25';
-        } else if (_marker == '25') {
-          _marker = '35';
-        } else {
-          _marker = '15';
-        }
+        _marker = _nextMarker(_marker);
       }
     }
 
     notifyListeners();
+  }
+
+  // =========================
+  // MARKER ROTATION FIX
+  // =========================
+
+
+  String _nextMarker(String current) {
+    switch (current) {
+      case '15':
+        return '25';
+      case '25':
+        return '35';
+      default:
+        return '15';
+    }
   }
 
   // ================= PREDICT =================
