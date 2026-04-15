@@ -85,14 +85,23 @@ class StopwatchController2 extends ChangeNotifier {
     final t = current;
     if (!t.running) return;
 
-    t.accumulated += elapsed();
+    // 1. Capture the exact elapsed time right now
+    final currentElapsed = elapsed();
+
+    // 2. Stop the ticker first to prevent further UI updates
+    _ticker?.cancel();
+    _ticker = null;
+
+    // 3. Update accumulated time and kill the running status
+    t.accumulated = currentElapsed; // Set total to exactly what elapsed() returned
     t.running = false;
     t.startTime = null;
     t.lastSplitWall = null;
 
     _appendLog('Pause');
+
+    // 4. Update the state
     notifyListeners();
-    _ticker?.cancel();
   }
 
   void stop() {

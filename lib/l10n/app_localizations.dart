@@ -981,7 +981,7 @@ abstract class AppLocalizations {
   /// No description provided for @joinedByThousandsOfElite.
   ///
   /// In en, this message translates to:
-  /// **'Joined by thousands of elite users who trust us to maximize their efforts and results.'**
+  /// **'Join elite users who trust us to maximize their efforts and results'**
   String get joinedByThousandsOfElite;
 
   /// No description provided for @emailIsRequired.

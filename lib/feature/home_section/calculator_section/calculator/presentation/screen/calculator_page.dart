@@ -626,7 +626,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CustomText(
-                              text: "Time (hh:mm.ss or mm.ss)",
+                              text: "Time (mm:ss.hh)",
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                               fontSize: getAdjustedFontSize(14, fontOption).sp,
@@ -637,7 +637,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                             /// ✅ TEXT FIELD WITH VALIDATOR
                             CustomTextField(
                               keyboardType: TextInputType.text,
-                              hintText: "hh:mm.ss or mm.ss",
+                              hintText: "mm:ss.hh",
                               controller: timeController,
 
                               validator: (value) {
@@ -698,9 +698,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                     ),
                                     SizedBox(width: 6.w),
                                     CustomText(
-                                      text: AppLocalizations.of(
-                                        context,
-                                      )!.calculateSplit,
+                                      text: "Calculate",
                                       fontSize: getAdjustedFontSize(
                                         14,
                                         fontOption,

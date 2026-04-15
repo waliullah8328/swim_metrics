@@ -457,7 +457,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get joinedByThousandsOfElite =>
-      'Joined by thousands of elite users who trust us to maximize their efforts and results.';
+      'Join elite users who trust us to maximize their efforts and results';
 
   @override
   String get emailIsRequired => 'Email is required.';

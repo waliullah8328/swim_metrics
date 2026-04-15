@@ -462,7 +462,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get joinedByThousandsOfElite =>
-      'Rejoignez des milliers d\'utilisateurs d\'élite qui nous font confiance pour maximiser leurs efforts et leurs résultats.';
+      'Rejoignez des milliers d’utilisateurs d’élite qui nous font confiance pour maximiser leurs efforts et leurs résultats';
 
   @override
   String get emailIsRequired => 'L\'email est requis.';

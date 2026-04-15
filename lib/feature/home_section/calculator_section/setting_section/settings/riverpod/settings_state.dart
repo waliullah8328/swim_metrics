@@ -9,7 +9,7 @@ class SettingsState {
   final AppLanguage language;
 
   SettingsState( {
-    this.darkMode = false,
+    this.darkMode = true,
     this.stopwatchSound = true,
     this.voiceInput = true,
     this.haptic = true,

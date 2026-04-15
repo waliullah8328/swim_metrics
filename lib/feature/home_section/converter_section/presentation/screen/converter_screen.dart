@@ -479,7 +479,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomText(
-                        text: "Time (hh:mm.ss or mm.ss)",
+                        text: "Time (mm:ss.hh)",
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
                         fontSize: getAdjustedFontSize(14, fontOption).sp,
@@ -491,7 +491,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         focusNode: timeFocusNode,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          hintText: "hh:mm.ss or mm.ss",
+                          hintText: "mm:ss.hh",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6),
                             borderSide: const BorderSide(color: Colors.grey),

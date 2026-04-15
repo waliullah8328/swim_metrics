@@ -223,39 +223,98 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     return Column(
       children: [
         if (status == StopwatchStatus.initial)
-          _buildButton(bg: isDark ? const Color(0xffC69C3F) : null, children: [SvgPicture.asset(IconPath.startIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))], text: AppLocalizations.of(context)!.start, fontSize: 14, context: context, fontOption: fontOption, onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-            ref.read(stopwatchProvider2.notifier).start();
-            ref.read(stopwatchProvider1.notifier).start();
-            if (isConverter) ref.read(showCourseSectionStopWatchProvider.notifier).state = false;
-            if (activeMode == 'Predictor') ref.read(showCourseSectionStopWatchProvider2.notifier).state = false;
-            if (isHaptic) HapticFeedback.lightImpact();
-            if (isStopWatch) ref.read(audioProvider.notifier).play();
-          }),
-        if (status == StopwatchStatus.running) Column(children: [
-          _buildButton(bg: const Color(0xff2DA8F0), side: const BorderSide(color: Color(0xff2DA8F0)), children: [SvgPicture.asset(IconPath.splitIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))], text: AppLocalizations.of(context)!.split, fontSize: 16, context: context, fontOption: fontOption, onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).split(); if(isHaptic) HapticFeedback.lightImpact();
-          }),
-          SizedBox(height: 20.h),
-          Row(children: [
-            Expanded(child: _buildButton(bg: const Color(0xff475569), side: const BorderSide(color: Color(0xff475569)), children: [SvgPicture.asset(IconPath.undoIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))], text: AppLocalizations.of(context)!.undoSplit, fontSize: 12, context: context, fontOption: fontOption, onTap: () {
-              FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).undoLastSplit(); if(isHaptic) HapticFeedback.lightImpact();
-            }, textColor: AppColors.textWhite)),
-            SizedBox(width: 10.w),
-            Expanded(child: _buildButton(bg: const Color(0xffFE484C), side: const BorderSide(color: Color(0xffFE484C)), children: [SvgPicture.asset(IconPath.stopIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))], text: AppLocalizations.of(context)!.stop, fontSize: 12, context: context, fontOption: fontOption, onTap: () {
-              FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider1.notifier).stop(); ref.read(stopwatchProvider2.notifier).pause(); if(isHaptic) HapticFeedback.lightImpact(); if(isStopWatch) ref.read(audioProvider.notifier).stop();
-            }, textColor: AppColors.textWhite)),
+          _buildButton(
+            bg: isDark ? const Color(0xffC69C3F) : AppColors.primary,
+            children: [SvgPicture.asset(IconPath.startIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))],
+            text: AppLocalizations.of(context)!.start,
+            fontSize: 14,
+            context: context,
+            fontOption: fontOption,
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              ref.read(stopwatchProvider2.notifier).start();
+              ref.read(stopwatchProvider1.notifier).start();
+              if (isConverter) ref.read(showCourseSectionStopWatchProvider.notifier).state = false;
+              if (activeMode == 'Predictor') ref.read(showCourseSectionStopWatchProvider2.notifier).state = false;
+              if (isHaptic) HapticFeedback.lightImpact();
+              if (isStopWatch) ref.read(audioProvider.notifier).play();
+            },
+          ),
+        if (status == StopwatchStatus.running)
+          Column(children: [
+            _buildButton(
+              bg: const Color(0xff2DA8F0),
+              side: const BorderSide(color: Color(0xff2DA8F0)),
+              children: [SvgPicture.asset(IconPath.splitIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))],
+              text: AppLocalizations.of(context)!.split,
+              fontSize: 16,
+              context: context,
+              fontOption: fontOption,
+              onTap: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                ref.read(stopwatchProvider2.notifier).split();
+                if(isHaptic) HapticFeedback.lightImpact();
+              },
+            ),
+            SizedBox(height: 20.h),
+            Row(children: [
+              Expanded(child: _buildButton(
+                bg: const Color(0xff475569),
+                side: const BorderSide(color: Color(0xff475569)),
+                children: [SvgPicture.asset(IconPath.undoIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))],
+                text: AppLocalizations.of(context)!.undoSplit,
+                fontSize: 12,
+                context: context,
+                fontOption: fontOption,
+                onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  ref.read(stopwatchProvider2.notifier).undoLastSplit();
+                  if(isHaptic) HapticFeedback.lightImpact();
+                },
+                textColor: AppColors.textWhite,
+              )),
+              SizedBox(width: 10.w),
+              Expanded(child: _buildButton(
+                bg: const Color(0xffFE484C),
+                side: const BorderSide(color: Color(0xffFE484C)),
+                children: [SvgPicture.asset(IconPath.stopIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))],
+                text: AppLocalizations.of(context)!.stop,
+                fontSize: 12,
+                context: context,
+                fontOption: fontOption,
+                onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  // Order matters: stop logic first, then update UI state
+                  ref.read(stopwatchProvider2.notifier).pause();
+                  ref.read(stopwatchProvider1.notifier).stop();
+
+                  if(isHaptic) HapticFeedback.lightImpact();
+                  if(isStopWatch) ref.read(audioProvider.notifier).stop();
+                },
+                textColor: AppColors.textWhite,
+              )),
+            ]),
           ]),
-        ]),
-        if (status == StopwatchStatus.stopped) Row(children: [
-          Expanded(child: _buildButton(bg: AppColors.primary, side: const BorderSide(color: AppColors.primary), children: [SvgPicture.asset(IconPath.startIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))], text: AppLocalizations.of(context)!.resume, fontSize: 12, context: context, fontOption: fontOption, onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).start(); ref.read(stopwatchProvider1.notifier).resume(); if(isHaptic) HapticFeedback.lightImpact(); if(isStopWatch) ref.read(audioProvider.notifier).play();
-          }, textColor: Colors.black)),
-          // SizedBox(width: 10.w),
-          // Expanded(child: _buildButton(bg: const Color(0xff6F35CA), side: const BorderSide(color: Color(0xff6F35CA)), children: [SvgPicture.asset(IconPath.clearIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))], text: AppLocalizations.of(context)!.clearTime, fontSize: 12, context: context, fontOption: fontOption, onTap: () {
-          //   FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider1.notifier).clear(); ref.read(stopwatchProvider2.notifier).reset(); if (activeMode == 'Converter') ref.read(stopwatchProvider2.notifier).logConverter = ''; if(isHaptic) HapticFeedback.lightImpact(); if(isStopWatch) ref.read(audioProvider.notifier).stop();
-          // }, textColor: AppColors.textWhite)),
-        ]),
+        if (status == StopwatchStatus.stopped)
+          Row(children: [
+            Expanded(child: _buildButton(
+              bg: AppColors.primary,
+              side: const BorderSide(color: AppColors.primary),
+              children: [SvgPicture.asset(IconPath.startIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))],
+              text: AppLocalizations.of(context)!.resume,
+              fontSize: 12,
+              context: context,
+              fontOption: fontOption,
+              onTap: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                ref.read(stopwatchProvider2.notifier).start();
+                ref.read(stopwatchProvider1.notifier).resume();
+                if(isHaptic) HapticFeedback.lightImpact();
+                if(isStopWatch) ref.read(audioProvider.notifier).play();
+              },
+              textColor: Colors.black,
+            )),
+          ]),
       ],
     );
   }
@@ -373,7 +432,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
       /// Course & Distance Row
       Row(children: [
         Expanded(child: Column(children: [
-          CustomText(text: AppLocalizations.of(context)!.course, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
+          CustomText(text: "COURSE", color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 8.h),
           Consumer(builder: (context, ref, child) {
             const items = ["SCY", "SCM", "LCM"];

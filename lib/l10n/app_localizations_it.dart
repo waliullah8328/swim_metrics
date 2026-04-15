@@ -459,7 +459,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get joinedByThousandsOfElite =>
-      'Unisciti a migliaia di utenti d\'élite che si affidano a noi per massimizzare i loro sforzi e risultati.';
+      'Unisciti a migliaia di utenti d\'élite che si affidano a noi per massimizzare i loro sforzi e risultati';
 
   @override
   String get emailIsRequired => 'L\'email è obbligatoria.';
