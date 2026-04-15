@@ -24,8 +24,8 @@ class SplitCalcState {
   const SplitCalcState({
     this.course = 'SCY',
     this.gender = '',
-    this.stroke = '',
-    this.distance = '',
+    this.stroke = 'BACK',
+    this.distance = '100',
     this.goalTime = '',
     this.history = const [],
   });

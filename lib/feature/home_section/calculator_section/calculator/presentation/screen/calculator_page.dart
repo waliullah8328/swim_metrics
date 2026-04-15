@@ -562,7 +562,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               /// ❌ REMOVE THIS → key: ValueKey(safeDistance),
 
                                               items: distances,
-                                              selectedValue: safeDistance,
+                                              selectedValue: currentDistance ,
                                               onChanged: (value) {
                                                 ref.read(splitCalcProvider.notifier)
                                                     .setDistance(value.toString());
