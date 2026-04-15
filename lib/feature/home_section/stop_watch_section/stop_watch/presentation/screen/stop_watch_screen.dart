@@ -490,6 +490,51 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           }),
         ])),
       ]),
+
+      SizedBox(height: 10.h),
+
+      /// ✅ SHOW ONLY FOR LCM + 50 + 15
+      Consumer(
+        builder: (context, ref, child) {
+          final state = ref.watch(
+            stopwatchProvider2.select(
+                  (s) => (
+              s.course,
+              s.distance,
+              s.splitSize,
+              s.progressiveActive,
+              ),
+            ),
+          );
+
+          final shouldShow = state.$1 == "lcm" &&
+              state.$2 == "50" &&
+              state.$3 == "15";
+
+          if (!shouldShow) {
+            return const SizedBox();
+          }
+
+          return Row(
+            children: [
+              Checkbox(
+                value: state.$4,
+                onChanged: (v) {
+                  ref
+                      .read(stopwatchProvider2.notifier)
+                      .toggleProgressive( v ?? false);
+                },
+              ),
+              CustomText(
+                text: "Progressive",
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: getAdjustedFontSize(14, fontOption).sp,
+              ),
+            ],
+          );
+        },
+      ),
     ]);
   }
 

@@ -713,7 +713,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       "back": ["50", "100", "200"],
       "breast": ["50", "100", "200"],
       "free": ["50", "100", "200", "500", "1000", "1650"],
-      "im": ["200", "400"],
+      "im": ["100","200", "400"],
     };
 
     final Map<String, List<String>> scmLcm = {
@@ -721,7 +721,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       "back": ["50", "100", "200"],
       "breast": ["50", "100", "200"],
       "free": ["50", "100", "200", "400", "800", "1500"],
-      "im": ["200", "400"],
+      "im": ["100","200", "400"],
     };
 
     if (course == "scy") {
@@ -759,7 +759,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       } else if (stroke == "free") {
         return ["50", "100", "200", "500", "1000", "1650"];
       } else if (stroke == "im") {
-        return ["200", "400"];
+        return ["100","200", "400"];
       }
     }
 

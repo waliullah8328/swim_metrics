@@ -1,17 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/utils/conversation_core_1.dart';
-
 import '../../../../core/utils/utils/ratios_1.dart' hide TimeUtils1;
-
-
 import '../../../../core/utils/utils/split_core_1.dart';
 import '../../../../core/utils/utils/time_utils_1.dart';
 import '../../../../l10n/app_localizations.dart';
 
-
 final converterProvider1 =
 NotifierProvider<ConverterController, ConverterState>(
-    ConverterController.new);
+  ConverterController.new,
+);
 
 class ConverterState {
   final String course;
@@ -70,7 +67,7 @@ class ConverterController extends Notifier<ConverterState> {
 
   void setCourse(String v) {
     final newTargets = {...state.targets};
-    newTargets.remove(v);
+    newTargets.remove(v.toLowerCase());
 
     state = state.copyWith(
       course: v.toLowerCase(),
@@ -99,12 +96,15 @@ class ConverterController extends Notifier<ConverterState> {
   }
 
   void toggleTarget(String v, bool selected) {
+    final key = v.toLowerCase();
     final newTargets = {...state.targets};
 
     if (selected) {
-      if (v != state.course) newTargets.add(v);
+      if (key != state.course) {
+        newTargets.add(key);
+      }
     } else {
-      newTargets.remove(v);
+      newTargets.remove(key);
     }
 
     state = state.copyWith(targets: newTargets);
@@ -120,40 +120,43 @@ class ConverterController extends Notifier<ConverterState> {
     final s = state;
 
     if ([s.course, s.gender, s.stroke, s.distance, s.timeText]
-        .any((e) => e.isEmpty)) {
+        .any((e) => e.trim().isEmpty)) {
       state = s.copyWith(
-        output: (AppLocalizations.of(context)!.pleaseFillAllFields) +
-            (s.output.isEmpty ? '' : '\n\n' + s.output),
+        output:
+        '${AppLocalizations.of(context)!.pleaseFillAllFields}\n\n${s.output}',
       );
       return;
     }
 
-    double total;
+    double totalSeconds;
+
     try {
-      total = TimeUtils1.parseToSeconds(s.timeText);
+      totalSeconds = TimeUtils1.parseToSeconds(s.timeText.trim());
     } catch (_) {
       state = s.copyWith(
-        output: (AppLocalizations.of(context)!.invalidTimeFormat) +
-            (s.output.isEmpty ? '' : '\n\n' + s.output),
+        output:
+        '${AppLocalizations.of(context)!.invalidTimeFormat}\n\n${s.output}',
       );
       return;
     }
 
-    // New conversion results
-    final resBasic = <String>['=== Conversion Results ==='];
-    final resSplits = <String>[];
+    final results = <String>[];
+    final splitResults = <String>[];
+
+    results.add('=== Conversion Results ===');
 
     if (s.showSplits) {
-      resSplits.add('=== Conversion Results with splits ===');
+      splitResults.add('=== Conversion Results with Splits ===');
     }
 
     final allowed = allowedTargets();
-    final listTargets = s.targets.isEmpty
+
+    final targets = s.targets.isEmpty
         ? allowed
         : allowed.where((e) => s.targets.contains(e)).toList();
 
-    for (final to in listTargets) {
-      final mult = s.preferWR
+    for (final to in targets) {
+      final multiplier = s.preferWR
           ? ConversionCore1.computeMultiplier(
         s.gender,
         s.stroke,
@@ -161,10 +164,13 @@ class ConverterController extends Notifier<ConverterState> {
         s.course,
         to,
       )
-          : ConversionCore1.poolRatio(s.course, to);
+          : ConversionCore1.poolRatio(
+        s.course,
+        to,
+      );
 
-      final converted = total * mult;
-      final convertedStr = TimeUtils1.formatSeconds(converted);
+      final converted = totalSeconds * multiplier;
+      final convertedText = TimeUtils1.formatSeconds(converted);
 
       final displayDistance = ConversionCore1.mappedDistance(
         s.stroke,
@@ -175,38 +181,92 @@ class ConverterController extends Notifier<ConverterState> {
 
       final strokeLabel = s.stroke == 'im'
           ? 'IM'
-          : s.stroke[0].toUpperCase() + s.stroke.substring(1);
+          : '${s.stroke[0].toUpperCase()}${s.stroke.substring(1)}';
 
-      resBasic.add(
-        '${s.gender[0].toUpperCase()}${s.gender.substring(1)} '
+      final genderLabel =
+          '${s.gender[0].toUpperCase()}${s.gender.substring(1)}';
+
+      results.add(
+        '$genderLabel '
             '${s.distance} $strokeLabel ${s.timeText} '
             '${s.course.toUpperCase()} → '
-            '$displayDistance $strokeLabel ${to.toUpperCase()}: $convertedStr',
+            '$displayDistance $strokeLabel ${to.toUpperCase()}: '
+            '$convertedText',
       );
 
       if (s.showSplits) {
-        final r = SplitsCore1.getRatios(to, s.gender, s.stroke, displayDistance) ?? [];
-        final splitsText = SplitsCore1.calculateSplits(
-          converted,
-          r,
-          int.parse(displayDistance),
-          targetCourse: to,
+        String splitsText = '';
+
+        /// SPECIAL FIX FOR 50 LCM
+        if (to == 'lcm' && displayDistance == '50') {
+          splitsText = _calculate50LcmSplits(
+            converted,
+            s.gender,
+          );
+        } else {
+          final ratios = SplitsCore1.getRatios(
+            to,
+            s.gender,
+            s.stroke,
+            displayDistance,
+          ) ??
+              [];
+
+          splitsText = SplitsCore1.calculateSplits(
+            converted,
+            ratios,
+            int.parse(displayDistance),
+            targetCourse: to,
+          );
+        }
+
+        splitResults.add(
+          '$genderLabel '
+              '$displayDistance $strokeLabel '
+              '${to.toUpperCase()}: $convertedText',
         );
 
-        resSplits.addAll([
-          '${s.gender[0].toUpperCase()}${s.gender.substring(1)} '
-              '$displayDistance $strokeLabel ${to.toUpperCase()}: $convertedStr',
-          splitsText,
-          '',
-        ]);
+        splitResults.add(splitsText);
+        splitResults.add('');
       }
     }
 
-    // PREPEND new results to previous output
-    final newOutput = (resBasic + [''] + resSplits).join('\n') +
-        (s.output.isEmpty ? '' : '\n\n' + s.output);
+    final finalOutput = [
+      ...results,
+      '',
+      ...splitResults,
+      if (s.output.isNotEmpty) '',
+      if (s.output.isNotEmpty) s.output,
+    ].join('\n');
 
-    state = s.copyWith(output: newOutput);
+    state = s.copyWith(output: finalOutput);
+  }
+
+  /// SPECIAL 50 LCM SPLITS
+  String _calculate50LcmSplits(
+      double total,
+      String gender,
+      ) {
+    double m15;
+    double m25;
+    double m35;
+
+    if (gender == 'men') {
+      m15 = total * 0.238;
+      m25 = total * 0.448;
+      m35 = total * 0.659;
+    } else {
+      m15 = total * 0.248;
+      m25 = total * 0.456;
+      m35 = total * 0.671;
+    }
+
+    return '''
+15m: ${TimeUtils1.formatSeconds(m15)}
+25m: ${TimeUtils1.formatSeconds(m25)}
+35m: ${TimeUtils1.formatSeconds(m35)}
+50m: ${TimeUtils1.formatSeconds(total)}
+''';
   }
 
   void reset() {
