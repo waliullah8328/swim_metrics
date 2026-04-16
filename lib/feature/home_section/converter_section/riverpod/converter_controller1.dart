@@ -119,6 +119,7 @@ class ConverterController extends Notifier<ConverterState> {
   void convert({required context}) {
     final s = state;
 
+    // Validate inputs
     if ([s.course, s.gender, s.stroke, s.distance, s.timeText]
         .any((e) => e.trim().isEmpty)) {
       state = s.copyWith(
@@ -170,6 +171,8 @@ class ConverterController extends Notifier<ConverterState> {
       );
 
       final converted = totalSeconds * multiplier;
+
+      // SAFE FORMAT (never crash on invalid mapping)
       final convertedText = TimeUtils1.formatSeconds(converted);
 
       final displayDistance = ConversionCore1.mappedDistance(
@@ -179,12 +182,17 @@ class ConverterController extends Notifier<ConverterState> {
         to,
       );
 
-      final strokeLabel = s.stroke == 'im'
+      // ❗ Skip invalid IM → LCM mapping issues
+      if (displayDistance == null || displayDistance.toString().isEmpty) {
+        continue;
+      }
+
+      final strokeLabel = s.stroke.toLowerCase() == 'im'
           ? 'IM'
-          : '${s.stroke[0].toUpperCase()}${s.stroke.substring(1)}';
+          : '${s.stroke[0].toUpperCase()}${s.stroke.substring(1).toLowerCase()}';
 
       final genderLabel =
-          '${s.gender[0].toUpperCase()}${s.gender.substring(1)}';
+          '${s.gender[0].toUpperCase()}${s.gender.substring(1).toLowerCase()}';
 
       results.add(
         '$genderLabel '
@@ -198,7 +206,7 @@ class ConverterController extends Notifier<ConverterState> {
         String splitsText = '';
 
         /// SPECIAL FIX FOR 50 LCM
-        if (to == 'lcm' && displayDistance == '50') {
+        if (to == 'lcm' && displayDistance.toString() == '50') {
           splitsText = _calculate50LcmSplits(
             converted,
             s.gender,
@@ -208,14 +216,14 @@ class ConverterController extends Notifier<ConverterState> {
             to,
             s.gender,
             s.stroke,
-            displayDistance,
+            displayDistance.toString(),
           ) ??
               [];
 
           splitsText = SplitsCore1.calculateSplits(
             converted,
             ratios,
-            int.parse(displayDistance),
+            int.parse(displayDistance.toString()),
             targetCourse: to,
           );
         }

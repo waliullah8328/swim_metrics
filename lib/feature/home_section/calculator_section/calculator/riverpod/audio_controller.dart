@@ -19,7 +19,7 @@ class AudioNotifier extends StateNotifier<AudioState> {
 
   /// ▶️ PLAY AUDIO
   Future<void> play() async {
-    await _player.play(AssetSource('audio/stop_watch_audio.mp3'));
+    await _player.play(AssetSource('audio/press_audio.mp3'));
     state = state.copyWith(isPlaying: true);
   }
 

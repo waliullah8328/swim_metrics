@@ -314,94 +314,221 @@ class LoginNotifier extends StateNotifier<LoginState> {
       successMessage: '',
     );
 
-    try {
-      final rawNonce = _generateNonce();
-      final nonce = _sha256(rawNonce);
+    debugPrint("🍎 Apple Login Started");
 
-      // 🍎 Apple Sign In
+    try {
+      /// 1. Check availability
+      final isAvailable = await SignInWithApple.isAvailable();
+      debugPrint("🍎 Apple available: $isAvailable");
+
+      if (!isAvailable) {
+        const msg = 'Apple Sign In is not available on this device.';
+
+        debugPrint("❌ ERROR: $msg");
+
+        state = state.copyWith(
+          isLoadingApple: false,
+          errorMessage: msg,
+        );
+
+        AppSnackBar.showError(context, msg);
+        return false;
+      }
+
+      /// 2. Generate nonce
+      final rawNonce = _generateNonce();
+      final hashedNonce = _sha256(rawNonce);
+
+      debugPrint("🔐 Raw Nonce: $rawNonce");
+      debugPrint("🔐 Hashed Nonce: $hashedNonce");
+
+      /// 3. Apple Sign In
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
-        nonce: nonce,
+        nonce: hashedNonce,
       );
 
-      // 🔐 Firebase OAuth
+      debugPrint("🍎 Apple Credential received");
+      debugPrint("📧 Email: ${appleCredential.email}");
+      debugPrint("👤 Name: ${appleCredential.givenName} ${appleCredential.familyName}");
+
+      final identityToken = appleCredential.identityToken;
+
+      if (identityToken == null || identityToken.isEmpty) {
+        const msg = 'Unable to get Apple identity token.';
+
+        debugPrint("❌ ERROR: $msg");
+
+        state = state.copyWith(
+          isLoadingApple: false,
+          errorMessage: msg,
+        );
+
+        AppSnackBar.showError(context, msg);
+        return false;
+      }
+
+      debugPrint("🔑 Identity Token received");
+      debugPrint("🔑 Identity Token received : $identityToken");
+
+      /// 4. Firebase Sign In
       final oauthCredential = OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
+        idToken: identityToken,
         rawNonce: rawNonce,
       );
+
+      debugPrint("🔥 Signing in with Firebase...");
 
       final userCred =
       await FirebaseAuth.instance.signInWithCredential(oauthCredential);
 
-      final fullName =
-          userCred.user?.displayName ;
+      final firebaseUser = userCred.user;
 
-      // 🌐 Backend login (IMPORTANT: send Apple identityToken)
-      final response = await AuthenticationRepository().signInWithApple(
-        idToken:  appleCredential.identityToken!,
-      );
+      if (firebaseUser == null) {
+        const msg = "Firebase user is null after Apple login";
 
-      if (response['success'] != true) {
-        // 🔴 rollback Firebase
+        debugPrint("❌ ERROR: $msg");
+
         await FirebaseAuth.instance.signOut();
 
         state = state.copyWith(
           isLoadingApple: false,
-          errorMessage: response['error'] ?? 'Apple login failed',
+          errorMessage: msg,
         );
+
+        AppSnackBar.showError(context, msg);
         return false;
       }
 
-      state = state.copyWith(isLoadingApple: false);
+      debugPrint("✅ Firebase Login Success");
+      debugPrint("UID: ${firebaseUser.uid}");
+      debugPrint("Email: ${firebaseUser.email}");
 
-      debugPrint("All response : ${response['data']}");
-      final tokens = response['tokens'];
-      debugPrint("Get Access Token : $tokens");
-      final refreshToken = response['refreshToken'];
-      debugPrint("Get Refresh Token : $refreshToken");
-      final isPayment = response['isPayment'];
-      debugPrint("Get Is Payment : $isPayment");
-      final planEndDate = response['plan_end_date'];
-      debugPrint("Get Is Plan End Date : ${planEndDate.toString() }");
+      /// ⭐ Firebase ID token for backend
+      final firebaseIdToken = await firebaseUser.getIdToken();
 
+      debugPrint("🔑 Firebase ID Token: $firebaseIdToken");
 
+      /// 5. Backend login
+      debugPrint("🌐 Calling backend...");
 
+      final response = await AuthenticationRepository().signInWithApple(
+        idToken: identityToken.toString(),
+      );
 
-      if(isPayment){
-        await TokenStorage.saveTokens(accessToken: tokens, refreshToken: refreshToken);
+      debugPrint("📩 Backend response: $response");
 
-        await TokenStorage.setPlanEndDate(
-          DateTime.tryParse(planEndDate) ?? DateTime.now(),
+      if (response['success'] != true) {
+        await FirebaseAuth.instance.signOut();
+
+        final msg = response['error'] ?? 'Apple login failed.';
+
+        debugPrint("❌ Backend ERROR: $msg");
+
+        state = state.copyWith(
+          isLoadingApple: false,
+          errorMessage: msg,
         );
 
-        final planDate = await TokenStorage.getPlanEndDate();
-
-
-        debugPrint("Get Saved Plan End Date : $planDate  ");
-
-        debugPrint(await TokenStorage.getAccessToken());
-        await TokenStorage.setLogin(true);
-        AppSnackBar.showSuccess(context, response['message']);
-        context.go(RouteNames.homeNavBarScreen);
+        AppSnackBar.showError(context, msg);
+        return false;
       }
-      else{
+
+      /// 6. Success
+      debugPrint("🎉 LOGIN SUCCESS");
+
+      final tokens = response['tokens'];
+      final refreshToken = response['refreshToken'];
+      final isPayment = response['isPayment'] ?? false;
+      final planEndDate = response['plan_end_date'];
+
+      debugPrint("Tokens: $tokens");
+      debugPrint("Refresh Token: $refreshToken");
+      debugPrint("isPayment: $isPayment");
+
+      state = state.copyWith(
+        isLoadingApple: false,
+        successMessage: response['message'] ?? 'Login successful',
+      );
+
+      AppSnackBar.showSuccess(
+        context,
+        response['message'] ?? 'Login successful',
+      );
+
+      /// 7. Navigation
+      if (isPayment == true) {
+        await TokenStorage.saveTokens(
+          accessToken: tokens,
+          refreshToken: refreshToken,
+        );
+
+        await TokenStorage.setPlanEndDate(
+          DateTime.tryParse(planEndDate ?? '') ?? DateTime.now(),
+        );
+
+        await TokenStorage.setLogin(true);
+
+        debugPrint("🚀 Navigating to Home");
+
+        context.go(RouteNames.homeNavBarScreen);
+      } else {
+        debugPrint("💰 Redirecting to Payment");
         context.push("${RouteNames.paymentScreen}/$tokens");
       }
 
       return true;
-    } catch (e, s) {
-      debugPrint('Apple login error: $e');
-      debugPrintStack(stackTrace: s);
+    }
 
-      await FirebaseAuth.instance.signOut();
+    /// 🍎 Apple error
+    on SignInWithAppleAuthorizationException catch (e) {
+      final msg = "Apple Error: ${e.code} - ${e.message}";
+
+      debugPrint("❌ $msg");
 
       state = state.copyWith(
         isLoadingApple: false,
-        errorMessage: 'Apple login failed. Please try again.',
+        errorMessage: msg,
       );
+
+      AppSnackBar.showError(context, msg);
+
+      return false;
+    }
+
+    /// 🔥 Firebase error
+    on FirebaseAuthException catch (e) {
+      final msg = "Firebase Error: ${e.code} - ${e.message}";
+
+      debugPrint("❌ $msg");
+
+      state = state.copyWith(
+        isLoadingApple: false,
+        errorMessage: msg,
+      );
+
+      AppSnackBar.showError(context, msg);
+
+      return false;
+    }
+
+    /// ❌ General error
+    catch (e, s) {
+      final msg = "Unexpected Error: $e";
+
+      debugPrint("❌ $msg");
+      debugPrintStack(stackTrace: s);
+
+      state = state.copyWith(
+        isLoadingApple: false,
+        errorMessage: msg,
+      );
+
+      AppSnackBar.showError(context, msg);
+
       return false;
     }
   }
@@ -416,8 +543,10 @@ class LoginNotifier extends StateNotifier<LoginState> {
     const chars =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
-    return List.generate(length, (_) => chars[random.nextInt(chars.length)])
-        .join();
+
+    return List.generate(length, (_) {
+      return chars[random.nextInt(chars.length)];
+    }).join();
   }
 
   String _sha256(String input) {

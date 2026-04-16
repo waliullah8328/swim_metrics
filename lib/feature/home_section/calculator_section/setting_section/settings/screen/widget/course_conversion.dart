@@ -69,7 +69,7 @@ class CourseConversionScreen extends StatelessWidget {
 
               CustomText(
                   text:
-                  "Convert race times instantly using discipline‑accurate conversion logic.",
+                  "Convert race times instantly using accurate conversion logic.",
                   fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
               ),
               SizedBox(height: 6.h,),

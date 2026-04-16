@@ -254,6 +254,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 FocusManager.instance.primaryFocus?.unfocus();
                 ref.read(stopwatchProvider2.notifier).split();
                 if(isHaptic) HapticFeedback.lightImpact();
+                if(isStopWatch) ref.read(audioProvider.notifier).play();
               },
             ),
             SizedBox(height: 20.h),
@@ -270,6 +271,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                   FocusManager.instance.primaryFocus?.unfocus();
                   ref.read(stopwatchProvider2.notifier).undoLastSplit();
                   if(isHaptic) HapticFeedback.lightImpact();
+                  if(isStopWatch) ref.read(audioProvider.notifier).play();
                 },
                 textColor: AppColors.textWhite,
               )),
@@ -289,7 +291,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                   ref.read(stopwatchProvider1.notifier).stop();
 
                   if(isHaptic) HapticFeedback.lightImpact();
-                  if(isStopWatch) ref.read(audioProvider.notifier).stop();
+                  if(isStopWatch) ref.read(audioProvider.notifier).play();
                 },
                 textColor: AppColors.textWhite,
               )),
@@ -400,8 +402,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
       /// Gender & Stroke Row
       Row(children: [
         Expanded(child: Column(children: [
+
           CustomText(text: AppLocalizations.of(context)!.gender, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
-          SizedBox(height: 8.h),
+          SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final gender = ref.watch(stopwatchProvider2.select((s) => s.gender));
             final selected = gender.isNotEmpty ? "${gender[0].toUpperCase()}${gender.substring(1)}" : "";
@@ -409,8 +412,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           }),
         ])),
         Expanded(child: Column(children: [
+
           CustomText(text: AppLocalizations.of(context)!.stroke, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
-          SizedBox(height: 8.h),
+          SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final items = const ["Fly", "Back", "Breast", "Free", "IM"];
             final stroke = ref.watch(stopwatchProvider2.select((s) => s.stroke));
@@ -432,8 +436,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
       /// Course & Distance Row
       Row(children: [
         Expanded(child: Column(children: [
-          CustomText(text: "COURSE", color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 8.h),
+          CustomText(text: "COURSE", color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
+          SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             const items = ["SCY", "SCM", "LCM"];
             final course = ref.watch(stopwatchProvider2.select((s) => s.course));
@@ -450,8 +455,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           }),
         ])),
         Expanded(child: Column(children: [
-          CustomText(text: AppLocalizations.of(context)!.distance, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
           SizedBox(height: 8.h),
+          CustomText(text: AppLocalizations.of(context)!.distance, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             // ✅ Watch course + stroke + distance tuple for accurate rebuilds
             final state = ref.watch(stopwatchProvider2.select((s) => (s.course, s.stroke, s.distance)));
@@ -471,8 +477,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
       /// Split Size & Start Type Row
       Row(children: [
         Expanded(child: Column(children: [
-          CustomText(text: AppLocalizations.of(context)!.splitSize, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
           SizedBox(height: 8.h),
+          CustomText(text: AppLocalizations.of(context)!.splitSize, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             // ✅ Watch course + stroke + distance + splitSize for accurate splits
             final state = ref.watch(stopwatchProvider2.select((s) => (s.course, s.stroke, s.distance, s.splitSize)));
@@ -482,8 +489,9 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           }),
         ])),
         Expanded(child: Column(children: [
-          CustomText(text: AppLocalizations.of(context)!.startType, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
           SizedBox(height: 8.h),
+          CustomText(text: AppLocalizations.of(context)!.startType, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final start = ref.watch(stopwatchProvider2.select((s) => s.startType));
             return SplitCalculatorSelectorOne(items: const ["From Start", "From Push"], selectedValue: start, onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(start: v));
@@ -518,11 +526,12 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           return Row(
             children: [
               Checkbox(
-                value: state.$4,
+                value: true,
+                //value: state.$4,
                 onChanged: (v) {
-                  ref
-                      .read(stopwatchProvider2.notifier)
-                      .toggleProgressive( v ?? false);
+                  // ref
+                  //     .read(stopwatchProvider2.notifier)
+                  //     .toggleProgressive( v ?? false);
                 },
               ),
               CustomText(

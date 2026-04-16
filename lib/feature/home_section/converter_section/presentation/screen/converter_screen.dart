@@ -532,12 +532,28 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                   /// CONVERT BUTTON
                   GestureDetector(
                     onTap: () {
-                      controller1.convert(context: context);
-                      ref.read(showCourseSectionConverter.notifier).state =
-                          false;
-                      if(isHaptic == true){
-                        HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+                      // Check if the time field is empty
+                      if (timeController.text.trim().isEmpty) {
+                        // Show a Snackbar if the time field is empty
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              AppLocalizations.of(context)!.enterYourTime, // You can customize this message
+                              style: TextStyle(fontSize: 14.sp, color: AppColors.backgroundDark),
+                            ),
+                            backgroundColor: Colors.grey,
+                            duration: Duration(seconds: 2), // Duration of Snackbar
+                          ),
+                        );
+                      } else {
+                        // Proceed with conversion if time field is not empty
+                        controller1.convert(context: context);
+                        ref.read(showCourseSectionConverter.notifier).state = false;
 
+                        // Trigger haptic feedback if enabled
+                        if (isHaptic == true) {
+                          HapticFeedback.lightImpact(); // 👈 HAPTIC FEEDBACK HERE
+                        }
                       }
                     },
                     child: Container(
@@ -555,7 +571,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                           SizedBox(width: 6.w),
                           CustomText(
                             text: AppLocalizations.of(context)!.convertTime,
-
                             fontSize: getAdjustedFontSize(16, fontOption).sp,
                             fontWeight: FontWeight.w600,
                             color: AppColors.backgroundDark,

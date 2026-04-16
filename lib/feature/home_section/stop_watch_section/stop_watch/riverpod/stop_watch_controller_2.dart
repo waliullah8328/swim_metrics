@@ -140,6 +140,8 @@ class StopwatchController2 extends ChangeNotifier {
     final t = current;
     if (!t.running) return;
 
+    const int maxLogs = 50; // limit history size
+
     final now = DateTime.now();
     final total = elapsed();
 
@@ -152,11 +154,26 @@ class StopwatchController2 extends ChangeNotifier {
 
     final lapNo = t.splits.length;
 
+    void trimLog(List<String> lines) {
+      if (lines.length > maxLogs) {
+        lines.removeLast(); // remove oldest (bottom)
+      }
+    }
+
     // ================= STOPWATCH =================
     if (activeMode == 'Stopwatch') {
-      logStopwatch +=
-      "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / "
-          "${TimeUtils1.formatTime(total)}\n";
+      final lines = logStopwatch.isEmpty
+          ? <String>[]
+          : logStopwatch.trim().split('\n');
+
+      lines.insert(
+        0,
+        "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / "
+            "${TimeUtils1.formatTime(total)}",
+      );
+
+      trimLog(lines);
+      logStopwatch = lines.join('\n');
     }
 
     // ================= CONVERTER =================
@@ -164,32 +181,81 @@ class StopwatchController2 extends ChangeNotifier {
       final factor = _factor(fromCourse, toCourse);
       final converted = total * factor;
 
-      logConverter +=
-      "Lap $lapNo: ${TimeUtils1.formatTime(total)} $fromCourse → "
-          "${TimeUtils1.formatTime(converted)} $toCourse\n";
+      final lines = logConverter.isEmpty
+          ? <String>[]
+          : logConverter.trim().split('\n');
+
+      lines.insert(
+        0,
+        "Lap $lapNo: ${TimeUtils1.formatTime(total)} ${fromCourse.toUpperCase()}  → "
+            "${TimeUtils1.formatTime(converted)}  ${toCourse.toUpperCase()}",
+      );
+
+      trimLog(lines);
+      logConverter = lines.join('\n');
     }
 
     // ================= PREDICTOR =================
+    // ================= PREDICTOR =================
+    // ================= PREDICTOR =================
     else {
+      // Create header only once (static until Clear button resets logPredictor)
+      if (logPredictor.trim().isEmpty) {
+        logPredictor =
+        "${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}'s "
+            "$distance "
+            "${stroke[0].toUpperCase()}${stroke.substring(1).toLowerCase()} "
+            "${course.toUpperCase()} Projection\n"
+            "Start Type: $startType | Split Size: $splitSize\n"
+            "===============\n"
+            "Split Breakdown:\n";
+      }
+
       final projected = _predict(lapNo) ?? 0.0;
-
-      final isProgressive =
-          _shouldEnableProgressive() && progressiveActive;
-
-      // Show 15 / 25 / 35 instead of Lap 1 / Lap 2 / Lap 3
+      final isProgressive = _shouldEnableProgressive() && progressiveActive;
       final label = isProgressive ? _marker : "Lap $lapNo";
 
-      logPredictor +=
-      "$label: ${TimeUtils1.formatTime(lap)} / "
-          "${TimeUtils1.formatTime(total)} / "
-          "Projected: ${TimeUtils1.formatTime(projected)}\n";
+      final allLines = logPredictor.split('\n');
 
-      // Move next marker
+      // Find split section
+      int insertIndex = allLines.indexOf("Split Breakdown:") + 1;
+
+      // Safety fallback
+      if (insertIndex == 0) insertIndex = allLines.length;
+
+      String fLap = TimeUtils1.formatTime(lap);
+      String fTotal = TimeUtils1.formatTime(total);
+      String fProj = TimeUtils1.formatTime(projected);
+
+      final newEntry =
+          "$label $fLap / $fTotal / Projected Finish $fProj";
+
+      // Add lap below header only
+      allLines.insert(insertIndex, newEntry);
+
+      // Keep only lap logs, header stays fixed
+      final headerLines = allLines.sublist(0, insertIndex);
+      final lapLines = allLines.sublist(insertIndex);
+
+      if (lapLines.length > maxLogs) {
+        lapLines.removeLast();
+      }
+
+      logPredictor = [...headerLines, ...lapLines].join('\n');
+
       if (isProgressive) {
         _marker = _nextMarker(_marker);
       }
     }
 
+    notifyListeners();
+  }
+
+  void initializePredictorLog() {
+    logPredictor = "${gender.toUpperCase()}'$distance e ${stroke.toUpperCase()} ${course.toUpperCase()}Projection\n"
+        "Start Type: $startType | Split Size: $splitSize\n"
+        "===============\n"
+        "Split Breakdown:\n";
     notifyListeners();
   }
 
@@ -277,23 +343,60 @@ class StopwatchController2 extends ChangeNotifier {
     final t = current;
     if (t.splits.isEmpty) return;
 
+    // Remove latest split data
     t.splits.removeLast();
 
     if (activeMode == 'Stopwatch') {
-      logStopwatch = _removeLast(logStopwatch);
+      logStopwatch = _removeFirst(logStopwatch);
     } else if (activeMode == 'Predictor') {
-      logPredictor = _removeLast(logPredictor);
-      _marker = '15';
+      // Remove first lap only, keep static header text
+      logPredictor = _removeFirstPredictorLap(logPredictor);
+
+      // Optional: reset marker back one step if using progressive mode
+      // _marker = _previousMarker(_marker);
     } else {
-      logConverter = _removeLast(logConverter);
+      logConverter = _removeFirst(logConverter);
     }
 
     notifyListeners();
   }
 
-  String _removeLast(String log) {
-    final lines = log.trim().split("\n");
-    if (lines.isNotEmpty) lines.removeLast();
+  String _removeFirst(String log) {
+    if (log.isEmpty) return "";
+
+    List<String> lines = log.trim().split("\n");
+
+    if (lines.isNotEmpty) {
+      lines.removeAt(0);
+    }
+
+    return lines.join("\n");
+  }
+
+// Predictor: preserve header, remove first lap after "Split Breakdown:"
+  String _removeFirstPredictorLap(String log) {
+    if (log.isEmpty) return "";
+
+    List<String> lines = log.split("\n");
+
+    int headerIndex = lines.indexOf("Split Breakdown:");
+
+    if (headerIndex == -1) {
+      return log; // header not found
+    }
+
+    int lapIndex = headerIndex + 1;
+
+    // Skip empty line(s)
+    while (lapIndex < lines.length && lines[lapIndex].trim().isEmpty) {
+      lapIndex++;
+    }
+
+    // Remove first lap only
+    if (lapIndex < lines.length) {
+      lines.removeAt(lapIndex);
+    }
+
     return lines.join("\n");
   }
 
