@@ -201,10 +201,15 @@ class StopwatchController2 extends ChangeNotifier {
     else {
       // Create header only once (static until Clear button resets logPredictor)
       if (logPredictor.trim().isEmpty) {
+        final formattedStroke =
+        stroke.toLowerCase() == "im"
+            ? "IM"
+            : "${stroke[0].toUpperCase()}${stroke.substring(1).toLowerCase()}";
+
         logPredictor =
         "${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}'s "
             "$distance "
-            "${stroke[0].toUpperCase()}${stroke.substring(1).toLowerCase()} "
+            "$formattedStroke "
             "${course.toUpperCase()} Projection\n"
             "Start Type: $startType | Split Size: $splitSize\n"
             "===============\n"
@@ -329,6 +334,24 @@ class StopwatchController2 extends ChangeNotifier {
     _marker = '15';
 
     _ticker?.cancel();
+    notifyListeners();
+  }
+
+  /// only clear time
+  void clearTime() {
+    final t = current;
+
+    t.running = false;
+    t.startTime = null;
+    t.accumulated = 0;
+    t.lastSplitWall = null;
+
+    /// keep splits if needed
+    /// or use t.splits.clear();
+
+    _ticker?.cancel();
+    _ticker = null;
+
     notifyListeners();
   }
 

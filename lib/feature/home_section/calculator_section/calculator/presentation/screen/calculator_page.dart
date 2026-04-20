@@ -252,7 +252,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                           isDense: true,
                                           icon: Icon(
                                             Icons.keyboard_arrow_down,
-                                            color: isDark?Colors.yellow:normalTextColor,
+                                            color: isDark?Colors.amber:normalTextColor,
                                           ),
 
                                           // ✅ IMPORTANT: match dropdown popup color
@@ -260,7 +260,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                           // ✅ Dropdown list item style
                                           style: TextStyle(
-                                            color: isDark?Colors.yellow:normalTextColor,
+                                            color: isDark?Colors.amber:normalTextColor,
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -273,7 +273,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                                 child: Text(
                                                   displayItems[c]!,
                                                   style: TextStyle(
-                                                    color: isDark?Colors.yellow:normalTextColor,// 🔥 consistent primary
+                                                    color: isDark?Colors.amber:normalTextColor,// 🔥 consistent primary
                                                     fontSize: 14.sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
@@ -309,6 +309,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               splitCalcProvider.notifier,
                                             )
                                                 .setCourse(value.toLowerCase());
+                                            if (isHaptic) HapticFeedback.heavyImpact();
                                           },
                                         ),
                                       ),
@@ -592,7 +593,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CustomText(
-                              text: "Time (hh:mm.ss)",
+                              text: "Time (mm:ss.hh)",
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                               fontSize: getAdjustedFontSize(14, fontOption).sp,
@@ -603,7 +604,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                             /// ✅ TEXT FIELD WITH VALIDATOR
                             CustomTextField(
                               keyboardType: TextInputType.text,
-                              hintText: "hh:mm.ss",
+                              hintText: "mm:ss.hh",
                               controller: timeController,
 
                               validator: (value) {
@@ -650,6 +651,19 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                 )
                                     .state =
                                 false;
+
+
+                                // deleteable
+                                final history = ref.watch(splitCalcProvider).history;
+
+
+
+                                // Reverse the history to show the latest first
+                                final reversedHistory = history.reversed.toList();
+
+                                for (var item in reversedHistory) {
+                                  debugPrint(item.toString());
+                                }
                               },
                               child: Center(
                                 child: Row(
@@ -824,75 +838,144 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
     );
   }
 
-  Future<void> exportHistoryAsPdf(BuildContext context, List history) async {
+  Future<void> exportHistoryAsPdf(
+      BuildContext context,
+      List history,
+      ) async {
+    if (history.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: CustomText(
+            text: AppLocalizations.of(context)!.noOutputToExport,
+          ),
+        ),
+      );
+      return;
+    }
+
     final pdf = pw.Document();
 
-    // Load logo
-    final ByteData logoData = await rootBundle.load(
-      'assets/images/app_logo.png',
-    );
+    /// logo
+    final ByteData logoData =
+    await rootBundle.load('assets/images/app_logo.png');
     final Uint8List logoBytes = logoData.buffer.asUint8List();
 
-    // Load Merriweather TTF font
-    final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
+    /// font
+    final fontData =
+    await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf = pw.Font.ttf(fontData);
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(32),
+        margin: const pw.EdgeInsets.all(24),
+
         header: (context) {
-          return pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text(
-                'Page ${context.pageNumber}',
-                style: pw.TextStyle(font: ttf, fontSize: 12),
-              ),
-              pw.Image(pw.MemoryImage(logoBytes), width: 50, height: 50),
-            ],
+          return pw.Container(
+            margin: const pw.EdgeInsets.only(
+              bottom: 10, // 10px space below header
+            ),
+            child: pw.Row(
+              mainAxisAlignment:
+              pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment:
+              pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  'Page ${context.pageNumber}',
+                  style: pw.TextStyle(
+                    font: ttf,
+                    fontSize: 11,
+                  ),
+                ),
+                pw.Image(
+                  pw.MemoryImage(logoBytes),
+                  width: 42,
+                  height: 42,
+                ),
+              ],
+            ),
           );
         },
-        build: (pw.Context context) {
-          return history.reversed.map<pw.Widget>((item) {
-            final lines = item.output?.split('\n') ?? [];
 
-            return pw.Container(
-              margin: const pw.EdgeInsets.only(bottom: 16),
-              padding: const pw.EdgeInsets.all(12),
-              decoration: pw.BoxDecoration(
-                border: pw.Border.all(color: PdfColors.blue, width: 1),
-                borderRadius: pw.BorderRadius.circular(8),
-              ),
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  ...lines.map((line) {
-                    // Replace spaces with non-breaking spaces to preserve alignment
-                    final formattedLine = line.replaceAll(' ', '\u00A0');
-                    return pw.Text(
-                      formattedLine,
-                      style: pw.TextStyle(font: ttf, fontSize: 12),
-                      softWrap: true,
-                    );
-                  }).toList(),
-                ],
+        build: (pw.Context context) {
+          List<pw.Widget> widgets = [];
+
+          for (final item in history.reversed) {
+            final lines = (item.output ?? '')
+                .toString()
+                .split('\n')
+                .map((e) => e.trim())
+                .where(
+                  (e) =>
+              e.isNotEmpty &&
+                  e != '=' &&
+                  e != '===',
+            )
+                .toList();
+
+            if (lines.isEmpty) continue;
+
+            widgets.add(
+              pw.Container(
+                width: double.infinity,
+                margin: const pw.EdgeInsets.only(
+                  bottom: 14,
+                ),
+                padding: const pw.EdgeInsets.all(14),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(
+                    color: PdfColors.blue,
+                    width: 1,
+                  ),
+                  borderRadius:
+                  pw.BorderRadius.circular(8),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment:
+                  pw.CrossAxisAlignment.start,
+                  children: [
+                    for (final line in lines)
+                      pw.Padding(
+                        padding:
+                        const pw.EdgeInsets.only(
+                          bottom: 4,
+                        ),
+                        child: pw.Text(
+                          line.replaceAll(
+                            '\t',
+                            '    ',
+                          ),
+                          style: pw.TextStyle(
+                            font: ttf,
+                            fontSize: 12,
+                            lineSpacing: 3,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             );
-          }).toList();
+          }
+
+          return widgets;
         },
       ),
     );
 
     try {
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/swim_converter_output.pdf');
+      final file =
+      File('${dir.path}/swim_converter_output.pdf');
+
       await file.writeAsBytes(await pdf.save());
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: CustomText(
-            text: '${AppLocalizations.of(context)!.pDFSavedAt}: ${file.path}',
+            text:
+            '${AppLocalizations.of(context)!.pDFSavedAt}: ${file.path}',
           ),
         ),
       );
@@ -900,10 +983,12 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
       await OpenFile.open(file.path);
     } catch (e) {
       debugPrint("PDF export error: $e");
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: CustomText(
-            text: AppLocalizations.of(context)!.failedToExportPDF,
+            text: AppLocalizations.of(context)!
+                .failedToExportPDF,
           ),
         ),
       );

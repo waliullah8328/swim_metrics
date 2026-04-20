@@ -37,7 +37,7 @@ class SwimSplitCalculator1 {
   static String formatCustom(List<double> splits, String course, String goalTime, String distance, String gender, String stroke, Map<String, dynamic> resultJson) {
     List<String> output = [];
     output.add("===============");
-    output.add("${gender}'s $distance $stroke $course Projection");
+    output.add("$gender's $distance $stroke $course Projection");
     double actualTotal = splits.fold(0.0, (a, b) => a + b);
     output.add("Goal Time: ${secondsToMmss(actualTotal)}");
     output.add("===============");
@@ -57,22 +57,22 @@ class SwimSplitCalculator1 {
       cumulativeTotal += s;
       List<String> lineParts = ["${idx * 50}: ${secondsToMmss(s)}"];
 
-      Map<String, dynamic> splitData = {
-        "distance": "${idx * 50}",
-        "split": secondsToMmss(s),
-        "cumulative": secondsToMmss(cumulativeTotal)
-      };
+      // Map<String, dynamic> splitData = {
+      //   "distance": "${idx * 50}",
+      //   "split": secondsToMmss(s),
+      //   "cumulative": secondsToMmss(cumulativeTotal)
+      // };
 
       lineParts.add(secondsToMmss(cumulativeTotal));
 
       if (idx % 2 == 0) {
         double hundredSplit = fiftySplits[idx - 2] + fiftySplits[idx - 1];
         lineParts.insert(1, secondsToMmss(hundredSplit));
-        splitData["hundred_split"] = secondsToMmss(hundredSplit);
+       // splitData["hundred_split"] = secondsToMmss(hundredSplit);
       }
 
       output.add(lineParts.join(" / "));
-      structuredSplits.add(splitData);
+      //structuredSplits.add(splitData);
     }
 
     output.add("===============");
@@ -85,7 +85,7 @@ class SwimSplitCalculator1 {
     try {
       totalSeconds = mmssToSeconds(goalTime);
     } catch (e) {
-      return "Invalid time format. Please use mm:ss or ss.ss.";
+      return "Invalid time format. Please use hh:mm.ss ";
     }
 
     List<double> ratioList = normalizeRatios(rawRatioList);
@@ -140,7 +140,7 @@ class SwimSplitCalculator1 {
           double combinedLastTwo = splits[2] + splits[3];
           double sumFirstFour = splits.sublist(0, 4).fold(0.0, (a, b) => a + b);
           output.add("200: ${secondsToMmss(splits[i])} / ${secondsToMmss(combinedLastTwo)} / ${secondsToMmss(sumFirstFour)}");
-          structuredSplits.add({"distance": "200", "split": secondsToMmss(splits[i]), "combined_last_two": secondsToMmss(combinedLastTwo), "cumulative": secondsToMmss(sumFirstFour)});
+         // structuredSplits.add({"distance": "200", "split": secondsToMmss(splits[i]), "combined_last_two": secondsToMmss(combinedLastTwo), "cumulative": secondsToMmss(sumFirstFour)});
         } else {
           output.add("${(i+1)*50}: ${secondsToMmss(splits[i])} / ${secondsToMmss(cumulativeTotal)}");
          // structuredSplits.add({"distance": "${(i+1)*50}", "split": secondsToMmss(splits[i]), "cumulative": secondsToMmss(cumulativeTotal)});
@@ -217,7 +217,7 @@ class SwimSplitCalculator1 {
       } catch (e) {
         outputJson["success"] = false;
         outputJson["error"] =
-        "Please enter a valid time (mm:ss or ss.ss).";
+        "Please enter a valid time (hh:mm.ss or).";
         return jsonEncode(outputJson);
       }
 
@@ -307,11 +307,11 @@ class SwimSplitCalculator1 {
 
     // ✅ IM disclaimer
     if (stroke == "im") {
-      String disclaimer =
-          "\n⚠️ Does not account for best/worst stroke.";
-      formattedResult += disclaimer;
-      outputJson["disclaimer"] =
-      "⚠️ Does not account for best/worst stroke.";
+      // String disclaimer =
+      //     "\n⚠️ Does not account for best/worst stroke.";
+      // formattedResult += disclaimer;
+      // outputJson["disclaimer"] =
+      // "⚠️ Does not account for best/worst stroke.";
     }
 
     outputJson["formatted_text"] = formattedResult;

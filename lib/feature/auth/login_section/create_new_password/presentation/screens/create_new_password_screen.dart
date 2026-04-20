@@ -176,7 +176,8 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                         if(_createNewPasswordFormKey.currentState!.validate()){
                           final result = await ref.read(createNewPasswordProvider.notifier).resetPassword(context: context,email: widget.email,forgotPasswordToken: widget.forgetToken);
                           if(result){
-                            context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/false");
+                            context.go(RouteNames.loginScreen);
+                            //context.go("${RouteNames.verifyEmailSuccessScreen}/$title/$subTitle/false");
                           }
 
 

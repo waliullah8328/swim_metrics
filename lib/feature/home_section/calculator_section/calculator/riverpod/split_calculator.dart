@@ -63,7 +63,8 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
 
   void calculate() {
     try {
-      final result = SwimSplitCalculator1.calculateSplits(
+      final result =
+      SwimSplitCalculator1.calculateSplits(
         course: state.course,
         gender: state.gender,
         stroke: state.stroke,
@@ -73,24 +74,45 @@ class SplitCalcNotifier extends StateNotifier<SplitCalcState> {
 
       final decoded = jsonDecode(result);
 
-      final newResult = decoded['success'] == true
+      final formattedText =
+      (decoded['formatted_text'] ?? '')
+          .toString()
+          .replaceAll('===', '')
+          .replaceAll('==', '')
+          .replaceAll('=', '')
+          .trim();
+
+      final newResult =
+      decoded['success'] == true
           ? SplitResult(
-        output: decoded['formatted_text'] ?? '',
-        splits: List.from(decoded['splits'] ?? []),
+        output: formattedText,
+        splits: List.from(
+          decoded['splits'] ?? [],
+        ),
       )
           : SplitResult(
-        output: decoded['error'] ?? 'Something went wrong',
+        output:
+        (decoded['error'] ??
+            'Something went wrong')
+            .toString(),
         splits: [],
       );
 
       state = state.copyWith(
-        history: [...state.history, newResult], // append to history
+        history: [
+          ...state.history,
+          newResult,
+        ],
       );
     } catch (e) {
       state = state.copyWith(
         history: [
           ...state.history,
-          SplitResult(output: 'Error: ${e.toString()}', splits: []),
+          SplitResult(
+            output:
+            'Error: ${e.toString()}',
+            splits: [],
+          ),
         ],
       );
     }
