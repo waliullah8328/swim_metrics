@@ -41,58 +41,58 @@ class _ToolsHeaderState extends State<ToolsHeader> {
     return Card(
       color: widget.isDarkMode?Color(0xff153250):Color(0xffEAEDF1),
       child: Padding(
-        padding:  EdgeInsets.only(left: 10.w,),
+        padding:  EdgeInsets.only(left: 10.w,top: 10.h,bottom: 10.h,right: 10.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
             /// HEADER
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(IconPath.toolsExplainIcon),
-                      SizedBox(width: 6.w),
+            GestureDetector(
+              onTap: (){
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(IconPath.toolsExplainIcon),
+                        SizedBox(width: 6.w),
 
-                      /// Expanded keeps text inside available space
-                      Expanded(
-                        child: Text(
-                          AppLocalizations.of(context)!.toolsExplain,
-                          maxLines: 1, // single line only
-                          overflow: TextOverflow.ellipsis, // show ...
-                          softWrap: false,
-                          style: TextStyle(
-                            fontSize: getAdjustedFontSize(16,
-                              widget.fontSizeOption,
-                            ).sp,
-                            fontWeight: FontWeight.bold,
+                        /// Expanded keeps text inside available space
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)!.toolsExplain,
+                            maxLines: 1, // single line only
+                            overflow: TextOverflow.ellipsis, // show ...
+                            softWrap: false,
+                            style: TextStyle(
+                              fontSize: getAdjustedFontSize(16,
+                                widget.fontSizeOption,
+                              ).sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                /// Arrow Button
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isExpanded = !isExpanded;
-                    });
-                  },
-                  icon: Icon(
+                  /// Arrow Button
+                  Icon(
                     isExpanded
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
                     color: Color(0xff368ABB),
                     size: 26,
                     weight: 8.w,
-                  ),
-                ),
-              ],
+                  )
+                ],
+              ),
             ),
 
             /// EXPANDED CONTENT
@@ -110,6 +110,7 @@ class _ToolsHeaderState extends State<ToolsHeader> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          SizedBox(height: 10.h,),
                           CustomText(text: AppLocalizations.of(context)!.splitCalculator,color: widget.isDarkMode?Color(0xffE3D99B):AppColors.textNavyBlue,fontWeight: FontWeight.w400,fontSize: getAdjustedFontSize(12, widget.fontSizeOption).sp,),
                           Divider(),
                         ],

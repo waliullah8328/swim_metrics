@@ -42,7 +42,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
   @override
   void initState() {
     super.initState();
-    checkPlanExpiry( context);
+    checkPlanExpiry(context);
 
     final state1 = ref.read(converterProvider1);
     timeController.text = state1.timeText;
@@ -81,10 +81,14 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
     final controller1 = ref.read(converterProvider1.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionConverter);
-    final fontOption = ref.watch(settingsProvider).fontSize;
-    final isHaptic = ref.watch(settingsProvider.select((s)=>s.haptic));
+    final fontOption = ref
+        .watch(settingsProvider)
+        .fontSize;
+    final isHaptic = ref.watch(settingsProvider.select((s) => s.haptic));
 
     return Scaffold(
       key: scaffoldKey,
@@ -100,7 +104,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
         leading: GestureDetector(
           onTap: () {
             scaffoldKey.currentState?.openDrawer();
-            if(isHaptic == true){
+            if (isHaptic == true) {
               HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
             }
@@ -132,8 +136,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    ref.read(showCourseSectionConverter.notifier).state = true;
-                    if(isHaptic == true){
+                    ref
+                        .read(showCourseSectionConverter.notifier)
+                        .state = true;
+                    if (isHaptic == true) {
                       HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
                     }
@@ -196,14 +202,14 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     builder: (context, ref, child) {
                                       final state1 = ref.watch(
                                         converterProvider1.select(
-                                          (s) => s.gender,
+                                              (s) => s.gender,
                                         ),
                                       );
 
                                       // convert to match UI
                                       final selectedValue = state1.isNotEmpty
                                           ? state1[0].toUpperCase() +
-                                                state1.substring(1)
+                                          state1.substring(1)
                                           : "";
                                       final controller1 = ref.read(
                                         converterProvider1.notifier,
@@ -213,7 +219,8 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                       return SplitCalculatorSelectorOne(
                                         items: const ["Men", "Women"],
                                         selectedValue:
-                                            selectedValue, // ✅ keep selected after refresh
+                                        selectedValue,
+                                        // ✅ keep selected after refresh
                                         onChanged: (v) =>
                                             controller1.setGender(v),
                                       );
@@ -249,13 +256,14 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                       final state1 = ref.watch(
                                         converterProvider1.select(
-                                          (s) => s.stroke,
+                                              (s) => s.stroke,
                                         ),
                                       );
 
                                       // match lowercase state with UI list
                                       final selectedValue = items.firstWhere(
-                                        (item) => item.toLowerCase() == state1,
+                                            (item) =>
+                                        item.toLowerCase() == state1,
                                         orElse: () => "",
                                       );
 
@@ -283,6 +291,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                         Row(
                           children: [
+
                             /// ================= FROM COURSE =================
                             Expanded(
                               child: Column(
@@ -302,14 +311,17 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     builder: (context, ref, child) {
                                       const items = ["SCY", "SCM", "LCM"];
 
-                                      final state = ref.watch(converterProvider1);
+                                      final state = ref.watch(
+                                          converterProvider1);
                                       final course = state.course;
                                       final stroke = state.stroke;
 
-                                      final controller = ref.read(converterProvider1.notifier);
+                                      final controller = ref.read(
+                                          converterProvider1.notifier);
 
                                       final selectedValue = items.firstWhere(
-                                            (item) => item.toLowerCase() == course,
+                                            (item) =>
+                                        item.toLowerCase() == course,
                                         orElse: () => items.first,
                                       );
 
@@ -317,15 +329,16 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                         items: items,
                                         selectedValue: selectedValue,
                                         onChanged: (selected) {
-                                          final newCourse = selected.toLowerCase();
+                                          final newCourse = selected
+                                              .toLowerCase();
 
                                           // ✅ use BOTH course + stroke
-                                         // final distances = getDistances(newCourse, stroke);
+                                          // final distances = getDistances(newCourse, stroke);
 
                                           controller.setCourse(newCourse);
 
                                           // reset distance safely
-                                         // controller.setDistance(distances.first);
+                                          // controller.setDistance(distances.first);
                                         },
                                       );
                                     },
@@ -333,7 +346,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                 ],
                               ),
                             ),
-
 
 
                             /// ================= DISTANCE =================
@@ -355,8 +367,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                                   Consumer(
                                     builder: (context, ref, child) {
-                                      final state = ref.watch(converterProvider1);
-                                      final controller = ref.read(converterProvider1.notifier);
+                                      final state = ref.watch(
+                                          converterProvider1);
+                                      final controller = ref.read(
+                                          converterProvider1.notifier);
 
                                       // ✅ use BOTH course + stroke
                                       final distances = getDistances(
@@ -365,7 +379,8 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                       );
 
                                       // ✅ ensure valid selection
-                                      final selectedDistance = distances.contains(state.distance)
+                                      final selectedDistance = distances
+                                          .contains(state.distance)
                                           ? state.distance
                                           : distances.first;
 
@@ -409,14 +424,17 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                         Checkbox(
                                           value: state.targets.contains('scy'),
                                           onChanged:
-                                              state.course.isNotEmpty &&
-                                                  state.course == 'scy'
+                                          state.course.isNotEmpty &&
+                                              state.course == 'scy'
                                               ? null
-                                              : (val) =>
-                                                    controller1.toggleTarget(
-                                                      'scy',
-                                                      val ?? false,
-                                                    ),
+                                              : (val) {
+                                            controller1.toggleTarget(
+                                              'scy',
+                                              val ?? false,
+                                            );
+                                            if (isHaptic) HapticFeedback.heavyImpact();
+                                          }
+
                                         ),
                                         const Text('SCY'),
                                       ],
@@ -430,14 +448,17 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                         Checkbox(
                                           value: state.targets.contains('scm'),
                                           onChanged:
-                                              state.course.isNotEmpty &&
-                                                  state.course == 'scm'
+                                          state.course.isNotEmpty &&
+                                              state.course == 'scm'
                                               ? null
-                                              : (val) =>
-                                                    controller1.toggleTarget(
-                                                      'scm',
-                                                      val ?? false,
-                                                    ),
+                                              : (val) {
+                                            controller1.toggleTarget(
+                                              'scm',
+                                              val ?? false,
+                                            );
+                                            if (isHaptic) HapticFeedback.heavyImpact();
+                                          }
+
                                         ),
                                         const Text('SCM'),
                                       ],
@@ -451,14 +472,17 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                         Checkbox(
                                           value: state.targets.contains('lcm'),
                                           onChanged:
-                                              state.course.isNotEmpty &&
-                                                  state.course == 'lcm'
+                                          state.course.isNotEmpty &&
+                                              state.course == 'lcm'
                                               ? null
-                                              : (val) =>
-                                                    controller1.toggleTarget(
-                                                      'lcm',
-                                                      val ?? false,
-                                                    ),
+                                              : (val) {
+                                            controller1.toggleTarget(
+                                              'lcm',
+                                              val ?? false,
+                                            );
+                                            if (isHaptic) HapticFeedback.heavyImpact();
+                                          }
+
                                         ),
                                         Text('LCM'),
                                       ],
@@ -487,7 +511,8 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                       SizedBox(height: 10.h),
 
                       TextFormField(
-                        controller: timeController, // ✅ use controller
+                        controller: timeController,
+                        // ✅ use controller
                         focusNode: timeFocusNode,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
@@ -521,8 +546,11 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                           );
                           return CustomCheckBoxWidget(
                             value: isRemember,
-                            onChanged: (v) =>
-                                controller1.setShowSplits(v ?? false),
+                            onChanged: (v) {
+                              controller1.setShowSplits(v ?? false);
+                              if (isHaptic) HapticFeedback.heavyImpact();
+                            }
+
                           );
                         },
                       ),
@@ -533,26 +561,34 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                   GestureDetector(
                     onTap: () {
                       // Check if the time field is empty
-                      if (timeController.text.trim().isEmpty) {
+                      if (timeController.text
+                          .trim()
+                          .isEmpty) {
                         // Show a Snackbar if the time field is empty
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              AppLocalizations.of(context)!.enterYourTime, // You can customize this message
-                              style: TextStyle(fontSize: 14.sp, color: AppColors.backgroundDark),
+                              AppLocalizations.of(context)!.enterYourTime,
+                              // You can customize this message
+                              style: TextStyle(fontSize: 14.sp,
+                                  color: AppColors.backgroundDark),
                             ),
                             backgroundColor: Colors.grey,
-                            duration: Duration(seconds: 2), // Duration of Snackbar
+                            duration: Duration(
+                                seconds: 2), // Duration of Snackbar
                           ),
                         );
                       } else {
                         // Proceed with conversion if time field is not empty
                         controller1.convert(context: context);
-                        ref.read(showCourseSectionConverter.notifier).state = false;
+                        ref
+                            .read(showCourseSectionConverter.notifier)
+                            .state = false;
 
                         // Trigger haptic feedback if enabled
                         if (isHaptic == true) {
-                          HapticFeedback.lightImpact(); // 👈 HAPTIC FEEDBACK HERE
+                          HapticFeedback
+                              .lightImpact(); // 👈 HAPTIC FEEDBACK HERE
                         }
                       }
                     },
@@ -593,27 +629,27 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                 return output.isEmpty
                     ? SizedBox()
                     : Container(
-                        padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
 
-                        decoration: BoxDecoration(
-                          color: isDark ? Color(0xff0C3156) : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            width: 1,
-                            color: Color(0xff2DA8F0),
-                          ),
-                          boxShadow: const [
-                            BoxShadow(blurRadius: 12, color: Colors.black12),
-                          ],
-                        ),
+                  decoration: BoxDecoration(
+                    color: isDark ? Color(0xff0C3156) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      width: 1,
+                      color: Color(0xff2DA8F0),
+                    ),
+                    boxShadow: const [
+                      BoxShadow(blurRadius: 12, color: Colors.black12),
+                    ],
+                  ),
 
-                        child: SingleChildScrollView(
-                          child: Text(
-                            output,
-                            style: const TextStyle(fontFamily: 'monospace'),
-                          ),
-                        ),
-                      );
+                  child: SingleChildScrollView(
+                    child: Text(
+                      output,
+                      style: const TextStyle(fontFamily: 'monospace'),
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -626,91 +662,91 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                 return output.isEmpty
                     ? SizedBox()
                     : Column(
-                        children: [
-                          SizedBox(height: 24.h),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xff234B6E),
-                                    side: BorderSide(color: Color(0xff234B6E)),
-                                  ),
-                                  onPressed: () {
-                                    controller1.reset();
-                                    if(isHaptic == true){
-                                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+                  children: [
+                    SizedBox(height: 24.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xff234B6E),
+                              side: BorderSide(color: Color(0xff234B6E)),
+                            ),
+                            onPressed: () {
+                              controller1.reset();
+                              if (isHaptic == true) {
+                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
 
-                                    }
-                                  },
-                                  child: Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(IconPath.clearIcon),
-                                        SizedBox(width: 6.w),
-                                        CustomText(
-                                          text: AppLocalizations.of(
-                                            context,
-                                          )!.clear,
-                                          fontSize: getAdjustedFontSize(
-                                            16,
-                                            fontOption,
-                                          ).sp,
-                                          color: AppColors.textWhite,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ],
-                                    ),
+                              }
+                            },
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(IconPath.clearIcon),
+                                  SizedBox(width: 6.w),
+                                  CustomText(
+                                    text: AppLocalizations.of(
+                                      context,
+                                    )!.clear,
+                                    fontSize: getAdjustedFontSize(
+                                      16,
+                                      fontOption,
+                                    ).sp,
+                                    color: AppColors.textWhite,
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                ),
+                                ],
                               ),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                  ),
-                                  onPressed: () {
-                                    final output = ref
-                                        .read(converterProvider1)
-                                        .output;
-                                    exportOutputAsPdf(context, output);
-                                    if(isHaptic == true){
-                                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                                    }
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SvgPicture.asset(
-                                        IconPath.exportIcon,
-                                        colorFilter: ColorFilter.mode(
-                                          Colors.black,
-                                          BlendMode.srcIn,
-                                        ),
-                                      ),
-                                      SizedBox(width: 6.w),
-                                      CustomText(
-                                        text: AppLocalizations.of(
-                                          context,
-                                        )!.export,
-                                        fontSize: getAdjustedFontSize(
-                                          16,
-                                          fontOption,
-                                        ).sp,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ],
-                      );
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                            ),
+                            onPressed: () {
+                              final output = ref
+                                  .read(converterProvider1)
+                                  .output;
+                              exportOutputAsPdf(context, output);
+                              if (isHaptic == true) {
+                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
+
+                              }
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  IconPath.exportIcon,
+                                  colorFilter: ColorFilter.mode(
+                                    Colors.black,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                SizedBox(width: 6.w),
+                                CustomText(
+                                  text: AppLocalizations.of(
+                                    context,
+                                  )!.export,
+                                  fontSize: getAdjustedFontSize(
+                                    16,
+                                    fontOption,
+                                  ).sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
               },
             ),
           ],
@@ -728,7 +764,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       "back": ["50", "100", "200"],
       "breast": ["50", "100", "200"],
       "free": ["50", "100", "200", "500", "1000", "1650"],
-      "im": ["100","200", "400"],
+      "im": ["100", "200", "400"],
     };
 
     final Map<String, List<String>> scmLcm = {
@@ -736,7 +772,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       "back": ["50", "100", "200"],
       "breast": ["50", "100", "200"],
       "free": ["50", "100", "200", "400", "800", "1500"],
-      "im": ["100","200", "400"],
+      "im": ["100", "200", "400"],
     };
 
     if (course == "scy") {
@@ -747,8 +783,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       return ["50"];
     }
   }
-
-
 
 
   List<String> getDistancesByCourseAndStroke(String course, String stroke) {
@@ -774,7 +808,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       } else if (stroke == "free") {
         return ["50", "100", "200", "500", "1000", "1650"];
       } else if (stroke == "im") {
-        return ["100","200", "400"];
+        return ["100", "200", "400"];
       }
     }
 
@@ -782,8 +816,11 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     return ["50"];
   }
 
-  Future<void> exportOutputAsPdf(BuildContext context, String output) async {
-    if (output.isEmpty) {
+  Future<void> exportOutputAsPdf(BuildContext context,
+      String output,) async {
+    if (output
+        .trim()
+        .isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: CustomText(
@@ -796,57 +833,96 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
     final pdf = pw.Document();
 
-    // Load logo from assets
-    final ByteData logoData = await rootBundle.load('assets/images/app_logo.png');
+    /// logo
+    final ByteData logoData =
+    await rootBundle.load('assets/images/app_logo.png');
     final Uint8List logoBytes = logoData.buffer.asUint8List();
 
-    // Load a TrueType font that supports Unicode
-    final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
+    /// font
+    final fontData =
+    await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf = pw.Font.ttf(fontData);
+
+    /// remove extra empty blocks
+    final blocks = output
+        .split('\n\n')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(32),
+        margin: const pw.EdgeInsets.all(24),
+
         header: (context) {
-          return pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text('Page ${context.pageNumber}', style: pw.TextStyle(fontSize: 12,font: ttf )),
-              pw.Image(pw.MemoryImage(logoBytes), width: 50, height: 50),
-            ],
+          return pw.Container(
+            margin: const pw.EdgeInsets.only(bottom: 10),
+            child: pw.Row(
+              mainAxisAlignment:
+              pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text(
+                  'Page ${context.pageNumber}',
+                  style: pw.TextStyle(
+                    font: ttf,
+                    fontSize: 11,
+                  ),
+                ),
+                pw.Image(
+                  pw.MemoryImage(logoBytes),
+                  width: 42,
+                  height: 42,
+                ),
+              ],
+            ),
           );
         },
-        build: (pw.Context context) {
-          // Preserve spacing by splitting by line breaks
-          final lines = output.split('\n');
-          return [
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: lines.map((line) {
-                // Replace normal spaces with non-breaking spaces to preserve spacing
-                final formattedLine = line.replaceAll(' ', '\u00A0');
-                return pw.Text(
-                  formattedLine,
-                  style: pw.TextStyle( fontSize: 12,font: ttf),
-                  softWrap: true,
-                );
-              }).toList(),
-            ),
-          ];
+
+        build: (context) {
+          return blocks.map((block) {
+            return pw.Container(
+              width: double.infinity,
+              margin: const pw.EdgeInsets.only(bottom: 14),
+              padding: const pw.EdgeInsets.all(14),
+
+              decoration: pw.BoxDecoration(
+                color: PdfColors.white,
+                border: pw.Border.all(
+                  color: PdfColors.blue,
+                  width: 1,
+                ),
+                borderRadius:
+                pw.BorderRadius.circular(8),
+              ),
+
+              child: pw.Text(
+                block.replaceAll('\t', '    ').trim(),
+                style: pw.TextStyle(
+                  font: ttf,
+                  fontSize: 12,
+                  lineSpacing: 3,
+                ),
+                softWrap: true,
+              ),
+            );
+          }).toList();
         },
       ),
     );
 
     try {
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/swim_converter_output.pdf');
+      final file =
+      File('${dir.path}/swim_converter_output.pdf');
+
       await file.writeAsBytes(await pdf.save());
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: CustomText(
-            text: '${AppLocalizations.of(context)!.pDFSavedAt}: ${file.path}',
+            text:
+            '${AppLocalizations.of(context)!.pDFSavedAt}: ${file.path}',
           ),
         ),
       );
@@ -854,10 +930,12 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       await OpenFile.open(file.path);
     } catch (e) {
       debugPrint("PDF export error: $e");
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: CustomText(
-            text: AppLocalizations.of(context)!.failedToExportPDF,
+            text: AppLocalizations.of(context)!
+                .failedToExportPDF,
           ),
         ),
       );

@@ -116,27 +116,157 @@ class ConverterController extends Notifier<ConverterState> {
         .toList();
   }
 
+  // void convert({required context}) {
+  //   final s = state;
+  //
+  //   // Validate inputs
+  //   if ([s.course, s.gender, s.stroke, s.distance, s.timeText]
+  //       .any((e) => e.trim().isEmpty)) {
+  //     state = s.copyWith(
+  //       output:
+  //       '${AppLocalizations.of(context)!.pleaseFillAllFields}\n\n${s.output}',
+  //     );
+  //     return;
+  //   }
+  //
+  //   double totalSeconds;
+  //
+  //   try {
+  //     totalSeconds = TimeUtils1.parseToSeconds(s.timeText.trim());
+  //   } catch (_) {
+  //     state = s.copyWith(
+  //       output:
+  //       '${AppLocalizations.of(context)!.invalidTimeFormat}\n\n${s.output}',
+  //     );
+  //     return;
+  //   }
+  //
+  //   final results = <String>[];
+  //   final splitResults = <String>[];
+  //
+  //   results.add('=== Conversion Results ===');
+  //
+  //   if (s.showSplits) {
+  //     splitResults.add('=== Conversion Results with Splits ===');
+  //   }
+  //
+  //   final allowed = allowedTargets();
+  //
+  //   final targets = s.targets.isEmpty
+  //       ? allowed
+  //       : allowed.where((e) => s.targets.contains(e)).toList();
+  //
+  //   for (final to in targets) {
+  //     final multiplier = s.preferWR
+  //         ? ConversionCore1.computeMultiplier(
+  //       s.gender,
+  //       s.stroke,
+  //       s.distance,
+  //       s.course,
+  //       to,
+  //     )
+  //         : ConversionCore1.poolRatio(
+  //       s.course,
+  //       to,
+  //     );
+  //
+  //     final converted = totalSeconds * multiplier;
+  //
+  //     // SAFE FORMAT (never crash on invalid mapping)
+  //     final convertedText = TimeUtils1.formatSeconds(converted);
+  //
+  //     final displayDistance = ConversionCore1.mappedDistance(
+  //       s.stroke,
+  //       s.distance,
+  //       s.course,
+  //       to,
+  //     );
+  //
+  //     // ❗ Skip invalid IM → LCM mapping issues
+  //     if (displayDistance == null || displayDistance.toString().isEmpty) {
+  //       continue;
+  //     }
+  //
+  //     final strokeLabel = s.stroke.toLowerCase() == 'im'
+  //         ? 'IM'
+  //         : '${s.stroke[0].toUpperCase()}${s.stroke.substring(1).toLowerCase()}';
+  //
+  //     final genderLabel =
+  //         '${s.gender[0].toUpperCase()}${s.gender.substring(1).toLowerCase()}';
+  //
+  //     results.add(
+  //       '$genderLabel '
+  //           '${s.distance} $strokeLabel ${s.timeText} '
+  //           '${s.course.toUpperCase()} → '
+  //           '$displayDistance $strokeLabel ${to.toUpperCase()}: '
+  //           '$convertedText',
+  //     );
+  //
+  //     if (s.showSplits) {
+  //       String splitsText = '';
+  //
+  //       /// SPECIAL FIX FOR 50 LCM
+  //       if (to == 'lcm' && displayDistance.toString() == '50') {
+  //         splitsText = _calculate50LcmSplits(
+  //           converted,
+  //           s.gender,
+  //         );
+  //       } else {
+  //         final ratios = SplitsCore1.getRatios(
+  //           to,
+  //           s.gender,
+  //           s.stroke,
+  //           displayDistance.toString(),
+  //         ) ??
+  //             [];
+  //
+  //         splitsText = SplitsCore1.calculateSplits(
+  //           converted,
+  //           ratios,
+  //           int.parse(displayDistance.toString()),
+  //           targetCourse: to,
+  //         );
+  //       }
+  //
+  //       splitResults.add(
+  //         '$genderLabel '
+  //             '$displayDistance $strokeLabel '
+  //             '${to.toUpperCase()}: $convertedText',
+  //       );
+  //
+  //       splitResults.add(splitsText);
+  //       splitResults.add('');
+  //     }
+  //   }
+  //
+  //   final finalOutput = [
+  //     ...results,
+  //     '',
+  //     ...splitResults,
+  //     if (s.output.isNotEmpty) '',
+  //     if (s.output.isNotEmpty) s.output,
+  //   ].join('\n');
+  //
+  //   state = s.copyWith(output: finalOutput);
+  // }
+
   void convert({required context}) {
     final s = state;
 
-    // Validate inputs
     if ([s.course, s.gender, s.stroke, s.distance, s.timeText]
         .any((e) => e.trim().isEmpty)) {
       state = s.copyWith(
-        output:
-        '${AppLocalizations.of(context)!.pleaseFillAllFields}\n\n${s.output}',
+        output: '${AppLocalizations.of(context)!.pleaseFillAllFields}\n\n${s.output}',
       );
       return;
     }
 
     double totalSeconds;
-
     try {
       totalSeconds = TimeUtils1.parseToSeconds(s.timeText.trim());
     } catch (_) {
       state = s.copyWith(
-        output:
-        '${AppLocalizations.of(context)!.invalidTimeFormat}\n\n${s.output}',
+        output: '${AppLocalizations.of(context)!.invalidTimeFormat}\n\n${s.output}',
       );
       return;
     }
@@ -150,76 +280,37 @@ class ConverterController extends Notifier<ConverterState> {
       splitResults.add('=== Conversion Results with Splits ===');
     }
 
-    final allowed = allowedTargets();
-
     final targets = s.targets.isEmpty
-        ? allowed
-        : allowed.where((e) => s.targets.contains(e)).toList();
+        ? allowedTargets()
+        : allowedTargets().where((e) => s.targets.contains(e)).toList();
 
     for (final to in targets) {
       final multiplier = s.preferWR
-          ? ConversionCore1.computeMultiplier(
-        s.gender,
-        s.stroke,
-        s.distance,
-        s.course,
-        to,
-      )
-          : ConversionCore1.poolRatio(
-        s.course,
-        to,
-      );
+          ? ConversionCore1.computeMultiplier(s.gender, s.stroke, s.distance, s.course, to)
+          : ConversionCore1.poolRatio(s.course, to);
 
       final converted = totalSeconds * multiplier;
-
-      // SAFE FORMAT (never crash on invalid mapping)
       final convertedText = TimeUtils1.formatSeconds(converted);
+      final displayDistance = ConversionCore1.mappedDistance(s.stroke, s.distance, s.course, to);
 
-      final displayDistance = ConversionCore1.mappedDistance(
-        s.stroke,
-        s.distance,
-        s.course,
-        to,
-      );
+      if (displayDistance == null || displayDistance.toString().isEmpty) continue;
 
-      // ❗ Skip invalid IM → LCM mapping issues
-      if (displayDistance == null || displayDistance.toString().isEmpty) {
-        continue;
-      }
+      final strokeLabel = s.stroke.toUpperCase() == 'IM' ? 'IM' :
+      '${s.stroke[0].toUpperCase()}${s.stroke.substring(1).toLowerCase()}';
+      final genderLabel = '${s.gender[0].toUpperCase()}${s.gender.substring(1).toLowerCase()}';
 
-      final strokeLabel = s.stroke.toLowerCase() == 'im'
-          ? 'IM'
-          : '${s.stroke[0].toUpperCase()}${s.stroke.substring(1).toLowerCase()}';
-
-      final genderLabel =
-          '${s.gender[0].toUpperCase()}${s.gender.substring(1).toLowerCase()}';
-
-      results.add(
-        '$genderLabel '
-            '${s.distance} $strokeLabel ${s.timeText} '
-            '${s.course.toUpperCase()} → '
-            '$displayDistance $strokeLabel ${to.toUpperCase()}: '
-            '$convertedText',
-      );
+      results.add('$genderLabel ${s.distance} $strokeLabel ${s.timeText} ${s.course.toUpperCase()} → $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
 
       if (s.showSplits) {
+        splitResults.add('$genderLabel $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
+
         String splitsText = '';
-
-        /// SPECIAL FIX FOR 50 LCM
         if (to == 'lcm' && displayDistance.toString() == '50') {
-          splitsText = _calculate50LcmSplits(
-            converted,
-            s.gender,
-          );
+          splitsText = _calculate50LcmSplits(converted, s.gender);
         } else {
-          final ratios = SplitsCore1.getRatios(
-            to,
-            s.gender,
-            s.stroke,
-            displayDistance.toString(),
-          ) ??
-              [];
+          final ratios = SplitsCore1.getRatios(to, s.gender, s.stroke, displayDistance.toString()) ?? [];
 
+          // This helper should now return lines like "100: 5.70 / 10.90 / 10.90"
           splitsText = SplitsCore1.calculateSplits(
             converted,
             ratios,
@@ -227,15 +318,8 @@ class ConverterController extends Notifier<ConverterState> {
             targetCourse: to,
           );
         }
-
-        splitResults.add(
-          '$genderLabel '
-              '$displayDistance $strokeLabel '
-              '${to.toUpperCase()}: $convertedText',
-        );
-
         splitResults.add(splitsText);
-        splitResults.add('');
+        splitResults.add(''); // Space between split blocks
       }
     }
 

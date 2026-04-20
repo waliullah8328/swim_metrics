@@ -51,41 +51,60 @@ class SplitsCore1 {
   static String calculateSplits(double totalSeconds, List<double> ratioList, int distance, {String? targetCourse}) {
     final d = distance;
     final course = targetCourse?.toLowerCase();
+
+    // 1. Handling Short Course (SCY/SCM) with 25-unit segments
     if ((course == 'scy' || course == 'scm') && (d == 50 || d == 100)) {
       final numSegments = d ~/ 25;
       final normalized = ratioList.length == numSegments ? ratioList : normalize(ratioList);
       final segTimes = normalized.map((r) => totalSeconds * r).toList();
       final out = <String>['--- Splits ---'];
+
       double cum = 0;
       for (int i = 0; i < numSegments; i++) {
         final distOut = (i + 1) * 25;
-        final splitVal = segTimes[i];
-        cum += splitVal;
-        final splitStr = secondsToLabel(splitVal);
+        final lapTime = segTimes[i]; // The current 25
+        cum += lapTime;
+
+        final lapStr = secondsToLabel(lapTime);
         final cumStr = secondsToLabel(cum);
-        if (d == 100 && distOut == 100) {
-          final last25 = segTimes[3];
-          final last50 = segTimes[2] + segTimes[3];
-          final last25Str = secondsToLabel(last25);
-          final last50Str = secondsToLabel(last50);
-          out.add('$distOut: $last25Str / $last50Str / $cumStr');
+
+        // Special case for 100: Show Lap / 50-Split / Cumulative
+        if (d == 100 && distOut % 50 == 0) {
+          final split50Time = segTimes[i-1] + segTimes[i];
+          final split50Str = secondsToLabel(split50Time);
+          out.add('$distOut: $lapStr / $split50Str / $cumStr');
         } else {
-          out.add('$distOut: $splitStr / $cumStr');
+          out.add('$distOut: $lapStr / $cumStr');
         }
       }
       return out.join('\n');
     }
 
+    // 2. Handling Long Course (LCM) or longer distances with 50-unit segments
     final normalized = normalize(ratioList);
-    final splits = normalized.map((r) => totalSeconds * r).toList();
+    final lapTimes = normalized.map((r) => totalSeconds * r).toList();
     final out = <String>['--- Splits ---'];
+
     double cum = 0;
-    const inc = 50;
-    for (int i = 0; i < splits.length; i++) {
-      cum += splits[i];
-      final splitStr = secondsToLabel(splits[i]);
+    const int inc = 50;
+
+    for (int i = 0; i < lapTimes.length; i++) {
+      final distOut = (i + 1) * inc;
+      final lapTime = lapTimes[i]; // The current 50
+      cum += lapTime;
+
+      final lapStr = secondsToLabel(lapTime);
       final cumStr = secondsToLabel(cum);
-      out.add('${(i + 1) * inc}: $splitStr / $cumStr');
+
+      // If it's a 100m mark (100, 200, 300, etc.), show Lap / 100-Split / Cumulative
+      if (distOut > 50 && distOut % 100 == 0) {
+        final split100Time = lapTimes[i-1] + lapTimes[i];
+        final split100Str = secondsToLabel(split100Time);
+        out.add('$distOut: $lapStr / $split100Str / $cumStr');
+      } else {
+        // Otherwise just show Lap / Cumulative
+        out.add('$distOut: $lapStr / $cumStr');
+      }
     }
     return out.join('\n');
   }

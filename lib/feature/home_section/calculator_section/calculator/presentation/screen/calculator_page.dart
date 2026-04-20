@@ -252,7 +252,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                           isDense: true,
                                           icon: Icon(
                                             Icons.keyboard_arrow_down,
-                                            color: isDark?Colors.yellow:normalTextColor,
+                                            color: isDark?Colors.amber:normalTextColor,
                                           ),
 
                                           // ✅ IMPORTANT: match dropdown popup color
@@ -260,7 +260,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                           // ✅ Dropdown list item style
                                           style: TextStyle(
-                                            color: isDark?Colors.yellow:normalTextColor,
+                                            color: isDark?Colors.amber:normalTextColor,
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -273,7 +273,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                                 child: Text(
                                                   displayItems[c]!,
                                                   style: TextStyle(
-                                                    color: isDark?Colors.yellow:normalTextColor,// 🔥 consistent primary
+                                                    color: isDark?Colors.amber:normalTextColor,// 🔥 consistent primary
                                                     fontSize: 14.sp,
                                                     fontWeight: FontWeight.w700,
                                                   ),
@@ -309,6 +309,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                               splitCalcProvider.notifier,
                                             )
                                                 .setCourse(value.toLowerCase());
+                                            if (isHaptic) HapticFeedback.heavyImpact();
                                           },
                                         ),
                                       ),
@@ -592,7 +593,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CustomText(
-                              text: "Time (hh:mm.ss)",
+                              text: "Time (mm:ss.hh)",
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                               fontSize: getAdjustedFontSize(14, fontOption).sp,
@@ -603,7 +604,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                             /// ✅ TEXT FIELD WITH VALIDATOR
                             CustomTextField(
                               keyboardType: TextInputType.text,
-                              hintText: "hh:mm.ss",
+                              hintText: "mm:ss.hh",
                               controller: timeController,
 
                               validator: (value) {
@@ -650,6 +651,20 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                 )
                                     .state =
                                 false;
+
+
+                                // deleteable
+                                final history = ref.watch(splitCalcProvider).history;
+
+
+
+                                // Reverse the history to show the latest first
+                                final reversedHistory = history.reversed.toList();
+
+                                for (var item in reversedHistory) {
+                                  debugPrint(item.toString());
+                                  debugPrint(item.output.toString());
+                                }
                               },
                               child: Center(
                                 child: Row(
@@ -824,89 +839,100 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
     );
   }
 
-  Future<void> exportHistoryAsPdf(BuildContext context, List history) async {
+  Future<void> exportHistoryAsPdf(
+      BuildContext context,
+      List history,
+      ) async {
+    if (history.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No history to export')),
+      );
+      return;
+    }
+
     final pdf = pw.Document();
-
-    // Load logo
-    final ByteData logoData = await rootBundle.load(
-      'assets/images/app_logo.png',
-    );
-    final Uint8List logoBytes = logoData.buffer.asUint8List();
-
-    // Load Merriweather TTF font
     final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf = pw.Font.ttf(fontData);
+
+    // We split the history into two lists here BEFORE the PDF build
+    final int mid = (history.length / 2).ceil();
+    final List firstHalf = history.reversed.toList().sublist(0, mid);
+    final List secondHalf = history.reversed.toList().sublist(mid);
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
-        header: (context) {
-          return pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text(
-                'Page ${context.pageNumber}',
-                style: pw.TextStyle(font: ttf, fontSize: 12),
+        header: (context) => pw.Column(
+          children: [
+            pw.Center(
+              child: pw.Text(
+                'Swim Metrics',
+                style: pw.TextStyle(font: ttf, fontSize: 20, fontWeight: pw.FontWeight.bold),
               ),
-              pw.Image(pw.MemoryImage(logoBytes), width: 50, height: 50),
-            ],
-          );
-        },
+            ),
+            pw.SizedBox(height: 8),
+            pw.Divider(thickness: 0.5, color: PdfColors.grey400),
+            pw.SizedBox(height: 12),
+          ],
+        ),
         build: (pw.Context context) {
-          return history.reversed.map<pw.Widget>((item) {
-            final lines = item.output?.split('\n') ?? [];
+          // Function to build a column of data
+          pw.Widget buildDataColumn(List data) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: data.map((item) {
+                final lines = (item.output ?? '')
+                    .toString()
+                    .split('\n')
+                    .where((e) => e.trim().isNotEmpty && e.trim() != '=' && e.trim() != '===')
+                    .toList();
 
-            return pw.Container(
-              margin: const pw.EdgeInsets.only(bottom: 16),
-              padding: const pw.EdgeInsets.all(12),
-              decoration: pw.BoxDecoration(
-                border: pw.Border.all(color: PdfColors.blue, width: 1),
-                borderRadius: pw.BorderRadius.circular(8),
-              ),
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  ...lines.map((line) {
-                    // Replace spaces with non-breaking spaces to preserve alignment
-                    final formattedLine = line.replaceAll(' ', '\u00A0');
-                    return pw.Text(
-                      formattedLine,
-                      style: pw.TextStyle(font: ttf, fontSize: 12),
-                      softWrap: true,
-                    );
-                  }).toList(),
-                ],
-              ),
+                return pw.Container(
+                  margin: const pw.EdgeInsets.only(bottom: 10),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      for (var line in lines)
+                        pw.Text(
+                          line.trim(),
+                          style: pw.TextStyle(font: ttf, fontSize: 9, lineSpacing: 2),
+                        ),
+                      pw.SizedBox(height: 4),
+                      pw.Divider(thickness: 0.2, color: PdfColors.grey300),
+                    ],
+                  ),
+                );
+              }).toList(),
             );
-          }).toList();
+          }
+
+          return [
+            // Row with two Expanded columns allows the data to sit side-by-side
+            // MultiPage will handle the overflow if the lists are long
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Expanded(child: buildDataColumn(firstHalf)),
+                pw.SizedBox(width: 20),
+                pw.Expanded(child: buildDataColumn(secondHalf)),
+              ],
+            ),
+          ];
         },
       ),
     );
 
     try {
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/swim_converter_output.pdf');
+      final file = File('${dir.path}/swim_metrics_history.pdf');
       await file.writeAsBytes(await pdf.save());
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: CustomText(
-            text: '${AppLocalizations.of(context)!.pDFSavedAt}: ${file.path}',
-          ),
-        ),
-      );
-
-      await OpenFile.open(file.path);
+      if (context.mounted) {
+        await OpenFile.open(file.path);
+      }
     } catch (e) {
-      debugPrint("PDF export error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: CustomText(
-            text: AppLocalizations.of(context)!.failedToExportPDF,
-          ),
-        ),
-      );
+      debugPrint("PDF Export Error: $e");
     }
   }
 

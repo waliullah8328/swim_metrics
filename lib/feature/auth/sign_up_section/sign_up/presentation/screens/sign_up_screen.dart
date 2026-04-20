@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:swim_metrics/config/route/routes_name.dart';
+import 'package:swim_metrics/core/common/widgets/new_custon_widgets/app_snackbar.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_check_box_widget.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_primary_button.dart';
 import 'package:swim_metrics/core/common/widgets/new_custon_widgets/custom_text_form_field.dart';
@@ -244,24 +245,27 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                   Consumer(builder: (context,ref,child){
                     final isLoading = ref.watch(signUpProvider.select((s)=>s.isLoading));
                     final email = ref.watch(signUpProvider.select((s)=>s.email));
+                    final isTerms= ref.watch(signUpProvider.select((s)=>s.isTermsAndPolicy));
 
                     return CustomPrimaryButton(title: "Create Account",
                       isLoading: isLoading,
-                      onPressed: () async {
-                        if(_signUpFormKey.currentState!.validate()){
-                          final result = await ref.read(signUpProvider.notifier).createAccount(context: context);
-                          if(result){
-                            context.go("${RouteNames.verifyEmailScreen}/$email/true");
+                        onPressed: () async {
+                          if (_signUpFormKey.currentState!.validate()) {
+
+                            if (!isTerms) {
+                              AppSnackBar.showError(context, "Please agree with terms and conditions");
+                              return;
+                            }
+
+                            final result = await ref.read(signUpProvider.notifier)
+                                .createAccount(context: context);
+
+                            if (result) {
+                              context.go("${RouteNames.verifyEmailScreen}/$email/true");
+                            }
                           }
-
-
                         }
-
-
-
-
-
-                      },);
+                    );
 
                   }),
 

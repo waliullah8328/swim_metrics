@@ -316,6 +316,51 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               },
               textColor: Colors.black,
             )),
+            SizedBox(width: 10.w,),
+            Expanded(
+              child: _buildButton(
+                bg: const Color(0xff234B6E),
+                side: const BorderSide(color: Color(0xff234B6E)),
+                children: [
+                  SvgPicture.asset(
+                    IconPath.clearIcon,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.textWhite,
+                      BlendMode.srcIn,
+                    ),
+                  )
+                ],
+                text: AppLocalizations.of(context)!.clearTime,
+                fontSize: 14.sp,
+                context: context,
+                fontOption: fontOption,
+                textColor: AppColors.textWhite,
+                onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+
+                  /// stop running audio
+                  if (isStopWatch) {
+                    ref.read(audioProvider.notifier).stop();
+                  }
+
+                  /// clear stopwatch data
+                  final stopwatch = ref.read(stopwatchProvider2.notifier);
+
+                  //stopwatch.pause();      // stop timer first
+                  stopwatch.clearTime();      // reset current time to 0
+                  //stopwatch.clearLog();   // clear lap/history
+                  //stopwatch.clearTime();  // if available custom clear method
+
+                  /// clear secondary timer / converter
+                  ref.read(stopwatchProvider1.notifier).clear();
+
+                  /// vibration feedback
+                  if (isHaptic) {
+                    HapticFeedback.lightImpact();
+                  }
+                },
+              ),
+            )
           ]),
       ],
     );
@@ -368,34 +413,110 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     ]);
   }
 
-  Widget _converterSelector(BuildContext context, FontSizeOption fontOption, bool isHaptic) {
-    return Row(children: [
-      Expanded(child: Column(children: [
-        CustomText(text: AppLocalizations.of(context)!.from, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
-        SizedBox(height: 8.h),
-        Consumer(builder: (context, ref, child) {
-          const items = ["SCY", "SCM", "LCM"];
-          final course = ref.watch(stopwatchProvider2.select((s) => s.fromCourse));
-          //final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.);
-          return SplitCalculatorSelectorOne(items: items, selectedValue: course , onChanged: (s) {
-            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).setConverterCourses(from: s.toLowerCase()); if(isHaptic) HapticFeedback.lightImpact();
-          });
-        })
-      ])),
-      Expanded(child: Column(children: [
-        CustomText(text: AppLocalizations.of(context)!.to, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
-        SizedBox(height: 8.h),
-        Consumer(builder: (context, ref, child) {
-          const items = ["SCY", "SCM", "LCM"];
-          final course = ref.watch(stopwatchProvider2.select((s) => s.toCourse));
-         //final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.first);
-          return SplitCalculatorSelectorOne(items: items, selectedValue: course, onChanged: (s) {
-            FocusManager.instance.primaryFocus?.unfocus(); ref.read(stopwatchProvider2.notifier).setConverterCourses(to: s.toLowerCase()); if(isHaptic) HapticFeedback.lightImpact();
-          });
-        })
-      ])),
-    ]);
+  Widget _converterSelector(
+      BuildContext context,
+      FontSizeOption fontOption,
+      bool isHaptic,
+      ) {
+    return Row(
+      children: [
+
+        /// FROM
+        Expanded(
+          child: Column(
+            children: [
+              CustomText(
+                text: AppLocalizations.of(context)!.from,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: getAdjustedFontSize(14, fontOption).sp,
+              ),
+              SizedBox(height: 8.h),
+
+              Consumer(
+                builder: (context, ref, child) {
+                  const items = ["SCY", "SCM", "LCM"];
+
+                  final course = ref.watch(
+                    stopwatchProvider2.select((s) => s.fromCourse),
+                  );
+
+                  /// ✅ SAFE MATCH (prevents future bugs)
+                  final selected = items.contains(course)
+                      ? course
+                      : items.first;
+
+                  return SplitCalculatorSelectorOne(
+                    items: items,
+                    selectedValue: selected,
+                    onChanged: (s) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+
+                      /// ✅ FIXED (NO lowercase)
+                      ref
+                          .read(stopwatchProvider2.notifier)
+                          .setConverterCourses(from: s);
+
+                      if (isHaptic) HapticFeedback.lightImpact();
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+
+        /// TO
+        Expanded(
+          child: Column(
+            children: [
+              CustomText(
+                text: AppLocalizations.of(context)!.to,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: getAdjustedFontSize(14, fontOption).sp,
+              ),
+              SizedBox(height: 8.h),
+
+              Consumer(
+                builder: (context, ref, child) {
+                  const items = ["SCY", "SCM", "LCM"];
+
+                  final course = ref.watch(
+                    stopwatchProvider2.select((s) => s.toCourse),
+                  );
+
+                  /// ✅ SAFE MATCH
+                  final selected = items.contains(course)
+                      ? course
+                      : items.first;
+
+                  return SplitCalculatorSelectorOne(
+                    items: items,
+                    selectedValue: selected,
+                    onChanged: (s) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+
+                      /// ✅ FIXED (NO lowercase)
+                      ref
+                          .read(stopwatchProvider2.notifier)
+                          .setConverterCourses(to: s);
+
+                      if (isHaptic) HapticFeedback.lightImpact();
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
+
+
+
+
 
   Widget _predictorSelector(BuildContext context, FontSizeOption fontOption) {
     return Column(children: [

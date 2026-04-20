@@ -93,7 +93,9 @@ class _LoginScreenState extends ConsumerState<ForgetPasswordScreen> {
                     onPressed: () async {
                      final result = await ref.read(forgetPasswordProvider.notifier).forgetPassword(context: context);
                      if(result){
-                       context.go("${RouteNames.verifyEmailScreen}/${ref.read(forgetPasswordProvider.select((s)=>s.email))}/false");
+
+
+                      context.go("${RouteNames.verifyEmailScreen}/${ref.read(forgetPasswordProvider.select((s)=>s.email))}/false");
 
                      }
             
