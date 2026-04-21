@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../../core/utils/utils/ratios_1.dart';
@@ -36,7 +37,7 @@ class StopwatchController2 extends ChangeNotifier {
   String gender = 'men';
   String stroke = 'free';
   String distance = '100';
-  String course = 'scm';
+  String course = 'SCM';
   String splitSize = '50';
   String startType = 'From Start';
 
@@ -136,11 +137,24 @@ class StopwatchController2 extends ChangeNotifier {
   }
 
   // ================= SPLIT =================
-  void split() {
+  // Pass context to the function to show the Snackbar
+  void split(BuildContext context) {
     final t = current;
     if (!t.running) return;
 
-    const int maxLogs = 50; // limit history size
+    const int maxLogs = 100;
+
+    // 1. CHECK LIMIT FIRST
+    // Check against the current number of splits already recorded
+    if (t.splits.length >= maxLogs) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You have reached the maximum of $maxLogs laps'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return; // Exit function so no more laps are added
+    }
 
     final now = DateTime.now();
     final total = elapsed();
@@ -154,11 +168,8 @@ class StopwatchController2 extends ChangeNotifier {
 
     final lapNo = t.splits.length;
 
-    void trimLog(List<String> lines) {
-      if (lines.length > maxLogs) {
-        lines.removeLast(); // remove oldest (bottom)
-      }
-    }
+    // You can remove the trimLog helper now, as the logic above
+    // prevents the list from ever exceeding the limit.
 
     // ================= STOPWATCH =================
     if (activeMode == 'Stopwatch') {
@@ -172,7 +183,6 @@ class StopwatchController2 extends ChangeNotifier {
             "${TimeUtils1.formatTime(total)}",
       );
 
-      trimLog(lines);
       logStopwatch = lines.join('\n');
     }
 
@@ -191,15 +201,11 @@ class StopwatchController2 extends ChangeNotifier {
             "${TimeUtils1.formatTime(converted)}  ${toCourse.toUpperCase()}",
       );
 
-      trimLog(lines);
       logConverter = lines.join('\n');
     }
 
     // ================= PREDICTOR =================
-    // ================= PREDICTOR =================
-    // ================= PREDICTOR =================
     else {
-      // Create header only once (static until Clear button resets logPredictor)
       if (logPredictor.trim().isEmpty) {
         final formattedStroke =
         stroke.toLowerCase() == "im"
@@ -221,32 +227,17 @@ class StopwatchController2 extends ChangeNotifier {
       final label = isProgressive ? _marker : "Lap $lapNo";
 
       final allLines = logPredictor.split('\n');
-
-      // Find split section
       int insertIndex = allLines.indexOf("Split Breakdown:") + 1;
-
-      // Safety fallback
       if (insertIndex == 0) insertIndex = allLines.length;
 
       String fLap = TimeUtils1.formatTime(lap);
       String fTotal = TimeUtils1.formatTime(total);
       String fProj = TimeUtils1.formatTime(projected);
 
-      final newEntry =
-          "$label $fLap / $fTotal / Projected Finish $fProj";
+      final newEntry = "$label $fLap / $fTotal / Projected Finish $fProj";
 
-      // Add lap below header only
       allLines.insert(insertIndex, newEntry);
-
-      // Keep only lap logs, header stays fixed
-      final headerLines = allLines.sublist(0, insertIndex);
-      final lapLines = allLines.sublist(insertIndex);
-
-      if (lapLines.length > maxLogs) {
-        lapLines.removeLast();
-      }
-
-      logPredictor = [...headerLines, ...lapLines].join('\n');
+      logPredictor = allLines.join('\n');
 
       if (isProgressive) {
         _marker = _nextMarker(_marker);

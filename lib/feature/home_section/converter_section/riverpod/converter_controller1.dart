@@ -275,61 +275,82 @@ class ConverterController extends Notifier<ConverterState> {
     final splitResults = <String>[];
 
     results.add('=== Conversion Results ===');
-
-    if (s.showSplits) {
-      splitResults.add('=== Conversion Results with Splits ===');
-    }
+    if (s.showSplits) splitResults.add('=== Conversion Results with Splits ===');
 
     final targets = s.targets.isEmpty
         ? allowedTargets()
         : allowedTargets().where((e) => s.targets.contains(e)).toList();
 
     for (final to in targets) {
+      // 1. Skip LCM result calculation entirely if source is LCM and it's a 100 IM
+      if (s.course.toLowerCase() == 'lcm' &&
+          s.stroke.toLowerCase() == 'im' &&
+          s.distance == '100' &&
+          to.toLowerCase() == 'lcm') {
+        continue;
+      }
+
+      final displayDistance = ConversionCore1.mappedDistance(s.stroke, s.distance, s.course, to);
+
+      // Skip if no mapping exists
+      if (displayDistance == null || displayDistance.toString().isEmpty) continue;
+
       final multiplier = s.preferWR
           ? ConversionCore1.computeMultiplier(s.gender, s.stroke, s.distance, s.course, to)
           : ConversionCore1.poolRatio(s.course, to);
 
       final converted = totalSeconds * multiplier;
       final convertedText = TimeUtils1.formatSeconds(converted);
-      final displayDistance = ConversionCore1.mappedDistance(s.stroke, s.distance, s.course, to);
-
-      if (displayDistance == null || displayDistance.toString().isEmpty) continue;
 
       final strokeLabel = s.stroke.toUpperCase() == 'IM' ? 'IM' :
       '${s.stroke[0].toUpperCase()}${s.stroke.substring(1).toLowerCase()}';
       final genderLabel = '${s.gender[0].toUpperCase()}${s.gender.substring(1).toLowerCase()}';
 
-      results.add('$genderLabel ${s.distance} $strokeLabel ${s.timeText} ${s.course.toUpperCase()} → $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
+      // ✅ NEW CHECK: Detect if this specific result is 100 IM LCM
+      final bool is100ImLcm = s.stroke.toUpperCase() == 'IM' &&
+          s.distance == '100' &&
+          to.toUpperCase() == 'LCM';
+
+      // Only add to results if NOT 100 IM LCM
+      if (!is100ImLcm) {
+        results.add('$genderLabel ${s.distance} $strokeLabel ${s.course.toUpperCase()} → $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
+      }
 
       if (s.showSplits) {
-        splitResults.add('$genderLabel $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
+        // Only add splits if NOT 100 IM LCM
+        if (!is100ImLcm) {
+          splitResults.add('$genderLabel ${s.distance} $strokeLabel ${s.course.toUpperCase()} → $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
 
-        String splitsText = '';
-        if (to == 'lcm' && displayDistance.toString() == '50') {
-          splitsText = _calculate50LcmSplits(converted, s.gender);
-        } else {
-          final ratios = SplitsCore1.getRatios(to, s.gender, s.stroke, displayDistance.toString()) ?? [];
+          String splitsText = '';
+          if (to == 'lcm' && displayDistance.toString() == '50') {
+            splitsText = _calculate50LcmSplits(converted, s.gender);
+          } else {
+            final ratios = SplitsCore1.getRatios(to, s.gender, s.stroke, displayDistance.toString()) ?? [];
 
-          // This helper should now return lines like "100: 5.70 / 10.90 / 10.90"
-          splitsText = SplitsCore1.calculateSplits(
-            converted,
-            ratios,
-            int.parse(displayDistance.toString()),
-            targetCourse: to,
-          );
+            splitsText = SplitsCore1.calculateSplits(
+              converted,
+              ratios,
+              int.parse(displayDistance.toString()),
+              targetCourse: to,
+            );
+          }
+          splitResults.add(splitsText);
+          splitResults.add('');
         }
-        splitResults.add(splitsText);
-        splitResults.add(''); // Space between split blocks
       }
     }
 
+    // Clean up the output: remove the headers if no valid results were added
+    if (results.length == 1) results.clear();
+    if (splitResults.length == 1) splitResults.clear();
+
     final finalOutput = [
       ...results,
-      '',
+      if (results.isNotEmpty && splitResults.isNotEmpty) '',
       ...splitResults,
-      if (s.output.isNotEmpty) '',
+      if (s.output.isNotEmpty && (results.isNotEmpty || splitResults.isNotEmpty)) '',
       if (s.output.isNotEmpty) s.output,
-    ].join('\n');
+    ].join('\n').trim();
 
     state = s.copyWith(output: finalOutput);
   }

@@ -21,6 +21,7 @@ import '../../../../../core/services/token_storage.dart';
 import '../../../../../core/utils/constants/icon_path.dart';
 
 import '../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
+
 import '../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/converter_controller1.dart';
 import 'package:path_provider/path_provider.dart';
@@ -590,6 +591,15 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                           HapticFeedback
                               .lightImpact(); // 👈 HAPTIC FEEDBACK HERE
                         }
+
+                        final history = ref.watch(converterProvider1.select((s) => s.output));
+
+
+
+                        // Reverse the history to show the latest first
+                        final reversedHistory = history;
+                        print(history.toString());
+
                       }
                     },
                     child: Container(
@@ -629,6 +639,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                 return output.isEmpty
                     ? SizedBox()
                     : Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.all(16),
 
                   decoration: BoxDecoration(
@@ -644,9 +655,10 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                   ),
 
                   child: SingleChildScrollView(
-                    child: Text(
+                    child: CustomText(text:
                       output,
-                      style: const TextStyle(fontFamily: 'monospace'),
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 );
@@ -816,36 +828,18 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     return ["50"];
   }
 
-  Future<void> exportOutputAsPdf(BuildContext context,
-      String output,) async {
-    if (output
-        .trim()
-        .isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: CustomText(
-            text: AppLocalizations.of(context)!.noOutputToExport,
-          ),
-        ),
-      );
-      return;
-    }
+  Future<void> exportOutputAsPdf(
+      BuildContext context,
+      String output,
+      ) async {
+    if (output.trim().isEmpty) return;
 
     final pdf = pw.Document();
-
-    /// logo
-    final ByteData logoData =
-    await rootBundle.load('assets/images/app_logo.png');
-    final Uint8List logoBytes = logoData.buffer.asUint8List();
-
-    /// font
-    final fontData =
-    await rootBundle.load('assets/font/Merriweather-font.ttf');
+    final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf = pw.Font.ttf(fontData);
 
-    /// remove extra empty blocks
-    final blocks = output
-        .split('\n\n')
+    final List<String> lines = output
+        .split('\n')
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
         .toList();
@@ -853,92 +847,75 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(24),
-
-        header: (context) {
-          return pw.Container(
-            margin: const pw.EdgeInsets.only(bottom: 10),
-            child: pw.Row(
-              mainAxisAlignment:
-              pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text(
-                  'Page ${context.pageNumber}',
-                  style: pw.TextStyle(
+        margin: const pw.EdgeInsets.all(32),
+        header: (context) => pw.Column(
+          children: [
+            pw.Center(
+              child: pw.Text(
+                'Swim Metrics',
+                style: pw.TextStyle(
                     font: ttf,
-                    fontSize: 11,
+                    fontSize: 28.sp, // Note: Use standard numbers, .sp is for UI
+                    fontWeight: pw.FontWeight.bold),
+              ),
+            ),
+            pw.SizedBox(height: 8),
+            pw.Divider(thickness: 0.5, color: PdfColors.grey400),
+            pw.SizedBox(height: 12),
+          ],
+        ),
+        build: (pw.Context context) {
+          return [
+            pw.Partitions(
+              children: [
+                pw.Partition(
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: lines.map((line) => _renderLine(line, ttf)).toList(),
                   ),
-                ),
-                pw.Image(
-                  pw.MemoryImage(logoBytes),
-                  width: 42,
-                  height: 42,
                 ),
               ],
             ),
-          );
-        },
-
-        build: (context) {
-          return blocks.map((block) {
-            return pw.Container(
-              width: double.infinity,
-              margin: const pw.EdgeInsets.only(bottom: 14),
-              padding: const pw.EdgeInsets.all(14),
-
-              decoration: pw.BoxDecoration(
-                color: PdfColors.white,
-                border: pw.Border.all(
-                  color: PdfColors.blue,
-                  width: 1,
-                ),
-                borderRadius:
-                pw.BorderRadius.circular(8),
-              ),
-
-              child: pw.Text(
-                block.replaceAll('\t', '    ').trim(),
-                style: pw.TextStyle(
-                  font: ttf,
-                  fontSize: 12,
-                  lineSpacing: 3,
-                ),
-                softWrap: true,
-              ),
-            );
-          }).toList();
+          ];
         },
       ),
     );
 
     try {
       final dir = await getTemporaryDirectory();
-      final file =
-      File('${dir.path}/swim_converter_output.pdf');
-
+      final file = File('${dir.path}/swim_metrics_output.pdf');
       await file.writeAsBytes(await pdf.save());
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: CustomText(
-            text:
-            '${AppLocalizations.of(context)!.pDFSavedAt}: ${file.path}',
-          ),
-        ),
-      );
-
-      await OpenFile.open(file.path);
+      if (context.mounted) await OpenFile.open(file.path);
     } catch (e) {
-      debugPrint("PDF export error: $e");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: CustomText(
-            text: AppLocalizations.of(context)!
-                .failedToExportPDF,
-          ),
-        ),
-      );
+      debugPrint("PDF Export Error: $e");
     }
   }
+
+  pw.Widget _renderLine(String text, pw.Font font) {
+    // 1. Identify the main Session Header (this starts a new conversion block)
+    bool isMainHeader = text.contains('Projection') || text.contains('→');
+
+    // 2. Identify secondary separators (Split Breakdown or lines)
+    bool isSubHeader = text.startsWith('===') || text.contains('Breakdown');
+
+    return pw.Padding(
+      padding: pw.EdgeInsets.only(
+        bottom: 2,
+        // ✅ If it's a new conversion, give it a large 15pt gap
+        // If it's just a breakdown line, give it a small 6pt gap
+        top: isMainHeader ? 15 : (isSubHeader ? 6 : 0),
+      ),
+      child: pw.Text(
+        text.replaceAll('=', '').trim(),
+        style: pw.TextStyle(
+          font: font,
+          fontSize: 16.sp,
+          lineSpacing: 1.2,
+          fontWeight: (isMainHeader || isSubHeader) ? pw.FontWeight.bold : pw.FontWeight.normal,
+        ),
+      ),
+    );
+  }
+
+
 }

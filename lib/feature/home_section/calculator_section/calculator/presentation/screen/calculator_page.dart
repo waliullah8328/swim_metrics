@@ -733,10 +733,10 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(item.output),
-                            const SizedBox(height: 8),
+                            CustomText(text:item.output,fontSize: 13.sp,fontWeight: FontWeight.w600,),
+                             SizedBox(height: 4.h),
                             ...item.splits
-                                .map((s) => Text(s.toString()))
+                                .map((s) => CustomText(text:s.toString(),fontSize: 13.sp,fontWeight: FontWeight.w600,))
                                 .toList(),
                           ],
                         );
@@ -854,21 +854,24 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
     final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf = pw.Font.ttf(fontData);
 
-    // We split the history into two lists here BEFORE the PDF build
-    final int mid = (history.length / 2).ceil();
-    final List firstHalf = history.reversed.toList().sublist(0, mid);
-    final List secondHalf = history.reversed.toList().sublist(mid);
+    final List historyList = history.reversed.toList();
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
+
+        /// Header
         header: (context) => pw.Column(
           children: [
             pw.Center(
               child: pw.Text(
                 'Swim Metrics',
-                style: pw.TextStyle(font: ttf, fontSize: 20, fontWeight: pw.FontWeight.bold),
+                style: pw.TextStyle(
+                  font: ttf,
+                  fontSize: 28.sp, // Increased title size
+                  fontWeight: pw.FontWeight.bold,
+                ),
               ),
             ),
             pw.SizedBox(height: 8),
@@ -876,47 +879,47 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
             pw.SizedBox(height: 12),
           ],
         ),
+
         build: (pw.Context context) {
-          // Function to build a column of data
-          pw.Widget buildDataColumn(List data) {
-            return pw.Column(
+          return [
+            pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: data.map((item) {
+              children: historyList.map((item) {
                 final lines = (item.output ?? '')
                     .toString()
                     .split('\n')
-                    .where((e) => e.trim().isNotEmpty && e.trim() != '=' && e.trim() != '===')
+                    .where(
+                      (e) =>
+                  e.trim().isNotEmpty &&
+                      e.trim() != '=' &&
+                      e.trim() != '===',
+                )
                     .toList();
 
                 return pw.Container(
-                  margin: const pw.EdgeInsets.only(bottom: 10),
+                  width: double.infinity,
+                  //margin: const pw.EdgeInsets.only(bottom: 12),
+                  padding: const pw.EdgeInsets.all(10),
+
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       for (var line in lines)
-                        pw.Text(
-                          line.trim(),
-                          style: pw.TextStyle(font: ttf, fontSize: 9, lineSpacing: 2),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.only(bottom: 4),
+                          child: pw.Text(
+                            line.trim(),
+                            style: pw.TextStyle(
+                              font: ttf,
+                              fontSize: 16.sp, // Increased text size
+                              lineSpacing: 3,
+                            ),
+                          ),
                         ),
-                      pw.SizedBox(height: 4),
-                      pw.Divider(thickness: 0.2, color: PdfColors.grey300),
                     ],
                   ),
                 );
               }).toList(),
-            );
-          }
-
-          return [
-            // Row with two Expanded columns allows the data to sit side-by-side
-            // MultiPage will handle the overflow if the lists are long
-            pw.Row(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Expanded(child: buildDataColumn(firstHalf)),
-                pw.SizedBox(width: 20),
-                pw.Expanded(child: buildDataColumn(secondHalf)),
-              ],
             ),
           ];
         },

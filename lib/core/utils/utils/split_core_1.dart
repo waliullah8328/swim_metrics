@@ -49,28 +49,39 @@ class SplitsCore1 {
   }
 
   static String calculateSplits(double totalSeconds, List<double> ratioList, int distance, {String? targetCourse}) {
+    // GUARD: If no ratios provided, return early to prevent RangeError
+    if (ratioList.isEmpty || totalSeconds <= 0) {
+      return '--- Splits ---\nNot available';
+    }
+
     final d = distance;
     final course = targetCourse?.toLowerCase();
 
-    // 1. Handling Short Course (SCY/SCM) with 25-unit segments
+    // 1. Short Course (SCY/SCM)
     if ((course == 'scy' || course == 'scm') && (d == 50 || d == 100)) {
       final numSegments = d ~/ 25;
+      if (numSegments <= 0) return ''; // Guard against 0 distance
+
       final normalized = ratioList.length == numSegments ? ratioList : normalize(ratioList);
+
+      // GUARD: Ensure normalize actually returned data
+      if (normalized.isEmpty) return '--- Splits ---\nData missing';
+
       final segTimes = normalized.map((r) => totalSeconds * r).toList();
       final out = <String>['--- Splits ---'];
 
       double cum = 0;
-      for (int i = 0; i < numSegments; i++) {
+      for (int i = 0; i < segTimes.length && i < numSegments; i++) {
         final distOut = (i + 1) * 25;
-        final lapTime = segTimes[i]; // The current 25
+        final lapTime = segTimes[i];
         cum += lapTime;
 
         final lapStr = secondsToLabel(lapTime);
         final cumStr = secondsToLabel(cum);
 
-        // Special case for 100: Show Lap / 50-Split / Cumulative
-        if (d == 100 && distOut % 50 == 0) {
-          final split50Time = segTimes[i-1] + segTimes[i];
+        // SAFETY: Check i > 0 before accessing segTimes[i-1]
+        if (d == 100 && distOut % 50 == 0 && i > 0) {
+          final split50Time = segTimes[i - 1] + segTimes[i];
           final split50Str = secondsToLabel(split50Time);
           out.add('$distOut: $lapStr / $split50Str / $cumStr');
         } else {
@@ -80,8 +91,12 @@ class SplitsCore1 {
       return out.join('\n');
     }
 
-    // 2. Handling Long Course (LCM) or longer distances with 50-unit segments
+    // 2. Long Course (LCM) or longer distances
     final normalized = normalize(ratioList);
+
+    // GUARD: Safety check
+    if (normalized.isEmpty) return '--- Splits ---\nData missing';
+
     final lapTimes = normalized.map((r) => totalSeconds * r).toList();
     final out = <String>['--- Splits ---'];
 
@@ -90,19 +105,18 @@ class SplitsCore1 {
 
     for (int i = 0; i < lapTimes.length; i++) {
       final distOut = (i + 1) * inc;
-      final lapTime = lapTimes[i]; // The current 50
+      final lapTime = lapTimes[i];
       cum += lapTime;
 
       final lapStr = secondsToLabel(lapTime);
       final cumStr = secondsToLabel(cum);
 
-      // If it's a 100m mark (100, 200, 300, etc.), show Lap / 100-Split / Cumulative
-      if (distOut > 50 && distOut % 100 == 0) {
-        final split100Time = lapTimes[i-1] + lapTimes[i];
+      // SAFETY: Check i > 0 before accessing lapTimes[i-1]
+      if (distOut > 50 && distOut % 100 == 0 && i > 0) {
+        final split100Time = lapTimes[i - 1] + lapTimes[i];
         final split100Str = secondsToLabel(split100Time);
         out.add('$distOut: $lapStr / $split100Str / $cumStr');
       } else {
-        // Otherwise just show Lap / Cumulative
         out.add('$distOut: $lapStr / $cumStr');
       }
     }

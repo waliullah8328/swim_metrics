@@ -252,7 +252,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               fontOption: fontOption,
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
-                ref.read(stopwatchProvider2.notifier).split();
+                ref.read(stopwatchProvider2.notifier).split(context);
                 if(isHaptic) HapticFeedback.lightImpact();
                 if(isStopWatch) ref.read(audioProvider.notifier).play();
               },
@@ -528,8 +528,18 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final gender = ref.watch(stopwatchProvider2.select((s) => s.gender));
-            final selected = gender.isNotEmpty ? "${gender[0].toUpperCase()}${gender.substring(1)}" : "";
-            return SplitCalculatorSelectorOne(items: const ["Men", "Women"], selectedValue: selected, onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(g: v));
+
+            // Keep the display value capitalized for the UI
+            final selected = gender.isNotEmpty
+                ? "${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}"
+                : "";
+
+            return SplitCalculatorSelectorOne(
+              items: const ["Men", "Women"],
+              selectedValue: selected,
+              // ✅ Pass to logic as lowercase so it matches Ratios1 keys
+              onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(g: v.toLowerCase()),
+            );
           }),
         ])),
         Expanded(child: Column(children: [
@@ -814,83 +824,67 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
   Future<void> exportOutputAsPdf3(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logPredictor, 'swim_predictor_output.pdf', context);
   Future<void> exportOutputAsPdf1(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logStopwatch, 'swim_stopwatch_output.pdf', context);
 
+
   Future<void> _exportPdf(
       String log,
       String fileName,
       BuildContext context,
       ) async {
-    if (log.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No output to export!')),
-      );
-      return;
-    }
+    if (log.isEmpty) return;
 
     final pdf = pw.Document();
-
-    // ✅ Load logo
-    final ByteData logoData =
-    await rootBundle.load('assets/images/app_logo.png');
-    final Uint8List logoBytes = logoData.buffer.asUint8List();
-
-    // ✅ Load custom font
-    final fontData =
-    await rootBundle.load('assets/font/Merriweather-font.ttf');
+    final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf = pw.Font.ttf(fontData);
 
-    // ✅ Split lines (like your first function)
-    final lines = log.split('\n');
+    final List<String> allLines = log
+        .split('\n')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
+    final int mid = (allLines.length / 2).ceil();
+    final List<String> leftHalf = allLines.sublist(0, mid);
+    final List<String> rightHalf = allLines.sublist(mid);
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
-
-        /// ✅ HEADER (Page number + logo)
-        header: (context) {
-          return pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text(
-                'Page ${context.pageNumber}',
-                style: pw.TextStyle(font: ttf, fontSize: 12),
+        header: (context) => pw.Column(
+          children: [
+            pw.Center(
+              child: pw.Text(
+                'Swim Metrics',
+                style: pw.TextStyle(font: ttf, fontSize: 20, fontWeight: pw.FontWeight.bold),
               ),
-              pw.Image(
-                pw.MemoryImage(logoBytes),
-                width: 50,
-                height: 50,
-              ),
-            ],
-          );
-        },
-
-        /// ✅ BODY
+            ),
+            pw.SizedBox(height: 10),
+            pw.Divider(thickness: 0.5),
+            pw.SizedBox(height: 10),
+          ],
+        ),
         build: (pw.Context context) {
           return [
-            pw.Container(
-              padding: const pw.EdgeInsets.all(12),
-              decoration: pw.BoxDecoration(
-                border: pw.Border.all(
-                  color: PdfColors.blue,
-                  width: 1,
-                ),
-                borderRadius: pw.BorderRadius.circular(8),
-              ),
-              child: pw.Column(
+            // ✅ Center the entire Row content
+            pw.Center(
+              child: pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: lines.map((line) {
-                  // ✅ preserve spacing like first function
-                  final formattedLine =
-                  line.replaceAll(' ', '\u00A0');
-
-                  return pw.Text(
-                    formattedLine,
-                    style: pw.TextStyle(
-                      font: ttf,
-                      fontSize: 12,
+                mainAxisSize: pw.MainAxisSize.min, // ✅ Shrink-wrap the row to its content
+                children: [
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: leftHalf.map((line) => _renderLine(line, ttf)).toList(),
                     ),
-                  );
-                }).toList(),
+                  ),
+                  pw.SizedBox(width: 30), // ✅ Slightly wider gap for better center visual
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: rightHalf.map((line) => _renderLine(line, ttf)).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ];
@@ -901,27 +895,32 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     try {
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/$fileName');
-
       await file.writeAsBytes(await pdf.save());
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('PDF saved at: ${file.path}'),
-          ),
-        );
-
-        await OpenFile.open(file.path);
-      }
+      if (context.mounted) await OpenFile.open(file.path);
     } catch (e) {
       debugPrint("PDF export error: $e");
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to export PDF')),
-        );
-      }
     }
+  }
+
+  pw.Widget _renderLine(String text, pw.Font font) {
+    bool isMainHeader = text.contains('Projection') || text.contains('→');
+    bool isSubHeader = text.startsWith('===') || text.contains('Breakdown');
+
+    return pw.Container(
+      alignment: pw.Alignment.centerLeft,
+      padding: pw.EdgeInsets.only(
+        top: isMainHeader ? 12 : (isSubHeader ? 6 : 0),
+      ),
+      child: pw.Text(
+        text.replaceAll('=', '').trim(),
+        style: pw.TextStyle(
+          font: font,
+          fontSize: 9,
+          lineSpacing: 1.2,
+          fontWeight: (isMainHeader || isSubHeader) ? pw.FontWeight.bold : pw.FontWeight.normal,
+        ),
+      ),
+    );
   }
 
   static String _formatElapsed(double s) => '${_twoDigits((s ~/ 60))}:${_secondsPart(s)}';
