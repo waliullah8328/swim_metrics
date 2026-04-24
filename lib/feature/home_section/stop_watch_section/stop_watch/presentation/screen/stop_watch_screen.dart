@@ -570,19 +570,73 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           SizedBox(height: 8.h),
           CustomText(text: "COURSE", color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
+
+          // Consumer(
+          //   builder: (context, ref, child) {
+          //     const items = ["SCY", "SCM", "LCM"];
+          //
+          //     final course = ref.watch(
+          //       stopwatchProvider2.select((s) => s.course),
+          //     );
+          //
+          //     /// ✅ SAFE MATCH
+          //     final selected = items.contains(course)
+          //         ? course
+          //         : items.first;
+          //
+          //     return SplitCalculatorSelectorOne(
+          //       items: items,
+          //       selectedValue: selected,
+          //       onChanged: (s) {
+          //         FocusManager.instance.primaryFocus?.unfocus();
+          //
+          //         /// ✅ FIXED (NO lowercase)
+          //         ref
+          //             .read(stopwatchProvider2.notifier)
+          //             .setConverterCourses(to: s);
+          //
+          //         if (isHaptic) HapticFeedback.lightImpact();
+          //       },
+          //     );
+          //   },
+          // ),
           Consumer(builder: (context, ref, child) {
             const items = ["SCY", "SCM", "LCM"];
-            final course = ref.watch(stopwatchProvider2.select((s) => s.course));
-            final selected = items.firstWhere((i) => i.toLowerCase() == course, orElse: () => items.first);
-            return SplitCalculatorSelectorOne(items: items, selectedValue: selected, onChanged: (s) {
-              // ✅ When course changes, reset stroke, distance & splitSize to valid defaults
-              final newCourse = s.toLowerCase();
-              final state = ref.read(stopwatchProvider2);
-              final validDistances = getDistances(newCourse, state.stroke);
-              final newDistance = validDistances.contains(state.distance) ? state.distance : validDistances.first;
-              final validSplits = getSplitSizes(course: newCourse, distance: newDistance, stroke: state.stroke);
-              ref.read(stopwatchProvider2.notifier).setPredictorParams(c: newCourse, d: newDistance, split: validSplits.first);
-            });
+
+            // Watch the course and ensure we handle it consistently in Uppercase for the UI
+            final rawCourse = ref.watch(stopwatchProvider2.select((s) => s.course));
+            final currentCourse = rawCourse.toUpperCase();
+
+            return SplitCalculatorSelectorOne(
+              items: items,
+              selectedValue: currentCourse, // UI uses Uppercase
+              onChanged: (s) {
+                final notifier = ref.read(stopwatchProvider2.notifier);
+                final state = ref.read(stopwatchProvider2);
+
+                final newCourse = s.toLowerCase(); // Backend uses lowercase
+
+                // 1. Get valid distances for the NEW course
+                final validDistances = getDistances(newCourse, state.stroke);
+                final newDistance = validDistances.contains(state.distance)
+                    ? state.distance
+                    : validDistances.first;
+
+                // 2. Get valid split sizes for the NEW course and NEW distance
+                final validSplits = getSplitSizes(
+                    course: newCourse,
+                    distance: newDistance,
+                    stroke: state.stroke
+                );
+
+                // 3. Update the provider
+                notifier.setPredictorParams(
+                  c: newCourse,
+                  d: newDistance,
+                  split: validSplits.isNotEmpty ? validSplits.first : "50",
+                );
+              },
+            );
           }),
         ])),
         Expanded(child: Column(children: [

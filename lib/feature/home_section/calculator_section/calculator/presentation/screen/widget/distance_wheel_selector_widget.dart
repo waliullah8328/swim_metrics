@@ -10,14 +10,14 @@ class DistanceWheelSelector extends ConsumerStatefulWidget { // 2. Changed to Co
   final List<int> items;
   final ValueChanged<int> onChanged;
   final int? selectedValue;
-  final bool isHaptic; // Optional haptic toggle
+ // Optional haptic toggle
 
   const DistanceWheelSelector({
     super.key,
     required this.items,
     required this.onChanged,
     this.selectedValue,
-    this.isHaptic = true,
+
   });
 
   @override
@@ -96,7 +96,7 @@ class _DistanceWheelSelectorState extends ConsumerState<DistanceWheelSelector> {
                 if (index == selectedIndex) return;
 
                 // 📳 Haptic Feedback Trigger
-                if (widget.isHaptic) {
+                if (isHaptic) {
                   HapticFeedback.mediumImpact();
                 }
 

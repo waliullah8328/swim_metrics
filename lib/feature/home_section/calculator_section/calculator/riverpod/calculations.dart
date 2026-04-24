@@ -94,7 +94,7 @@ class SwimSplitCalculator1 {
     try {
       totalSeconds = mmssToSeconds(goalTime);
     } catch (e) {
-      return "Invalid time format. Please use hh:mm.ss ";
+      return "Invalid time format.";
     }
 
     List<double> ratioList = normalizeRatios(rawRatioList);
@@ -225,7 +225,7 @@ class SwimSplitCalculator1 {
       } catch (e) {
         outputJson["success"] = false;
         outputJson["error"] =
-        "Please enter a valid time (hh:mm.ss or).";
+        "Please enter a valid time";
         return jsonEncode(outputJson);
       }
 
@@ -315,11 +315,11 @@ class SwimSplitCalculator1 {
 
     // ✅ IM disclaimer
     if (stroke == "im") {
-      // String disclaimer =
-      //     "\n⚠️ Does not account for best/worst stroke.";
-      // formattedResult += disclaimer;
-      // outputJson["disclaimer"] =
-      // "⚠️ Does not account for best/worst stroke.";
+      String disclaimer =
+          "\n Does not account for best/worst stroke.";
+      formattedResult += disclaimer;
+      outputJson["disclaimer"] =
+      " Does not account for best/worst stroke.";
     }
 
     outputJson["formatted_text"] = formattedResult;

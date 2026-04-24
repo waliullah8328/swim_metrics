@@ -851,84 +851,87 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
     }
 
     final pdf = pw.Document();
-    final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
+
+    final fontData =
+    await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf = pw.Font.ttf(fontData);
 
-    final List historyList = history.reversed.toList();
-
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(32),
-
-        /// Header
-        header: (context) => pw.Column(
-          children: [
-            pw.Center(
-              child: pw.Text(
-                'Swim Metrics',
-                style: pw.TextStyle(
-                  font: ttf,
-                  fontSize: 28.sp, // Increased title size
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-            ),
-            pw.SizedBox(height: 8),
-            pw.Divider(thickness: 0.5, color: PdfColors.grey400),
-            pw.SizedBox(height: 12),
-          ],
-        ),
-
-        build: (pw.Context context) {
-          return [
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: historyList.map((item) {
-                final lines = (item.output ?? '')
-                    .toString()
-                    .split('\n')
-                    .where(
-                      (e) =>
-                  e.trim().isNotEmpty &&
-                      e.trim() != '=' &&
-                      e.trim() != '===',
-                )
-                    .toList();
-
-                return pw.Container(
-                  width: double.infinity,
-                  //margin: const pw.EdgeInsets.only(bottom: 12),
-                  padding: const pw.EdgeInsets.all(10),
-
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      for (var line in lines)
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.only(bottom: 4),
-                          child: pw.Text(
-                            line.trim(),
-                            style: pw.TextStyle(
-                              font: ttf,
-                              fontSize: 16.sp, // Increased text size
-                              lineSpacing: 3,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ];
-        },
-      ),
-    );
+    // Optional: limit history to avoid massive PDFs
+    final List historyList = history.reversed.take(200).toList();
 
     try {
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(32),
+
+          // Safety limit (prevents crash)
+          maxPages: 100,
+
+          /// Header
+          header: (context) => pw.Column(
+            children: [
+              pw.Center(
+                child: pw.Text(
+                  'SwimMetrics',
+                  style: pw.TextStyle(
+                    font: ttf,
+                    fontSize: 28.sp,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ),
+              pw.SizedBox(height: 8),
+              pw.Divider(thickness: 0.5, color: PdfColors.grey400),
+              pw.SizedBox(height: 12),
+            ],
+          ),
+
+          build: (pw.Context context) {
+            // IMPORTANT: return a flat list, NOT a single Column
+            return historyList.map((item) {
+              final lines = (item.output ?? '')
+                  .toString()
+                  .split('\n')
+                  .where((e) =>
+              e.trim().isNotEmpty &&
+                  e.trim() != '=' &&
+                  e.trim() != '===')
+                  .toList();
+
+              return pw.Container(
+                width: double.infinity,
+                margin: const pw.EdgeInsets.only(bottom: 12),
+                padding: const pw.EdgeInsets.all(10),
+
+
+
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    for (var line in lines)
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.only(bottom: 4),
+                        child: pw.Text(
+                          line.trim(),
+                          style: pw.TextStyle(
+                            font: ttf,
+                            fontSize: 16.sp,
+                            lineSpacing: 3,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }).toList();
+          },
+        ),
+      );
+
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/swim_metrics_history.pdf');
+
       await file.writeAsBytes(await pdf.save());
 
       if (context.mounted) {
@@ -936,6 +939,12 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
       }
     } catch (e) {
       debugPrint("PDF Export Error: $e");
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to export PDF')),
+        );
+      }
     }
   }
 

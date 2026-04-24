@@ -852,7 +852,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
           children: [
             pw.Center(
               child: pw.Text(
-                'Swim Metrics',
+                'SwimMetrics',
                 style: pw.TextStyle(
                     font: ttf,
                     fontSize: 28.sp, // Note: Use standard numbers, .sp is for UI

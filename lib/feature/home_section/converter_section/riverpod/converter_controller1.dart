@@ -313,13 +313,13 @@ class ConverterController extends Notifier<ConverterState> {
 
       // Only add to results if NOT 100 IM LCM
       if (!is100ImLcm) {
-        results.add('$genderLabel ${s.distance} $strokeLabel ${s.course.toUpperCase()} → $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
+        results.add('$genderLabel ${s.distance} $strokeLabel ${s.timeText} ${s.course.toUpperCase()} → $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
       }
 
       if (s.showSplits) {
         // Only add splits if NOT 100 IM LCM
         if (!is100ImLcm) {
-          splitResults.add('$genderLabel ${s.distance} $strokeLabel ${s.course.toUpperCase()} → $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
+          splitResults.add('$genderLabel ${s.distance} $strokeLabel ${s.timeText} ${s.course.toUpperCase()} → $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText');
 
           String splitsText = '';
           if (to == 'lcm' && displayDistance.toString() == '50') {

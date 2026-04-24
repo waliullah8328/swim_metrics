@@ -135,6 +135,7 @@ class StopwatchController2 extends ChangeNotifier {
     }
     return t.accumulated;
   }
+  String lastPredictorConfig = '';
 
   // ================= SPLIT =================
   // Pass context to the function to show the Snackbar
@@ -206,38 +207,49 @@ class StopwatchController2 extends ChangeNotifier {
 
     // ================= PREDICTOR =================
     else {
-      if (logPredictor.trim().isEmpty) {
-        final formattedStroke =
-        stroke.toLowerCase() == "im"
-            ? "IM"
-            : "${stroke[0].toUpperCase()}${stroke.substring(1).toLowerCase()}";
+      final formattedStroke = stroke.toLowerCase() == "im" ? "IM" : "${stroke[0].toUpperCase()}${stroke.substring(1).toLowerCase()}";
+      final currentConfig = "$gender|$stroke|$distance|$course|$splitSize|$startType|$progressiveActive";
 
-        logPredictor =
-        "${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}'s "
-            "$distance "
-            "$formattedStroke "
-            "${course.toUpperCase()} Projection\n"
+      // 1. Reset/Initialize Header if config changes or log is empty
+      if (lastPredictorConfig != currentConfig || logPredictor.trim().isEmpty) {
+        lastPredictorConfig = currentConfig;
+        logPredictor = "${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}'s $distance $formattedStroke ${course.toUpperCase()} Projection\n"
             "Start Type: $startType | Split Size: $splitSize\n"
             "===============\n"
-            "Split Breakdown:\n";
+            "Split Breakdown:";
+
+        _marker = '15';
+        t.lastSplitWall = now;
       }
 
+      // 2. Prepare the data
       final projected = _predict(lapNo) ?? 0.0;
       final isProgressive = _shouldEnableProgressive() && progressiveActive;
       final label = isProgressive ? _marker : "Lap $lapNo";
 
-      final allLines = logPredictor.split('\n');
-      int insertIndex = allLines.indexOf("Split Breakdown:") + 1;
-      if (insertIndex == 0) insertIndex = allLines.length;
+      final String fLap = TimeUtils1.formatTime(lap);
+      final String fTotal = TimeUtils1.formatTime(total);
+      final String fProj = TimeUtils1.formatTime(projected);
 
-      String fLap = TimeUtils1.formatTime(lap);
-      String fTotal = TimeUtils1.formatTime(total);
-      String fProj = TimeUtils1.formatTime(projected);
+      final newEntry = isProgressive
+          ? "$label $fLap / Projected Finish $fProj"
+          : "$label $fLap / $fTotal / Projected Finish $fProj";
 
-      final newEntry = "$label $fLap / $fTotal / Projected Finish $fProj";
+      // 3. Split the log into Header and Body
+      final parts = logPredictor.split("Split Breakdown:");
 
-      allLines.insert(insertIndex, newEntry);
-      logPredictor = allLines.join('\n');
+      // Use ${header} with braces to avoid the "Undefined name" error
+      final String header = parts[0];
+      final String currentBody = parts.length > 1 ? parts[1].trim() : "";
+
+      // 4. Reconstruct: Header + Label + New Entry + Full History
+      if (currentBody.isEmpty) {
+        // Fixed interpolation here:
+        logPredictor = "${header}Split Breakdown:\n$newEntry";
+      } else {
+        // Fixed interpolation here:
+        logPredictor = "${header}Split Breakdown:\n$newEntry\n$currentBody";
+      }
 
       if (isProgressive) {
         _marker = _nextMarker(_marker);
@@ -357,22 +369,44 @@ class StopwatchController2 extends ChangeNotifier {
     final t = current;
     if (t.splits.isEmpty) return;
 
-    // Remove latest split data
+    /// remove last split time
     t.splits.removeLast();
 
+    // ================= STOPWATCH =================
     if (activeMode == 'Stopwatch') {
       logStopwatch = _removeFirst(logStopwatch);
-    } else if (activeMode == 'Predictor') {
-      // Remove first lap only, keep static header text
+    }
+
+    // ================= PREDICTOR =================
+    else if (activeMode == 'Predictor') {
       logPredictor = _removeFirstPredictorLap(logPredictor);
 
-      // Optional: reset marker back one step if using progressive mode
-      // _marker = _previousMarker(_marker);
-    } else {
+      /// ✅ FIX PROGRESSIVE MODE MARKER
+      if (_shouldEnableProgressive() && progressiveActive) {
+        _marker = _getMarkerFromCount(t.splits.length);
+      }
+    }
+
+    // ================= CONVERTER =================
+    else {
       logConverter = _removeFirst(logConverter);
     }
 
     notifyListeners();
+  }
+
+  /// ======================================================
+  /// FIX MARKER AFTER UNDO
+  /// ======================================================
+  String _getMarkerFromCount(int count) {
+    final markers = ['15', '25', '35'];
+
+    /// count = remaining splits
+    /// 0 => 15
+    /// 1 => 25
+    /// 2 => 35
+    /// 3 => 15 again
+    return markers[count % 3];
   }
 
   String _removeFirst(String log) {
