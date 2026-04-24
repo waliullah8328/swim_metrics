@@ -908,7 +908,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           children: [
             pw.Center(
               child: pw.Text(
-                'Swim Metrics',
+                'SwimMetrics',
                 style: pw.TextStyle(font: ttf, fontSize: 20, fontWeight: pw.FontWeight.bold),
               ),
             ),
