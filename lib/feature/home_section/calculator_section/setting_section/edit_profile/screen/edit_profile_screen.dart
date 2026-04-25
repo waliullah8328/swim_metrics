@@ -76,6 +76,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _emailController.text = info.email;
     _phoneController.text = info.phone;
 
+    final changePasswordFormKey = GlobalKey<FormState>();
+
 
     return Scaffold(
       appBar: AppBar(
@@ -137,7 +139,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         radius: getAdjustedFontSize(45, fontOption),
                         backgroundImage: ref.watch(profileProvider).profileImage != null
                             ? FileImage(ref.watch(profileProvider).profileImage!)
-                            :data.profilePicture != ""?NetworkImage(data.profilePicture.toString()): AssetImage(ImagePath.profileDeleteImage)
+                            :data.profilePicture != ""?NetworkImage(data.profilePicture.toString()): AssetImage(ImagePath.profileDeleteImage1)
                         as ImageProvider,
                       ),
                     );
@@ -195,7 +197,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           ref.invalidate(getMeProvider);
                         }
 
-                      
+
 
 
 
@@ -203,7 +205,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       },);
 
                   }),
-                  
+
 
 
                 ],

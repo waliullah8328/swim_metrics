@@ -77,6 +77,7 @@ class CustomTextField extends ConsumerWidget {
       onFieldSubmitted: onFieldSubmitted,
       focusNode: focusNode, // ✅ Use the passed focusNode
       maxLines: maxLine ?? 1,
+
       readOnly: readOnly,
       keyboardType: keyboardType,
       obscureText: obscureText ? !isVisible : false,

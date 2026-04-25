@@ -119,9 +119,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                      controller: passwordController,
                      hintText: AppLocalizations.of(context)!.enterYourPassword,
                      obscureText: !isRemember ,
-                     validator: (value){
-
-                       return  AppValidator.validatePassword(value,context);
+                     validator: (value) {
+                       if (value == null || value.trim().isEmpty) {
+                         return AppLocalizations.of(context)!.enterYourPassword;
+                       }
+                       return null;
                      },
                      onChanged: (password) {
                        ref.read(loginProvider.notifier).

@@ -9,6 +9,7 @@ class ImagePath{
   static const  String orImage ='$_basePath/or_image.svg';
   static const  String verifiedSuccessImage ='$_basePath/verified_success_image.svg';
   static const  String profileDeleteImage ='$_basePath/profile_delete_image.jpg';
+  static const  String profileDeleteImage1 ='$_basePath/assets/images/blank_image.png';
 
 
 

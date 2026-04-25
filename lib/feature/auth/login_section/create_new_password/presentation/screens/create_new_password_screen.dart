@@ -85,6 +85,7 @@ class _LoginScreenState extends ConsumerState<CreateNewPasswordScreen> {
                       focusNode: _passwordFocusNode,
                       hintText: AppLocalizations.of(context)!.enterYourPassword,
                       obscureText: !isRemember ,
+
                       validator: (value){
 
                         return  AppValidator.validatePassword(value,context);

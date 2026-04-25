@@ -92,7 +92,7 @@ class SettingsScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(18),
                     child: Row(
                       children: [
-                        CircleAvatar(radius: 35,backgroundImage:  data.profilePicture != ""?NetworkImage(data.profilePicture!):AssetImage(ImagePath.profileDeleteImage),),
+                        CircleAvatar(radius: 35,backgroundImage:  data.profilePicture != ""?NetworkImage(data.profilePicture!):AssetImage(ImagePath.profileDeleteImage1),),
                         SizedBox(width: 12.w),
                         Expanded(
                           child: Column(
@@ -100,7 +100,7 @@ class SettingsScreen extends ConsumerWidget {
                             children: [
                               CustomText(
                                 text:
-                                data.name.toString(),
+                                data.name.toString()??"N/A",
                                 fontWeight: FontWeight.w600,
                                 fontSize: getAdjustedFontSize(19, fontOption).sp,
                               ),

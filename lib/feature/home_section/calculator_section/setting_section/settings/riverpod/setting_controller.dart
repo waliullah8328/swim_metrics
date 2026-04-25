@@ -1,19 +1,11 @@
-import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/riverpod/settings_state.dart';
 
-import '../../../../../../config/theme/theme_provider.dart';
-import '../../../../../../core/services/theme_service.dart';
 
-
-enum FontSizeOption {
-  small,
-  medium,
-  big,
-}
-
+enum FontSizeOption { small, medium, big }
 
 enum AppLanguage {
   english('en', 'ENGLISH'),
@@ -23,10 +15,8 @@ enum AppLanguage {
 
   final String code;
   final String name;
-
   const AppLanguage(this.code, this.name);
 }
-
 
 class SettingsNotifier extends StateNotifier<SettingsState> {
   final Ref ref;
@@ -39,49 +29,23 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     await loadSettings();
   }
 
-  /// Keys
   static const String fontSizeKey = "font_size";
   static const String darkModeKey = "dark_mode";
   static const String languageKey = "app_language";
   static const String stopwatchKey = "stopwatch_sound";
   static const String hapticKey = "haptic_feedback";
 
-  /// DARK MODE
-  Future<void> toggleDarkMode(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(darkModeKey, value);
-
-    ref.read(themeModeProvider.notifier).state =
-    value ? ThemeMode.dark : ThemeMode.light;
-
-    state = state.copyWith(darkMode: value);
-  }
-
-  /// STOPWATCH
-  Future<void> toggleStopwatch(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(stopwatchKey, value);
-
-    state = state.copyWith(stopwatchSound: value);
-  }
-
-  /// HAPTIC
-  Future<void> toggleHaptic(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(hapticKey, value);
-
-    state = state.copyWith(haptic: value);
-  }
-
   /// LOAD SETTINGS
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
+    // 🔥 FIX: Defaulting to TRUE if null (first run)
+    final darkMode = prefs.getBool(darkModeKey) ?? true;
+    final stopwatch = prefs.getBool(stopwatchKey) ?? true;
+    final haptic = prefs.getBool(hapticKey) ?? true;
+
     final fontSizeValue = prefs.getString(fontSizeKey);
-    final darkMode = prefs.getBool(darkModeKey) ?? false;
     final languageCode = prefs.getString(languageKey);
-    final stopwatch = prefs.getBool(stopwatchKey) ?? false;
-    final haptic = prefs.getBool(hapticKey) ?? false;
 
     final fontSize = fontSizeValue != null
         ? FontSizeOption.values.firstWhere(
@@ -97,8 +61,8 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     )
         : state.language;
 
-    ref.read(themeModeProvider.notifier).state =
-    darkMode ? ThemeMode.dark : ThemeMode.light;
+    // Sync the ThemeProvider with the loaded (or default) value
+    // ref.read(themeModeProvider.notifier).state = darkMode ? ThemeMode.dark : ThemeMode.light;
 
     state = state.copyWith(
       fontSize: fontSize,
@@ -109,22 +73,38 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     );
   }
 
+  Future<void> toggleDarkMode(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(darkModeKey, value);
+    // ref.read(themeModeProvider.notifier).state = value ? ThemeMode.dark : ThemeMode.light;
+    state = state.copyWith(darkMode: value);
+  }
+
+  Future<void> toggleStopwatch(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(stopwatchKey, value);
+    state = state.copyWith(stopwatchSound: value);
+  }
+
+  Future<void> toggleHaptic(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(hapticKey, value);
+    state = state.copyWith(haptic: value);
+  }
+
   Future<void> changeFontSize(FontSizeOption size) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(fontSizeKey, size.name);
-
     state = state.copyWith(fontSize: size);
   }
 
   Future<void> changeLanguage(AppLanguage language) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(languageKey, language.code);
-
     state = state.copyWith(language: language);
   }
 }
 
-final settingsProvider =
-StateNotifierProvider<SettingsNotifier, SettingsState>(
+final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>(
       (ref) => SettingsNotifier(ref),
 );

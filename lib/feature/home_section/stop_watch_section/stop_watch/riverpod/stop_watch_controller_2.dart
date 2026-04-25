@@ -75,8 +75,8 @@ class StopwatchController2 extends ChangeNotifier {
     String? split,
     String? start,
   }) {
-    if (g != null) gender = g;
-    if (s != null) stroke = s;
+    if (g != null) gender = g.toLowerCase();
+    if (s != null) stroke = s.toLowerCase();
     if (d != null) distance = d;
     if (c != null) course = c.toLowerCase();
     if (split != null) splitSize = split;
@@ -346,25 +346,35 @@ class StopwatchController2 extends ChangeNotifier {
 
   double? _predict(int lapNo) {
     final total = elapsed();
+
     if (total <= 0) return null;
 
+    /// normalize values
+    final g = gender.toLowerCase().trim();
+    final s = stroke.toLowerCase().trim();
+    final c = course.toLowerCase().trim();
+
+    final split = int.tryParse(splitSize) ?? 50;
+
+    /// Progressive mode
     if (_shouldEnableProgressive() && progressiveActive) {
       return SplitsCore4.predictorLCM50(
         elapsedSeconds: total,
-        gender: gender,
+        gender: g,
         marker: _marker,
         pushStart: startType.toLowerCase() == 'from push',
       );
     }
 
+    /// Standard mode
     return SplitsCore4.predictorStandard(
       elapsedSeconds: total,
       splitCount: lapNo,
-      gender: gender,
-      stroke: stroke,
+      gender: g,
+      stroke: s,
       distance: distance,
-      course: course,
-      splitSize: int.parse(splitSize),
+      course: c,
+      splitSize: split,
       pushStart: startType.toLowerCase() == 'from push',
     );
   }

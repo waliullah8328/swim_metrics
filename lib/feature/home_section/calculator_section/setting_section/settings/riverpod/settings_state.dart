@@ -1,5 +1,6 @@
 import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/riverpod/setting_controller.dart';
 
+
 class SettingsState {
   final bool darkMode;
   final bool stopwatchSound;
@@ -8,13 +9,13 @@ class SettingsState {
   final FontSizeOption fontSize;
   final AppLanguage language;
 
-  SettingsState( {
-    this.darkMode = true,
+  SettingsState({
+    this.darkMode = true, // Defaulting to True
     this.stopwatchSound = true,
     this.voiceInput = true,
     this.haptic = true,
     this.fontSize = FontSizeOption.medium,
-    this.language = AppLanguage.english
+    this.language = AppLanguage.english,
   });
 
   SettingsState copyWith({
@@ -30,8 +31,8 @@ class SettingsState {
       stopwatchSound: stopwatchSound ?? this.stopwatchSound,
       voiceInput: voiceInput ?? this.voiceInput,
       haptic: haptic ?? this.haptic,
-      fontSize: fontSize?? this.fontSize,
-      language: language??this.language
+      fontSize: fontSize ?? this.fontSize,
+      language: language ?? this.language,
     );
   }
 }
