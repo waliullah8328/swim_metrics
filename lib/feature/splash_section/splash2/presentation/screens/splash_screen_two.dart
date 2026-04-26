@@ -101,7 +101,7 @@ class _SplashScreenState extends ConsumerState<SplashScreenTwo> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
            // Image.asset(ImagePath.swimmingGifLogo,width: 150.w,height: 150.h,fit: BoxFit.fitHeight,),
-            CustomText(text: "Please wait....",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.textWhite,)
+            CustomText(text: "Please wait...",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.textWhite,)
 
 
           ],

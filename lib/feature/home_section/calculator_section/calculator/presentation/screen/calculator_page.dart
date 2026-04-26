@@ -596,7 +596,7 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                               text: "Time (mm:ss.hh)",
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
-                              fontSize: getAdjustedFontSize(14, fontOption).sp,
+                              fontSize: getAdjustedFontSize(16, fontOption).sp,
                             ),
 
                             SizedBox(height: 10.h),
@@ -856,81 +856,55 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
     await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf = pw.Font.ttf(fontData);
 
-    // Optional: limit history to avoid massive PDFs
     final List historyList = history.reversed.take(200).toList();
 
     try {
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.all(32),
-
-          // Safety limit (prevents crash)
+          margin: const pw.EdgeInsets.symmetric(
+            horizontal: 40,
+            vertical: 30,
+          ),
           maxPages: 100,
 
-          /// Header
+          /// Header for each page
           header: (context) => pw.Column(
             children: [
               pw.Center(
                 child: pw.Text(
                   'SwimMetrics',
-                  style: pw.TextStyle(
-                    font: ttf,
-                    fontSize: 28.sp,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+                  style: pw.TextStyle(font: ttf, fontSize: 20, fontWeight: pw.FontWeight.bold),
                 ),
               ),
-              pw.SizedBox(height: 8),
-              pw.Divider(thickness: 0.5, color: PdfColors.grey400),
-              pw.SizedBox(height: 12),
+              pw.SizedBox(height: 10),
+              pw.Divider(thickness: 0.5),
+              pw.SizedBox(height: 10),
             ],
           ),
 
-          build: (pw.Context context) {
-            // IMPORTANT: return a flat list, NOT a single Column
-            return historyList.map((item) {
-              final lines = (item.output ?? '')
-                  .toString()
-                  .split('\n')
-                  .where((e) =>
-              e.trim().isNotEmpty &&
-                  e.trim() != '=' &&
-                  e.trim() != '===')
-                  .toList();
-
-              return pw.Container(
-                width: double.infinity,
-                margin: const pw.EdgeInsets.only(bottom: 12),
-                padding: const pw.EdgeInsets.all(10),
-
-
-
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    for (var line in lines)
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.only(bottom: 4),
-                        child: pw.Text(
-                          line.trim(),
-                          style: pw.TextStyle(
-                            font: ttf,
-                            fontSize: 16.sp,
-                            lineSpacing: 3,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            }).toList();
-          },
+          build: (context) => [
+            /// Auto height 2-column layout
+            pw.Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: historyList.map((item) {
+                return pw.Container(
+                  width:
+                  (PdfPageFormat.a4.availableWidth - 20) / 2,
+                  child: _buildPdfEntry(item, ttf),
+                );
+              }).toList(),
+            ),
+          ],
         ),
       );
 
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/swim_metrics_history.pdf');
+
+      final file = File(
+        '${dir.path}/swim_metrics_split_calculator.pdf',
+      );
 
       await file.writeAsBytes(await pdf.save());
 
@@ -942,12 +916,39 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to export PDF')),
+          const SnackBar(
+            content: Text('Failed to export PDF'),
+          ),
         );
       }
     }
   }
 
+  /// PDF Item Widget
+  pw.Widget _buildPdfEntry(dynamic item, pw.Font ttf) {
+    final lines = (item.output ?? '')
+        .toString()
+        .split('\n')
+        .where(
+          (e) =>
+      e.trim().isNotEmpty &&
+          e.trim() != '=' &&
+          e.trim() != '===',
+    )
+        .toList();
+
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(6),
+      child: pw.Text(
+        lines.join('\n'),
+        style: pw.TextStyle(
+          font: ttf,
+          fontSize: 9,
+          lineSpacing: 1.3,
+        ),
+      ),
+    );
+  }
   static List<int> getDistances(String course, String stroke, String gender) {
     course = course.toLowerCase().trim();
     stroke = stroke.toLowerCase().trim();

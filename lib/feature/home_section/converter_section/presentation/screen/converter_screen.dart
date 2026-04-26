@@ -194,7 +194,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
                                     fontSize: getAdjustedFontSize(
-                                      14,
+                                      16,
                                       fontOption,
                                     ).sp,
                                   ),
@@ -240,7 +240,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
                                     fontSize: getAdjustedFontSize(
-                                      14,
+                                      16,
                                       fontOption,
                                     ).sp,
                                   ),
@@ -302,7 +302,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
                                     fontSize: getAdjustedFontSize(
-                                      14,
+                                      16,
                                       fontOption,
                                     ).sp,
                                   ),
@@ -360,7 +360,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
                                     fontSize: getAdjustedFontSize(
-                                      14,
+                                      16,
                                       fontOption,
                                     ).sp,
                                   ),
@@ -408,7 +408,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                               text: AppLocalizations.of(context)!.to,
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
-                              fontSize: getAdjustedFontSize(14, fontOption).sp,
+                              fontSize: getAdjustedFontSize(16, fontOption).sp,
                             ),
                             Consumer(
                               builder: (context, ref, child) {
@@ -507,7 +507,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         text: "Time (mm:ss.hh)",
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
-                        fontSize: getAdjustedFontSize(14, fontOption).sp,
+                        fontSize: getAdjustedFontSize(16, fontOption).sp,
                       ),
                       SizedBox(height: 10.h),
 
@@ -538,6 +538,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     children: [
                       CustomText(
                         text: AppLocalizations.of(context)!.showSplits,
+                        fontSize: 14.sp,
                       ),
 
                       Consumer(
@@ -828,92 +829,270 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     return ["50"];
   }
 
+
+  // ═══════════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════════
+  static const double _kPageMargin       = 28;
+  static const double _kColumnGap        = 16;
+  static const double _kHeaderHeight     = 60;   // SwimMetrics + divider
+  static const double _kFooterHeight     = 20;
+  static const double _kBlockPaddingV    = 12;   // top+bottom padding per block card
+  static const double _kLineHeight       = 14.5; // per text line at font 10
+  static const double _kTitleLineHeight  = 16.0; // bold header lines
+  static const double _kInterBlockGap    = 10;   // gap between blocks
+
+// ═══════════════════════════════════════════════════════════
+//  HELPERS — measure how tall a block will be
+// ═══════════════════════════════════════════════════════════
+  double _measureBlock(List<String> lines) {
+    double h = _kBlockPaddingV;
+    for (final raw in lines) {
+      final line = raw.trim();
+      final isHeader = line.contains('===') ||
+          line.contains('→') ||
+          line.contains('Projection');
+      h += isHeader ? _kTitleLineHeight : _kLineHeight;
+      h += 3; // bottom padding per text row
+    }
+    return h;
+  }
+
+// ═══════════════════════════════════════════════════════════
+//  MAIN EXPORT
+// ═══════════════════════════════════════════════════════════
   Future<void> exportOutputAsPdf(
       BuildContext context,
       String output,
       ) async {
     if (output.trim().isEmpty) return;
 
-    final pdf = pw.Document();
+    final pdf      = pw.Document();
     final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
-    final ttf = pw.Font.ttf(fontData);
+    final ttf      = pw.Font.ttf(fontData);
 
-    final List<String> lines = output
+    // ── Parse: double-newline = section boundary ─────────────────────────
+    final List<List<String>> allBlocks = output
+        .split('\n\n')
+        .map((s) => s
         .split('\n')
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty)
+        .map((l) => l.trim())
+        .where((l) => l.isNotEmpty)
+        .toList())
+        .where((b) => b.isNotEmpty)
         .toList();
 
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(32),
-        header: (context) => pw.Column(
-          children: [
-            pw.Center(
-              child: pw.Text(
-                'SwimMetrics',
-                style: pw.TextStyle(
-                    font: ttf,
-                    fontSize: 28.sp, // Note: Use standard numbers, .sp is for UI
-                    fontWeight: pw.FontWeight.bold),
-              ),
-            ),
-            pw.SizedBox(height: 8),
-            pw.Divider(thickness: 0.5, color: PdfColors.grey400),
-            pw.SizedBox(height: 12),
-          ],
-        ),
-        build: (pw.Context context) {
-          return [
-            pw.Partitions(
+    // ── Page geometry ─────────────────────────────────────────────────────
+    final double pageW        = PdfPageFormat.a4.width;
+    final double pageH        = PdfPageFormat.a4.height;
+    final double usableW      = pageW  - _kPageMargin * 2;
+    final double usableH      = pageH  - _kPageMargin * 2
+        - _kHeaderHeight
+        - _kFooterHeight;
+    final double colW         = (usableW - _kColumnGap) / 2;
+
+    // ── Bin blocks into (page, column) slots ─────────────────────────────
+    //   Structure: pages → columns(2) → blocks
+    //   Fill col-0 → col-1 → new page col-0 → col-1 → …
+    final List<List<List<List<String>>>> pages = [];
+
+    List<List<String>> currentCol    = [];
+    int                currentColIdx = 0;          // 0 = left, 1 = right
+    double             colUsed       = 0;
+
+    void _nextColumn() {
+      // Save current column, advance
+      if (pages.isEmpty || pages.last.length == 2) {
+        // Start a new page with this column
+        pages.add([List.from(currentCol)]);
+      } else {
+        // Add as right column of current page
+        pages.last.add(List.from(currentCol));
+      }
+      currentCol    = [];
+      currentColIdx = pages.isEmpty ? 0 : (pages.last.length % 2);
+      colUsed       = 0;
+    }
+
+    for (final block in allBlocks) {
+      final blockH = _measureBlock(block) + _kInterBlockGap;
+
+      if (colUsed + blockH > usableH && currentCol.isNotEmpty) {
+        // Current column is full — move to next column / page
+        _nextColumn();
+      }
+
+      currentCol.add(block as dynamic); // ← fix below — store block itself
+      colUsed += blockH;
+    }
+
+    // ── Flush remaining ───────────────────────────────────────────────────
+    if (currentCol.isNotEmpty) {
+      if (pages.isEmpty) {
+        pages.add([List.from(currentCol)]);
+      } else if (pages.last.length < 2) {
+        pages.last.add(List.from(currentCol));
+      } else {
+        pages.add([List.from(currentCol)]);
+      }
+    }
+
+    // Ensure every page has exactly 2 column slots (right may be empty)
+    for (final page in pages) {
+      while (page.length < 2) page.add([]);
+    }
+
+    // ── Build PDF — one pw.Page per logical page ──────────────────────────
+    final int totalPages = pages.length;
+
+    for (int pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+      final leftBlocks  = pages[pageIdx][0];
+      final rightBlocks = pages[pageIdx][1];
+
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(_kPageMargin),
+          build: (pw.Context ctx) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
               children: [
-                pw.Partition(
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: lines.map((line) => _renderLine(line, ttf)).toList(),
+
+                // ── Header ───────────────────────────────────────────────
+                pw.Center(
+                  child: pw.Text(
+                    'SwimMetrics',
+                    style: pw.TextStyle(
+                      font: ttf,
+                      fontSize: 22,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
                   ),
                 ),
+                pw.SizedBox(height: 6),
+                pw.Divider(thickness: 0.6),
+                pw.SizedBox(height: 10),
+
+                // ── Two columns ──────────────────────────────────────────
+                pw.Expanded(
+                  child: pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+
+                      // LEFT column
+                      pw.SizedBox(
+                        width: colW,
+                        child: _buildColumn(leftBlocks, ttf),
+                      ),
+
+                      pw.SizedBox(width: _kColumnGap),
+
+                      // RIGHT column
+                      pw.SizedBox(
+                        width: colW,
+                        child: _buildColumn(rightBlocks, ttf),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ── Footer ───────────────────────────────────────────────
+                // pw.Divider(thickness: 0.4),
+                // pw.Row(
+                //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     pw.Text(
+                //       'SwimMetrics Report',
+                //       style: pw.TextStyle(
+                //         font: ttf,
+                //         fontSize: 8,
+                //         color: PdfColors.grey600,
+                //       ),
+                //     ),
+                //     pw.Text(
+                //       'Page ${pageIdx + 1} of $totalPages',
+                //       style: pw.TextStyle(
+                //         font: ttf,
+                //         fontSize: 8,
+                //         color: PdfColors.grey600,
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ],
-            ),
-          ];
-        },
-      ),
-    );
+            );
+          },
+        ),
+      );
+    }
 
     try {
-      final dir = await getTemporaryDirectory();
+      final dir  = await getTemporaryDirectory();
       final file = File('${dir.path}/swim_metrics_output.pdf');
       await file.writeAsBytes(await pdf.save());
       if (context.mounted) await OpenFile.open(file.path);
     } catch (e) {
-      debugPrint("PDF Export Error: $e");
+      debugPrint('PDF Export Error: $e');
     }
   }
 
-  pw.Widget _renderLine(String text, pw.Font font) {
-    // 1. Identify the main Session Header (this starts a new conversion block)
-    bool isMainHeader = text.contains('Projection') || text.contains('→');
+// ═══════════════════════════════════════════════════════════
+//  COLUMN BUILDER — stacks blocks top→bottom
+// ═══════════════════════════════════════════════════════════
+  pw.Widget _buildColumn(List<List<String>> blocks, pw.Font ttf) {
+    if (blocks.isEmpty) return pw.SizedBox();
 
-    // 2. Identify secondary separators (Split Breakdown or lines)
-    bool isSubHeader = text.startsWith('===') || text.contains('Breakdown');
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: blocks.map((block) {
+        return pw.Padding(
+          padding: const pw.EdgeInsets.only(bottom: _kInterBlockGap),
+          child: _buildOutputBlock(block, ttf),
+        );
+      }).toList(),
+    );
+  }
 
-    return pw.Padding(
-      padding: pw.EdgeInsets.only(
-        bottom: 2,
-        // ✅ If it's a new conversion, give it a large 15pt gap
-        // If it's just a breakdown line, give it a small 6pt gap
-        top: isMainHeader ? 15 : (isSubHeader ? 6 : 0),
-      ),
-      child: pw.Text(
-        text.replaceAll('=', '').trim(),
-        style: pw.TextStyle(
-          font: font,
-          fontSize: 16.sp,
-          lineSpacing: 1.2,
-          fontWeight: (isMainHeader || isSubHeader) ? pw.FontWeight.bold : pw.FontWeight.normal,
-        ),
-      ),
+// ═══════════════════════════════════════════════════════════
+//  BLOCK RENDERER
+// ═══════════════════════════════════════════════════════════
+  pw.Widget _buildOutputBlock(List<String> lines, pw.Font font) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: lines.map((raw) {
+        final line = raw.trim();
+
+        // Clean === decorators
+        final display = line.replaceAll('=', '').replaceAll('-', '').trim();
+
+        final bool isTitle   = line.contains('===') || line.contains('---');
+        final bool isResult  = line.contains('→');
+        final bool isSplit   = RegExp(r'^\d+(m)?:').hasMatch(line);
+
+        return pw.Padding(
+          padding: pw.EdgeInsets.only(
+            bottom: 3,
+            // Indent split lines
+            left: isSplit ? 0 : 0,
+          ),
+          child: pw.Text(
+            display,
+            style: pw.TextStyle(
+              font: font,
+              fontSize: isTitle ? 11 : 10,
+              fontWeight: isTitle || isResult
+                  ? pw.FontWeight.bold
+                  : pw.FontWeight.bold,
+              color: isTitle
+                  ? PdfColors.black
+                  : isSplit
+                  ? PdfColors.black
+                  : PdfColors.black,
+              lineSpacing: 1.4,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 

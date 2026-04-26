@@ -117,7 +117,7 @@ class _DistanceWheelSelectorState extends ConsumerState<DistanceWheelSelector> {
                     child: AnimatedDefaultTextStyle(
                       duration: const Duration(milliseconds: 200),
                       style: GoogleFonts.merriweather(
-                        fontSize: isSelected ? 20.sp : 16.sp,
+                        fontSize: isSelected ? 20.sp : 18.sp,
                         color: isSelected
                             ? (isDark ? Colors.amber : const Color(0xFFB38F2E))
                             : (isDark ? Colors.white : Colors.black),

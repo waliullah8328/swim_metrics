@@ -1,10 +1,17 @@
-
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:swim_metrics/feature/home_section/calculator_section/setting_section/settings/riverpod/settings_state.dart';
+import 'settings_state.dart';
 
 
+final themeModeProvider = Provider<ThemeMode>((ref) {
+  // Watch only the darkMode property.
+  // Whenever toggleDarkMode is called, this provider auto-updates.
+  final isDarkMode = ref.watch(settingsProvider.select((s) => s.darkMode));
+
+  return isDarkMode ? ThemeMode.dark : ThemeMode.light;
+});
 enum FontSizeOption { small, medium, big }
 
 enum AppLanguage {
@@ -19,9 +26,7 @@ enum AppLanguage {
 }
 
 class SettingsNotifier extends StateNotifier<SettingsState> {
-  final Ref ref;
-
-  SettingsNotifier(this.ref) : super(SettingsState()) {
+  SettingsNotifier() : super(SettingsState()) {
     _init();
   }
 
@@ -35,11 +40,9 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   static const String stopwatchKey = "stopwatch_sound";
   static const String hapticKey = "haptic_feedback";
 
-  /// LOAD SETTINGS
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // 🔥 FIX: Defaulting to TRUE if null (first run)
     final darkMode = prefs.getBool(darkModeKey) ?? true;
     final stopwatch = prefs.getBool(stopwatchKey) ?? true;
     final haptic = prefs.getBool(hapticKey) ?? true;
@@ -61,9 +64,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     )
         : state.language;
 
-    // Sync the ThemeProvider with the loaded (or default) value
-    // ref.read(themeModeProvider.notifier).state = darkMode ? ThemeMode.dark : ThemeMode.light;
-
     state = state.copyWith(
       fontSize: fontSize,
       darkMode: darkMode,
@@ -76,7 +76,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleDarkMode(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(darkModeKey, value);
-    // ref.read(themeModeProvider.notifier).state = value ? ThemeMode.dark : ThemeMode.light;
     state = state.copyWith(darkMode: value);
   }
 
@@ -106,5 +105,5 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
 }
 
 final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>(
-      (ref) => SettingsNotifier(ref),
+      (ref) => SettingsNotifier(),
 );

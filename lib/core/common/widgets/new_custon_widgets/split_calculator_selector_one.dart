@@ -119,7 +119,7 @@ class _SplitCalculatorSelectorOneState
                         text: widget.items[index],
                         fontSize: 19.sp,
                         color: isSelected ? AppColors.primary : (isDark ? Colors.white70 : Colors.black54),
-                        fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                   );

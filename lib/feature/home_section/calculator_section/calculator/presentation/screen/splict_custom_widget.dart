@@ -100,7 +100,7 @@ class _SplitCalculatorSelectorState extends ConsumerState<SplitCalculatorSelecto
                             ? (isDark ? Colors.amber : const Color(0xFFB38F2E))
                             : null,
                         fontWeight:
-                        isSelected ? FontWeight.w500 : FontWeight.normal,
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                   );

@@ -429,7 +429,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 text: AppLocalizations.of(context)!.from,
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
-                fontSize: getAdjustedFontSize(14, fontOption).sp,
+                fontSize: getAdjustedFontSize(16, fontOption).sp,
               ),
               SizedBox(height: 8.h),
 
@@ -474,7 +474,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 text: AppLocalizations.of(context)!.to,
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
-                fontSize: getAdjustedFontSize(14, fontOption).sp,
+                fontSize: getAdjustedFontSize(16, fontOption).sp,
               ),
               SizedBox(height: 8.h),
 
@@ -524,7 +524,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
       Row(children: [
         Expanded(child: Column(children: [
 
-          CustomText(text: AppLocalizations.of(context)!.gender, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          CustomText(text: AppLocalizations.of(context)!.gender, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final gender = ref.watch(stopwatchProvider2.select((s) => s.gender));
@@ -544,7 +544,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         ])),
         Expanded(child: Column(children: [
 
-          CustomText(text: AppLocalizations.of(context)!.stroke, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          CustomText(text: AppLocalizations.of(context)!.stroke, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final items = const ["Fly", "Back", "Breast", "Free", "IM"];
@@ -641,7 +641,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         ])),
         Expanded(child: Column(children: [
           SizedBox(height: 8.h),
-          CustomText(text: AppLocalizations.of(context)!.distance, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          CustomText(text: AppLocalizations.of(context)!.distance, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             // ✅ Watch course + stroke + distance tuple for accurate rebuilds
@@ -663,7 +663,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
       Row(children: [
         Expanded(child: Column(children: [
           SizedBox(height: 8.h),
-          CustomText(text: AppLocalizations.of(context)!.splitSize, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          CustomText(text: AppLocalizations.of(context)!.splitSize, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             // ✅ Watch course + stroke + distance + splitSize for accurate splits
@@ -675,7 +675,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
         ])),
         Expanded(child: Column(children: [
           SizedBox(height: 8.h),
-          CustomText(text: AppLocalizations.of(context)!.startType, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+          CustomText(text: AppLocalizations.of(context)!.startType, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final start = ref.watch(stopwatchProvider2.select((s) => s.startType));

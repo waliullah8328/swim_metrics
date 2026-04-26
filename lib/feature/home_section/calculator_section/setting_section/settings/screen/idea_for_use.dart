@@ -321,7 +321,7 @@ class IdeaForUseScreen extends StatelessWidget {
               SizedBox(height: 10.h,),
               CustomText(
                   text:
-                  "SwimMetrics becomes a translation layer between coaches and parents.  (New Line)*Parents please consult your Swimmer’s Coach before utilizing, implementing, and suggesting race strategies with your Swimmer.",
+                  "SwimMetrics becomes a translation layer between coaches and parents.Parents please consult your Swimmer’s Coach before utilizing, implementing, and suggesting race strategies with your Swimmer.",
                   fontSize: 14.sp, color: isDark?Color(0xffC7C7C7):Colors.black87
               ),
 
