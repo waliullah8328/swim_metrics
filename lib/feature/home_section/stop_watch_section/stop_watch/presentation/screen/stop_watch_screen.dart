@@ -24,18 +24,12 @@ import '../../riverpod/stop_watch_controller_2.dart';
 
 enum StopwatchStatus { initial, running, stopped }
 
-class StopwatchController1 extends StateNotifier<StopwatchStatus> {
-  StopwatchController1() : super(StopwatchStatus.initial);
-  void start() => state = StopwatchStatus.running;
-  void stop() => state = StopwatchStatus.stopped;
-  void resume() => state = StopwatchStatus.running;
-  void clear() => state = StopwatchStatus.initial;
-}
+// ── Per-mode independent UI status providers ─────────────────
+final stopwatchStatusProvider = StateProvider<StopwatchStatus>((ref) => StopwatchStatus.initial);
+final converterStatusProvider  = StateProvider<StopwatchStatus>((ref) => StopwatchStatus.initial);
+final predictorStatusProvider  = StateProvider<StopwatchStatus>((ref) => StopwatchStatus.initial);
 
-final stopwatchProvider1 = StateNotifierProvider<StopwatchController1, StopwatchStatus>(
-      (ref) => StopwatchController1(),
-);
-final showCourseSectionStopWatchProvider = StateProvider<bool>((ref) => true);
+final showCourseSectionStopWatchProvider  = StateProvider<bool>((ref) => true);
 final showCourseSectionStopWatchProvider2 = StateProvider<bool>((ref) => true);
 
 class StopwatchScreen extends ConsumerStatefulWidget {
@@ -65,45 +59,72 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
 
   double getAdjustedFontSize(double baseSize, FontSizeOption option) {
     switch (option) {
-      case FontSizeOption.small: return baseSize - 2;
+      case FontSizeOption.small:  return baseSize - 2;
       case FontSizeOption.medium: return baseSize;
-      case FontSizeOption.big: return baseSize + 2;
+      case FontSizeOption.big:    return baseSize + 2;
+    }
+  }
+
+  // ── Helper: get the status provider for a given mode ─────────
+  StateProvider<StopwatchStatus> _statusProviderFor(String mode) {
+    switch (mode) {
+      case 'Converter':  return converterStatusProvider;
+      case 'Predictor':  return predictorStatusProvider;
+      default:           return stopwatchStatusProvider;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // ✅ FIX 1: activeMode defined properly at the top of build()
-    final activeMode = ref.watch(stopwatchProvider2.select((s) => s.activeMode));
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final status = ref.watch(stopwatchProvider1);
-    final settings = ref.watch(settingsProvider);
-    final currentLanguageCode = settings.language.code;
-    final showCourse = ref.watch(showCourseSectionStopWatchProvider);
-    final showCourse2 = ref.watch(showCourseSectionStopWatchProvider2);
-    final fontOption = settings.fontSize;
-    final isHaptic = ref.watch(settingsProvider.select((s) => s.haptic));
-    final isStopWatch = ref.watch(settingsProvider.select((s) => s.stopwatchSound));
+    final activeMode        = ref.watch(stopwatchProvider2.select((s) => s.activeMode));
+    final isDark            = Theme.of(context).brightness == Brightness.dark;
+    final settings          = ref.watch(settingsProvider);
+    final showCourse        = ref.watch(showCourseSectionStopWatchProvider);
+    final showCourse2       = ref.watch(showCourseSectionStopWatchProvider2);
+    final fontOption        = settings.fontSize;
+    final isHaptic          = ref.watch(settingsProvider.select((s) => s.haptic));
+    final isStopWatch       = ref.watch(settingsProvider.select((s) => s.stopwatchSound));
 
-    // ✅ Optimized logs (only update when log string actually changes)
-    final log = ref.watch(stopwatchProvider2.select((s) => s.logStopwatch));
+    // Each mode watches its own status independently
+    final swStatus   = ref.watch(stopwatchStatusProvider);
+    final convStatus = ref.watch(converterStatusProvider);
+    final predStatus = ref.watch(predictorStatusProvider);
+
+    final log  = ref.watch(stopwatchProvider2.select((s) => s.logStopwatch));
     final log2 = ref.watch(stopwatchProvider2.select((s) => s.logConverter));
     final log3 = ref.watch(stopwatchProvider2.select((s) => s.logPredictor));
+
     final modes = ["Stopwatch", "Converter", "Predictor"];
 
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: CustomText(text: AppLocalizations.of(context)!.stopWatch, fontSize: getAdjustedFontSize(24, fontOption).sp, fontWeight: FontWeight.w600),
+        title: CustomText(
+          text: AppLocalizations.of(context)!.stopWatch,
+          fontSize: getAdjustedFontSize(24, fontOption).sp,
+          fontWeight: FontWeight.w600,
+        ),
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
             if (isHaptic) HapticFeedback.lightImpact();
             _scaffoldKey.currentState?.openDrawer();
           },
-          child: Padding(padding: EdgeInsets.only(left: 18.w), child: SvgPicture.asset(IconPath.lightModeDrawerIcon, height: 48.h, width: 48.w, fit: BoxFit.contain)),
+          child: Padding(
+            padding: EdgeInsets.only(left: 18.w),
+            child: SvgPicture.asset(
+              IconPath.lightModeDrawerIcon,
+              height: 48.h, width: 48.w, fit: BoxFit.contain,
+            ),
+          ),
         ),
-        bottom: PreferredSize(preferredSize: Size.fromHeight(1), child: Divider(height: 1, thickness: 1, color: isDark ? const Color(0xffDADADA) : Colors.grey.shade300)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Divider(
+            height: 1, thickness: 1,
+            color: isDark ? const Color(0xffDADADA) : Colors.grey.shade300,
+          ),
+        ),
       ),
       drawer: CustomDrawer(),
       body: SingleChildScrollView(
@@ -111,31 +132,49 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              CustomText(text: AppLocalizations.of(context)!.mode, fontSize: getAdjustedFontSize(18, fontOption).sp, fontWeight: FontWeight.w600, color: const Color(0xffE3D99B)),
+              CustomText(
+                text: AppLocalizations.of(context)!.mode,
+                fontSize: getAdjustedFontSize(18, fontOption).sp,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xffE3D99B),
+              ),
               SizedBox(height: 10.h),
+
+              // ── Mode Tabs ───────────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: isDark ? const Color(0xff153250) : Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(blurRadius: 8, spreadRadius: 1, offset: Offset(0, 4), color: Colors.black12)]),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkThemeContainerColor : const Color(0xffFFFFFF),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [BoxShadow(blurRadius: 8, spreadRadius: 1, offset: Offset(0, 4), color: Colors.black12)],
+                ),
                 child: Row(
                   children: List.generate(modes.length * 2 - 1, (index) {
                     if (index.isOdd) return SizedBox(width: 6.w);
                     final itemIndex = index ~/ 2;
-                    final mode = modes[itemIndex];
+                    final mode     = modes[itemIndex];
                     final isActive = activeMode == mode;
                     return Expanded(
                       child: GestureDetector(
                         onTap: () {
                           FocusManager.instance.primaryFocus?.unfocus();
+                          // ✅ Switch mode in controller — does NOT reset other modes' timers
                           ref.read(stopwatchProvider2.notifier).setMode(mode);
-                          ref.read(stopwatchProvider1.notifier).clear();
-                          ref.read(stopwatchProvider2.notifier).stop();
                           if (isHaptic) HapticFeedback.lightImpact();
                         },
                         child: Container(
                           alignment: Alignment.center,
                           height: 45.h,
-                          decoration: BoxDecoration(color: isActive ? const Color(0xFFC9A84C) : const Color(0xFFEAEDF1), borderRadius: BorderRadius.circular(10)),
-                          child: CustomText(text: mode, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp, color: isActive ? Colors.black : const Color(0xFF82888E)),
+                          decoration: BoxDecoration(
+                            color: isActive ? const Color(0xFFC9A84C) : const Color(0xFFEAEDF1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: CustomText(
+                            text: mode,
+                            fontWeight: FontWeight.w600,
+                            fontSize: getAdjustedFontSize(14, fontOption).sp,
+                            color: isActive ? Colors.black : const Color(0xFF82888E),
+                          ),
                         ),
                       ),
                     );
@@ -144,13 +183,16 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               ),
               SizedBox(height: 20.h),
 
-              if (!showCourse && activeMode == 'Converter') _pullDownHint(isHaptic, fontOption, context, () => ref.read(showCourseSectionStopWatchProvider.notifier).state = true),
+              if (!showCourse  && activeMode == 'Converter') _pullDownHint(isHaptic, fontOption, context, () => ref.read(showCourseSectionStopWatchProvider.notifier).state  = true),
               if (!showCourse2 && activeMode == 'Predictor') _pullDownHint(isHaptic, fontOption, context, () => ref.read(showCourseSectionStopWatchProvider2.notifier).state = true),
 
-              /// Main Content Switcher
-              if (activeMode == 'Stopwatch') _stopwatchSection(isDark, fontOption, status, isHaptic, isStopWatch, context, log, activeMode),
-              if (activeMode == 'Converter') _converterSection(isDark, fontOption, status, isHaptic, isStopWatch, context, showCourse, log2, activeMode),
-              if (activeMode == 'Predictor') _predictorSection(isDark, fontOption, status, isHaptic, isStopWatch, context, showCourse2, log3, activeMode),
+              // ── Content per mode (all rendered, only active shown) ──
+              if (activeMode == 'Stopwatch')
+                _stopwatchSection(isDark, fontOption, swStatus,   isHaptic, isStopWatch, context, log,  'Stopwatch'),
+              if (activeMode == 'Converter')
+                _converterSection(isDark, fontOption, convStatus, isHaptic, isStopWatch, context, showCourse,  log2, 'Converter'),
+              if (activeMode == 'Predictor')
+                _predictorSection(isDark, fontOption, predStatus, isHaptic, isStopWatch, context, showCourse2, log3, 'Predictor'),
             ],
           ),
         ),
@@ -158,70 +200,155 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     );
   }
 
-  // ✅ Reusable Pull Down Hint
+  // ── Pull Down Hint ───────────────────────────────────────────
   Widget _pullDownHint(bool isHaptic, FontSizeOption fontOption, BuildContext context, VoidCallback onTap) {
     return Center(
       child: GestureDetector(
-        onTap: () { FocusManager.instance.primaryFocus?.unfocus(); onTap(); if(isHaptic) HapticFeedback.lightImpact(); },
+        onTap: () { FocusManager.instance.primaryFocus?.unfocus(); onTap(); if (isHaptic) HapticFeedback.lightImpact(); },
         child: Column(children: [
           SizedBox(height: 10.h),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [SvgPicture.asset(IconPath.pullIcon), CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions, fontSize: getAdjustedFontSize(14, fontOption).sp, color: const Color(0xffC7C7C7))]),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            SvgPicture.asset(IconPath.pullIcon),
+            CustomText(text: AppLocalizations.of(context)!.pullDownToSeeOptions, fontSize: getAdjustedFontSize(14, fontOption).sp, color: const Color(0xffC7C7C7)),
+          ]),
           SizedBox(height: 20.h),
         ]),
       ),
     );
   }
 
-  // ✅ Stopwatch Section
-  Widget _stopwatchSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, String log, String activeMode) {
+  // ── Stopwatch Section ────────────────────────────────────────
+  Widget _stopwatchSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, String log, String mode) {
     return Column(children: [
-      _timerCard(isDark, fontOption, context),
-      SizedBox(height: 20.h),
-      _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, activeMode),
+      Container(
+        padding: EdgeInsets.only(
+          left: 12.w,
+          right: 12.w,
+          top: 14.h,
+          bottom: 14.h,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkThemeContainerColor : const Color(0xffFFFFFF),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, spreadRadius: 1, offset: const Offset(0, 4))],
+        ),
+        child: Column(
+          children: [
+            _timerCard(isDark, fontOption, context, mode),
+            SizedBox(height: 20.h),
+            _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, mode),
+          ],
+        ),
+      ),
       if (log.isNotEmpty) _logSection(log, isDark, fontOption, isHaptic, isStopWatch, context, 1),
     ]);
   }
 
-  // ✅ Converter Section
-  Widget _converterSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, bool showCourse, String log2, String activeMode) {
+  // ── Converter Section ────────────────────────────────────────
+  Widget _converterSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, bool showCourse, String log2, String mode) {
     return Column(children: [
-      if (showCourse) _converterSelector(context, fontOption, isHaptic),
-      SizedBox(height: 10.h),
-      _timerCard(isDark, fontOption, context),
-      SizedBox(height: 20.h),
-      _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, activeMode, isConverter: true),
+
+      Container(
+        padding: EdgeInsets.only(
+          left: 12.w,
+          right: 12.w,
+          top: 14.h,
+          bottom: 14.h,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkThemeContainerColor : const Color(0xffFFFFFF),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, spreadRadius: 1, offset: const Offset(0, 4))],
+        ),
+        child: Column(
+          children: [
+            if (showCourse) _converterSelector(context, fontOption, isHaptic),
+            SizedBox(height: 10.h),
+            _timerCard(isDark, fontOption, context, mode),
+            SizedBox(height: 20.h),
+            _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, mode, isConverter: true),
+
+          ],
+        ),
+      ),
+
       if (log2.isNotEmpty) _logSection(log2, isDark, fontOption, isHaptic, isStopWatch, context, 2),
     ]);
   }
 
-  // ✅ Predictor Section
-  Widget _predictorSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, bool showCourse2, String log3, String activeMode) {
+  // ── Predictor Section ────────────────────────────────────────
+  Widget _predictorSection(bool isDark, FontSizeOption fontOption, StopwatchStatus status, bool isHaptic, bool isStopWatch, BuildContext context, bool showCourse2, String log3, String mode) {
     return Column(children: [
-      if (showCourse2) _predictorSelector(context, fontOption),
-      SizedBox(height: 10.h),
-      _timerCard(isDark, fontOption, context),
-      SizedBox(height: 20.h),
-      _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, activeMode),
+
+      Container(
+        padding: EdgeInsets.only(
+          left: 12.w,
+          right: 12.w,
+          top: 14.h,
+          bottom: 14.h,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkThemeContainerColor : const Color(0xffFFFFFF),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, spreadRadius: 1, offset: const Offset(0, 4))],
+        ),
+
+        child: Column(
+          children: [
+            if (showCourse2) _predictorSelector(context, fontOption),
+            SizedBox(height: 10.h),
+            _timerCard(isDark, fontOption, context, mode),
+            SizedBox(height: 20.h),
+            _statusButtons(status, isDark, fontOption, context, isHaptic, isStopWatch, mode),
+          ],
+        ),
+      ),
+
       if (log3.isNotEmpty) _logSection(log3, isDark, fontOption, isHaptic, isStopWatch, context, 3),
     ]);
   }
 
-  Widget _timerCard(bool isDark, FontSizeOption fontOption, BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: isDark ? const Color(0xff0C3156) : const Color(0xffFFFFFF), borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, spreadRadius: 1, offset: const Offset(0, 4))]),
-      child: Consumer(
-        builder: (context, ref, child) {
-          var time = ref.watch(stopwatchProvider2.select((s) => s.elapsed()));
-          return Card(child: Center(child: Padding(padding: const EdgeInsets.all(24.0), child: CustomText(text: _formatElapsed(time), fontSize: getAdjustedFontSize(35, fontOption).sp, fontWeight: FontWeight.w700))));
-        },
-      ),
+  // ── Timer Card — shows elapsed for the ACTIVE mode ──────────
+  Widget _timerCard(bool isDark, FontSizeOption fontOption, BuildContext context, String mode) {
+    return Consumer(
+      builder: (context, ref, child) {
+        // ✅ Each mode reads its OWN controller's elapsed via setMode-awareness
+        // StopwatchController2 already isolates elapsed() per activeMode
+        final time = ref.watch(stopwatchProvider2.select((s) => s.elapsed()));
+        return Card(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: CustomText(
+                text: _formatElapsed(time),
+                fontSize: getAdjustedFontSize(35, fontOption).sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _statusButtons(StopwatchStatus status, bool isDark, FontSizeOption fontOption, BuildContext context, bool isHaptic, bool isStopWatch, String activeMode, {bool isConverter = false}) {
+  // ── Status Buttons — fully independent per mode ──────────────
+  Widget _statusButtons(
+      StopwatchStatus status,
+      bool isDark,
+      FontSizeOption fontOption,
+      BuildContext context,
+      bool isHaptic,
+      bool isStopWatch,
+      String mode, {
+        bool isConverter = false,
+      }) {
+    // ✅ Each mode reads/writes its OWN status provider
+    final statusProvider = _statusProviderFor(mode);
+
     return Column(
       children: [
+
+        // ── INITIAL: Show Start ────────────────────────────────
         if (status == StopwatchStatus.initial)
           _buildButton(
             bg: isDark ? const Color(0xffC69C3F) : AppColors.primary,
@@ -232,14 +359,18 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
             fontOption: fontOption,
             onTap: () {
               FocusManager.instance.primaryFocus?.unfocus();
+              // ✅ First switch controller to this mode, then start
+              ref.read(stopwatchProvider2.notifier).setMode(mode);
               ref.read(stopwatchProvider2.notifier).start();
-              ref.read(stopwatchProvider1.notifier).start();
-              if (isConverter) ref.read(showCourseSectionStopWatchProvider.notifier).state = false;
-              if (activeMode == 'Predictor') ref.read(showCourseSectionStopWatchProvider2.notifier).state = false;
-              if (isHaptic) HapticFeedback.lightImpact();
+              ref.read(statusProvider.notifier).state = StopwatchStatus.running;
+              if (isConverter) ref.read(showCourseSectionStopWatchProvider.notifier).state  = false;
+              if (mode == 'Predictor') ref.read(showCourseSectionStopWatchProvider2.notifier).state = false;
+              if (isHaptic)   HapticFeedback.lightImpact();
               if (isStopWatch) ref.read(audioProvider.notifier).play();
             },
           ),
+
+        // ── RUNNING: Show Split + Undo/Stop ───────────────────
         if (status == StopwatchStatus.running)
           Column(children: [
             _buildButton(
@@ -252,9 +383,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               fontOption: fontOption,
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
+                ref.read(stopwatchProvider2.notifier).setMode(mode);
                 ref.read(stopwatchProvider2.notifier).split(context);
-                if(isHaptic) HapticFeedback.lightImpact();
-                if(isStopWatch) ref.read(audioProvider.notifier).play();
+                if (isHaptic)    HapticFeedback.lightImpact();
+                if (isStopWatch) ref.read(audioProvider.notifier).play();
               },
             ),
             SizedBox(height: 20.h),
@@ -269,9 +401,10 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 fontOption: fontOption,
                 onTap: () {
                   FocusManager.instance.primaryFocus?.unfocus();
+                  ref.read(stopwatchProvider2.notifier).setMode(mode);
                   ref.read(stopwatchProvider2.notifier).undoLastSplit();
-                  if(isHaptic) HapticFeedback.lightImpact();
-                  if(isStopWatch) ref.read(audioProvider.notifier).play();
+                  if (isHaptic)    HapticFeedback.lightImpact();
+                  if (isStopWatch) ref.read(audioProvider.notifier).play();
                 },
                 textColor: AppColors.textWhite,
               )),
@@ -286,17 +419,18 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 fontOption: fontOption,
                 onTap: () {
                   FocusManager.instance.primaryFocus?.unfocus();
-                  // Order matters: stop logic first, then update UI state
+                  ref.read(stopwatchProvider2.notifier).setMode(mode);
                   ref.read(stopwatchProvider2.notifier).pause();
-                  ref.read(stopwatchProvider1.notifier).stop();
-
-                  if(isHaptic) HapticFeedback.lightImpact();
-                  if(isStopWatch) ref.read(audioProvider.notifier).play();
+                  ref.read(statusProvider.notifier).state = StopwatchStatus.stopped;
+                  if (isHaptic)    HapticFeedback.lightImpact();
+                  if (isStopWatch) ref.read(audioProvider.notifier).play();
                 },
                 textColor: AppColors.textWhite,
               )),
             ]),
           ]),
+
+        // ── STOPPED: Show Resume + Clear ──────────────────────
         if (status == StopwatchStatus.stopped)
           Row(children: [
             Expanded(child: _buildButton(
@@ -309,64 +443,39 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
               fontOption: fontOption,
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
+                ref.read(stopwatchProvider2.notifier).setMode(mode);
                 ref.read(stopwatchProvider2.notifier).start();
-                ref.read(stopwatchProvider1.notifier).resume();
-                if(isHaptic) HapticFeedback.lightImpact();
-                if(isStopWatch) ref.read(audioProvider.notifier).play();
+                ref.read(statusProvider.notifier).state = StopwatchStatus.running;
+                if (isHaptic)    HapticFeedback.lightImpact();
+                if (isStopWatch) ref.read(audioProvider.notifier).play();
               },
               textColor: Colors.black,
             )),
-            SizedBox(width: 10.w,),
-            Expanded(
-              child: _buildButton(
-                bg: const Color(0xff234B6E),
-                side: const BorderSide(color: Color(0xff234B6E)),
-                children: [
-                  SvgPicture.asset(
-                    IconPath.clearIcon,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.textWhite,
-                      BlendMode.srcIn,
-                    ),
-                  )
-                ],
-                text: AppLocalizations.of(context)!.clearTime,
-                fontSize: 14.sp,
-                context: context,
-                fontOption: fontOption,
-                textColor: AppColors.textWhite,
-                onTap: () {
-                  FocusManager.instance.primaryFocus?.unfocus();
-
-                  /// stop running audio
-                  if (isStopWatch) {
-                    ref.read(audioProvider.notifier).stop();
-                  }
-
-                  /// clear stopwatch data
-                  final stopwatch = ref.read(stopwatchProvider2.notifier);
-
-                  //stopwatch.pause();      // stop timer first
-                  stopwatch.clearTime();      // reset current time to 0
-                  //stopwatch.clearLog();   // clear lap/history
-                  //stopwatch.clearTime();  // if available custom clear method
-
-                  /// clear secondary timer / converter
-                  ref.read(stopwatchProvider1.notifier).clear();
-
-                  /// vibration feedback
-                  if (isHaptic) {
-                    HapticFeedback.lightImpact();
-                  }
-                },
-              ),
-            )
+            SizedBox(width: 10.w),
+            Expanded(child: _buildButton(
+              bg: const Color(0xff234B6E),
+              side: const BorderSide(color: Color(0xff234B6E)),
+              children: [SvgPicture.asset(IconPath.clearIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))],
+              text: AppLocalizations.of(context)!.clearTime,
+              fontSize: 14,
+              context: context,
+              fontOption: fontOption,
+              textColor: AppColors.textWhite,
+              onTap: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                if (isStopWatch) ref.read(audioProvider.notifier).stop();
+                ref.read(stopwatchProvider2.notifier).setMode(mode);
+                ref.read(stopwatchProvider2.notifier).clearTime();
+                // ✅ Reset ONLY this mode's status back to initial
+                ref.read(statusProvider.notifier).state = StopwatchStatus.initial;
+                if (isHaptic) HapticFeedback.lightImpact();
+              },
+            )),
           ]),
       ],
     );
   }
 
-  // ✅ FIX 2: bg changed to Color? to accept null
   Widget _buildButton({
     required Color? bg,
     BorderSide? side,
@@ -379,262 +488,192 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
     Color? textColor,
   }) {
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(fixedSize: Size(double.infinity, 52.h), backgroundColor: bg, side: side),
+      style: ElevatedButton.styleFrom(
+        minimumSize: Size(double.infinity, 52.h),
+        backgroundColor: bg,
+        side: side,
+      ),
       onPressed: onTap,
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [...children, SizedBox(width: 6.w), CustomText(text: text, fontSize: getAdjustedFontSize(fontSize, fontOption).sp, fontWeight: FontWeight.w700, color: textColor)]),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ...children,
+          SizedBox(width: 6.w),
+
+          Flexible(
+            child: CustomText(
+              text: text,
+              fontSize: getAdjustedFontSize(fontSize, fontOption).sp,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+              maxLines: 1,
+              textOverflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _logSection(String logText, bool isDark, FontSizeOption fontOption, bool isHaptic, bool isStopWatch, BuildContext context, int type) {
     return Column(children: [
       SizedBox(height: 16.h),
-      Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: isDark ? const Color(0xff0C3156) : Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(width: 1.w, color: const Color(0xff2DA8F0)), boxShadow: const [BoxShadow(blurRadius: 12, color: Colors.black12)]),
-          child: SingleChildScrollView(child: CustomText(text: logText))),
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xff0C3156) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(width: 1.w, color: const Color(0xff2DA8F0)),
+          boxShadow: const [BoxShadow(blurRadius: 12, color: Colors.black12)],
+        ),
+        child: SingleChildScrollView(child: CustomText(text: logText)),
+      ),
       SizedBox(height: 16.h),
       Row(children: [
-        Expanded(child: _buildButton(bg: const Color(0xff234B6E), side: const BorderSide(color: Color(0xff234B6E)), children: [SvgPicture.asset(IconPath.clearIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))], text: AppLocalizations.of(context)!.clear, fontSize: 16, context: context, fontOption: fontOption, onTap: () {
-
-
-          FocusManager.instance.primaryFocus?.unfocus();
-          ref.read(stopwatchProvider2.notifier).clearLog();
-          if(isStopWatch) ref.read(audioProvider.notifier).stop();
-         // ref.read(stopwatchProvider2.notifier).pause();
-          ref.read(stopwatchProvider2.notifier).reset();
-          ref.read(stopwatchProvider1.notifier).clear();
-          if(isHaptic) HapticFeedback.lightImpact();
-        }, textColor: AppColors.textWhite)),
+        Expanded(child: _buildButton(
+          bg: const Color(0xff234B6E),
+          side: const BorderSide(color: Color(0xff234B6E)),
+          children: [SvgPicture.asset(IconPath.clearIcon, colorFilter: const ColorFilter.mode(AppColors.textWhite, BlendMode.srcIn))],
+          text: AppLocalizations.of(context)!.clear,
+          fontSize: 16,
+          context: context,
+          fontOption: fontOption,
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            // ✅ Clear log + reset ONLY this mode
+            final mode = type == 1 ? 'Stopwatch' : type == 2 ? 'Converter' : 'Predictor';
+            ref.read(stopwatchProvider2.notifier).setMode(mode);
+            ref.read(stopwatchProvider2.notifier).clearLog();
+            if (isStopWatch) ref.read(audioProvider.notifier).stop();
+            ref.read(stopwatchProvider2.notifier).reset();
+            ref.read(_statusProviderFor(mode).notifier).state = StopwatchStatus.initial;
+            if (isHaptic) HapticFeedback.lightImpact();
+          },
+          textColor: AppColors.textWhite,
+        )),
         SizedBox(width: 12.w),
-        Expanded(child: _buildButton(bg: AppColors.primary, children: [SvgPicture.asset(IconPath.exportIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))], text: AppLocalizations.of(context)!.export, fontSize: 16, context: context, fontOption: fontOption, onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          if (type == 1) exportOutputAsPdf1(context, ref); else if (type == 2) exportOutputAsPdf(context, ref); else exportOutputAsPdf3(context, ref);
-          if (isHaptic) HapticFeedback.lightImpact();
-        }, textColor: Colors.black)),
+        Expanded(child: _buildButton(
+          bg: AppColors.primary,
+          children: [SvgPicture.asset(IconPath.exportIcon, colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn))],
+          text: AppLocalizations.of(context)!.export,
+          fontSize: 16,
+          context: context,
+          fontOption: fontOption,
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            if (type == 1) exportOutputAsPdf1(context, ref);
+            else if (type == 2) exportOutputAsPdf(context, ref);
+            else exportOutputAsPdf3(context, ref);
+            if (isHaptic) HapticFeedback.lightImpact();
+          },
+          textColor: Colors.black,
+        )),
       ]),
     ]);
   }
 
-  Widget _converterSelector(
-      BuildContext context,
-      FontSizeOption fontOption,
-      bool isHaptic,
-      ) {
-    return Row(
-      children: [
-
-        /// FROM
-        Expanded(
-          child: Column(
-            children: [
-              CustomText(
-                text: AppLocalizations.of(context)!.from,
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: getAdjustedFontSize(16, fontOption).sp,
-              ),
-              SizedBox(height: 8.h),
-
-              Consumer(
-                builder: (context, ref, child) {
-                  const items = ["SCY", "SCM", "LCM"];
-
-                  final course = ref.watch(
-                    stopwatchProvider2.select((s) => s.fromCourse),
-                  );
-
-                  /// ✅ SAFE MATCH (prevents future bugs)
-                  final selected = items.contains(course)
-                      ? course
-                      : items.first;
-
-                  return SplitCalculatorSelectorOne(
-                    items: items,
-                    selectedValue: selected,
-                    onChanged: (s) {
-                      FocusManager.instance.primaryFocus?.unfocus();
-
-                      /// ✅ FIXED (NO lowercase)
-                      ref
-                          .read(stopwatchProvider2.notifier)
-                          .setConverterCourses(from: s);
-
-                      if (isHaptic) HapticFeedback.lightImpact();
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-
-        /// TO
-        Expanded(
-          child: Column(
-            children: [
-              CustomText(
-                text: AppLocalizations.of(context)!.to,
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: getAdjustedFontSize(16, fontOption).sp,
-              ),
-              SizedBox(height: 8.h),
-
-              Consumer(
-                builder: (context, ref, child) {
-                  const items = ["SCY", "SCM", "LCM"];
-
-                  final course = ref.watch(
-                    stopwatchProvider2.select((s) => s.toCourse),
-                  );
-
-                  /// ✅ SAFE MATCH
-                  final selected = items.contains(course)
-                      ? course
-                      : items.first;
-
-                  return SplitCalculatorSelectorOne(
-                    items: items,
-                    selectedValue: selected,
-                    onChanged: (s) {
-                      FocusManager.instance.primaryFocus?.unfocus();
-
-                      /// ✅ FIXED (NO lowercase)
-                      ref
-                          .read(stopwatchProvider2.notifier)
-                          .setConverterCourses(to: s);
-
-                      if (isHaptic) HapticFeedback.lightImpact();
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+  Widget _converterSelector(BuildContext context, FontSizeOption fontOption, bool isHaptic) {
+    return Row(children: [
+      Expanded(child: Column(children: [
+        CustomText(text: AppLocalizations.of(context)!.from, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
+        SizedBox(height: 8.h),
+        Consumer(builder: (context, ref, child) {
+          const items = ["SCY", "SCM", "LCM"];
+          final course = ref.watch(stopwatchProvider2.select((s) => s.fromCourse));
+          final selected = items.contains(course) ? course : items.first;
+          return SplitCalculatorSelectorOne(
+            items: items,
+            selectedValue: selected,
+            onChanged: (s) {
+              FocusManager.instance.primaryFocus?.unfocus();
+              ref.read(stopwatchProvider2.notifier).setConverterCourses(from: s);
+              if (isHaptic) HapticFeedback.lightImpact();
+            },
+          );
+        }),
+      ])),
+      Expanded(child: Column(children: [
+        CustomText(text: AppLocalizations.of(context)!.to, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
+        SizedBox(height: 8.h),
+        Consumer(builder: (context, ref, child) {
+          const items = ["SCY", "SCM", "LCM"];
+          final course = ref.watch(stopwatchProvider2.select((s) => s.toCourse));
+          final selected = items.contains(course) ? course : items.first;
+          return SplitCalculatorSelectorOne(
+            items: items,
+            selectedValue: selected,
+            onChanged: (s) {
+              FocusManager.instance.primaryFocus?.unfocus();
+              ref.read(stopwatchProvider2.notifier).setConverterCourses(to: s);
+              if (isHaptic) HapticFeedback.lightImpact();
+            },
+          );
+        }),
+      ])),
+    ]);
   }
-
-
-
-
 
   Widget _predictorSelector(BuildContext context, FontSizeOption fontOption) {
     return Column(children: [
-      /// Gender & Stroke Row
       Row(children: [
         Expanded(child: Column(children: [
-
           CustomText(text: AppLocalizations.of(context)!.gender, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final gender = ref.watch(stopwatchProvider2.select((s) => s.gender));
-
-            // Keep the display value capitalized for the UI
-            final selected = gender.isNotEmpty
-                ? "${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}"
-                : "";
-
+            final selected = gender.isNotEmpty ? "${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}" : "";
             return SplitCalculatorSelectorOne(
               items: const ["Men", "Women"],
               selectedValue: selected,
-              // ✅ Pass to logic as lowercase so it matches Ratios1 keys
               onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(g: v.toLowerCase()),
             );
           }),
         ])),
         Expanded(child: Column(children: [
-
           CustomText(text: AppLocalizations.of(context)!.stroke, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
-            final items = const ["Fly", "Back", "Breast", "Free", "IM"];
+            const items = ["Fly", "Back", "Breast", "Free", "IM"];
             final stroke = ref.watch(stopwatchProvider2.select((s) => s.stroke));
             final selected = items.firstWhere((i) => i.toLowerCase() == stroke, orElse: () => items.first);
-            return SplitCalculatorSelectorOne(items: items, selectedValue: selected, onChanged: (s) {
-              // ✅ When stroke changes, reset distance & splitSize to valid defaults
-              final newStroke = s.toLowerCase();
-              final state = ref.read(stopwatchProvider2);
-              final validDistances = getDistances(state.course, newStroke);
-              final newDistance = validDistances.contains(state.distance) ? state.distance : validDistances.first;
-              final validSplits = getSplitSizes(course: state.course, distance: newDistance, stroke: newStroke);
-              ref.read(stopwatchProvider2.notifier).setPredictorParams(s: newStroke, d: newDistance, split: validSplits.first);
-            });
+            return SplitCalculatorSelectorOne(
+              items: items,
+              selectedValue: selected,
+              onChanged: (s) {
+                final newStroke     = s.toLowerCase();
+                final state         = ref.read(stopwatchProvider2);
+                final validDistances = getDistances(state.course, newStroke);
+                final newDistance   = validDistances.contains(state.distance) ? state.distance : validDistances.first;
+                final validSplits   = getSplitSizes(course: state.course, distance: newDistance, stroke: newStroke);
+                ref.read(stopwatchProvider2.notifier).setPredictorParams(s: newStroke, d: newDistance, split: validSplits.first);
+              },
+            );
           }),
         ])),
       ]),
       SizedBox(height: 10.h),
-
-      /// Course & Distance Row
       Row(children: [
         Expanded(child: Column(children: [
           SizedBox(height: 8.h),
-          CustomText(text: "COURSE", color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
+          CustomText(text: AppLocalizations.of(context)!.course, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
-
-          // Consumer(
-          //   builder: (context, ref, child) {
-          //     const items = ["SCY", "SCM", "LCM"];
-          //
-          //     final course = ref.watch(
-          //       stopwatchProvider2.select((s) => s.course),
-          //     );
-          //
-          //     /// ✅ SAFE MATCH
-          //     final selected = items.contains(course)
-          //         ? course
-          //         : items.first;
-          //
-          //     return SplitCalculatorSelectorOne(
-          //       items: items,
-          //       selectedValue: selected,
-          //       onChanged: (s) {
-          //         FocusManager.instance.primaryFocus?.unfocus();
-          //
-          //         /// ✅ FIXED (NO lowercase)
-          //         ref
-          //             .read(stopwatchProvider2.notifier)
-          //             .setConverterCourses(to: s);
-          //
-          //         if (isHaptic) HapticFeedback.lightImpact();
-          //       },
-          //     );
-          //   },
-          // ),
           Consumer(builder: (context, ref, child) {
-            const items = ["SCY", "SCM", "LCM"];
-
-            // Watch the course and ensure we handle it consistently in Uppercase for the UI
+            const items    = ["SCY", "SCM", "LCM"];
             final rawCourse = ref.watch(stopwatchProvider2.select((s) => s.course));
             final currentCourse = rawCourse.toUpperCase();
-
             return SplitCalculatorSelectorOne(
               items: items,
-              selectedValue: currentCourse, // UI uses Uppercase
+              selectedValue: currentCourse,
               onChanged: (s) {
-                final notifier = ref.read(stopwatchProvider2.notifier);
-                final state = ref.read(stopwatchProvider2);
-
-                final newCourse = s.toLowerCase(); // Backend uses lowercase
-
-                // 1. Get valid distances for the NEW course
+                final notifier      = ref.read(stopwatchProvider2.notifier);
+                final state         = ref.read(stopwatchProvider2);
+                final newCourse     = s.toLowerCase();
                 final validDistances = getDistances(newCourse, state.stroke);
-                final newDistance = validDistances.contains(state.distance)
-                    ? state.distance
-                    : validDistances.first;
-
-                // 2. Get valid split sizes for the NEW course and NEW distance
-                final validSplits = getSplitSizes(
-                    course: newCourse,
-                    distance: newDistance,
-                    stroke: state.stroke
-                );
-
-                // 3. Update the provider
-                notifier.setPredictorParams(
-                  c: newCourse,
-                  d: newDistance,
-                  split: validSplits.isNotEmpty ? validSplits.first : "50",
-                );
+                final newDistance   = validDistances.contains(state.distance) ? state.distance : validDistances.first;
+                final validSplits   = getSplitSizes(course: newCourse, distance: newDistance, stroke: state.stroke);
+                notifier.setPredictorParams(c: newCourse, d: newDistance, split: validSplits.isNotEmpty ? validSplits.first : "50");
               },
             );
           }),
@@ -644,33 +683,35 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           CustomText(text: AppLocalizations.of(context)!.distance, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
-            // ✅ Watch course + stroke + distance tuple for accurate rebuilds
-            final state = ref.watch(stopwatchProvider2.select((s) => (s.course, s.stroke, s.distance)));
+            final state     = ref.watch(stopwatchProvider2.select((s) => (s.course, s.stroke, s.distance)));
             final distances = getDistances(state.$1, state.$2);
-            final selected = distances.contains(state.$3) ? state.$3 : distances.first;
-            return SplitCalculatorSelectorOne(items: distances, selectedValue: selected, onChanged: (v) {
-              // ✅ When distance changes, reset splitSize to valid default
-              final newDistance = v;
-              final validSplits = getSplitSizes(course: state.$1, distance: newDistance, stroke: state.$2);
-              ref.read(stopwatchProvider2.notifier).setPredictorParams(d: newDistance, split: validSplits.first);
-            });
+            final selected  = distances.contains(state.$3) ? state.$3 : distances.first;
+            return SplitCalculatorSelectorOne(
+              items: distances,
+              selectedValue: selected,
+              onChanged: (v) {
+                final validSplits = getSplitSizes(course: state.$1, distance: v, stroke: state.$2);
+                ref.read(stopwatchProvider2.notifier).setPredictorParams(d: v, split: validSplits.first);
+              },
+            );
           }),
         ])),
       ]),
       SizedBox(height: 10.h),
-
-      /// Split Size & Start Type Row
       Row(children: [
         Expanded(child: Column(children: [
           SizedBox(height: 8.h),
           CustomText(text: AppLocalizations.of(context)!.splitSize, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
-            // ✅ Watch course + stroke + distance + splitSize for accurate splits
-            final state = ref.watch(stopwatchProvider2.select((s) => (s.course, s.stroke, s.distance, s.splitSize)));
+            final state  = ref.watch(stopwatchProvider2.select((s) => (s.course, s.stroke, s.distance, s.splitSize)));
             final splits = getSplitSizes(course: state.$1, distance: state.$3, stroke: state.$2);
             final selected = splits.contains(state.$4) ? state.$4 : splits.first;
-            return SplitCalculatorSelectorOne(items: splits, selectedValue: selected, onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(split: v));
+            return SplitCalculatorSelectorOne(
+              items: splits,
+              selectedValue: selected,
+              onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(split: v),
+            );
           }),
         ])),
         Expanded(child: Column(children: [
@@ -679,275 +720,223 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
           SizedBox(height: 16.h),
           Consumer(builder: (context, ref, child) {
             final start = ref.watch(stopwatchProvider2.select((s) => s.startType));
-            return SplitCalculatorSelectorOne(items: const ["From Start", "From Push"], selectedValue: start, onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(start: v));
+            return SplitCalculatorSelectorOne(
+              items: const ["From Start", "From Push"],
+              selectedValue: start,
+              onChanged: (v) => ref.read(stopwatchProvider2.notifier).setPredictorParams(start: v),
+            );
           }),
         ])),
       ]),
-
       SizedBox(height: 10.h),
-
-      /// ✅ SHOW ONLY FOR LCM + 50 + 15
-      Consumer(
-        builder: (context, ref, child) {
-          final state = ref.watch(
-            stopwatchProvider2.select(
-                  (s) => (
-              s.course,
-              s.distance,
-              s.splitSize,
-              s.progressiveActive,
-              ),
-            ),
-          );
-
-          final shouldShow = state.$1 == "lcm" &&
-              state.$2 == "50" &&
-              state.$3 == "15";
-
-          if (!shouldShow) {
-            return const SizedBox();
-          }
-
-          return Row(
-            children: [
-              Checkbox(
-                value: true,
-                //value: state.$4,
-                onChanged: (v) {
-                  // ref
-                  //     .read(stopwatchProvider2.notifier)
-                  //     .toggleProgressive( v ?? false);
-                },
-              ),
-              CustomText(
-                text: "Progressive",
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: getAdjustedFontSize(14, fontOption).sp,
-              ),
-            ],
-          );
-        },
-      ),
+      Consumer(builder: (context, ref, child) {
+        final state = ref.watch(stopwatchProvider2.select((s) => (s.course, s.distance, s.splitSize, s.progressiveActive)));
+        final shouldShow = state.$1 == "lcm" && state.$2 == "50" && state.$3 == "15";
+        if (!shouldShow) return const SizedBox();
+        return Row(children: [
+          Checkbox(value: true, onChanged: (v) {}),
+          CustomText(text: "Progressive", color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(14, fontOption).sp),
+        ]);
+      }),
     ]);
   }
 
-// ============================================================
-// 📊 COMPLETE PREDICTOR DATA DICTIONARY
-// ============================================================
+  // ── Predictor Data & Helpers (unchanged) ─────────────────────
   static const Map<String, Map<String, Map<String, List<String>>>> _predictorData = {
     'scy': {
-      'free': {
-        '50': ['25'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-        '500': ['50', '100'],
-        '1000': ['50', '100'],
-        '1650': ['50', '100'],
-      },
-      'fly': {
-        '50': ['25'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'back': {
-        '50': ['25'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'breast': {
-        '50': ['25'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'im': {
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-        '400': ['50', '100'],
-      },
+      'free':   {'50': ['25'], '100': ['25','50'], '200': ['50','100'], '500': ['50','100'], '1000': ['50','100'], '1650': ['50','100']},
+      'fly':    {'50': ['25'], '100': ['25','50'], '200': ['50','100']},
+      'back':   {'50': ['25'], '100': ['25','50'], '200': ['50','100']},
+      'breast': {'50': ['25'], '100': ['25','50'], '200': ['50','100']},
+      'im':     {'100': ['25','50'], '200': ['50','100'], '400': ['50','100']},
     },
     'scm': {
-      'free': {
-        '50': ['25'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-        '400': ['50', '100'],
-        '800': ['50', '100'],
-        '1500': ['50', '100'],
-      },
-      'fly': {
-        '50': ['25'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'back': {
-        '50': ['25'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'breast': {
-        '50': ['25'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'im': {
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-        '400': ['50', '100'],
-      },
+      'free':   {'50': ['25'], '100': ['25','50'], '200': ['50','100'], '400': ['50','100'], '800': ['50','100'], '1500': ['50','100']},
+      'fly':    {'50': ['25'], '100': ['25','50'], '200': ['50','100']},
+      'back':   {'50': ['25'], '100': ['25','50'], '200': ['50','100']},
+      'breast': {'50': ['25'], '100': ['25','50'], '200': ['50','100']},
+      'im':     {'100': ['25','50'], '200': ['50','100'], '400': ['50','100']},
     },
     'lcm': {
-      'free': {
-        '50': ['15', '25', '35'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-        '400': ['50', '100'],
-        '800': ['50', '100'],
-        '1500': ['50', '100'],
-      },
-      'fly': {
-        '50': ['15', '25', '35'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'back': {
-        '50': ['15', '25', '35'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'breast': {
-        '50': ['15', '25', '35'],
-        '100': ['25', '50'],
-        '200': ['50', '100'],
-      },
-      'im': {
-        '200': ['50', '100'],
-        '400': ['50', '100'],
-      },
+      'free':   {'50': ['15','25','35'], '100': ['25','50'], '200': ['50','100'], '400': ['50','100'], '800': ['50','100'], '1500': ['50','100']},
+      'fly':    {'50': ['15','25','35'], '100': ['25','50'], '200': ['50','100']},
+      'back':   {'50': ['15','25','35'], '100': ['25','50'], '200': ['50','100']},
+      'breast': {'50': ['15','25','35'], '100': ['25','50'], '200': ['50','100']},
+      'im':     {'200': ['50','100'], '400': ['50','100']},
     },
   };
 
-  /// ✅ Get valid distances for a given course + stroke
   List<String> getDistances(String course, String stroke) {
-    course = course.toLowerCase();
-    stroke = stroke.toLowerCase();
-
-    final courseData = _predictorData[course];
-    if (courseData == null) return ['50'];
-
-    final strokeData = courseData[stroke];
-    if (strokeData == null) return ['50'];
-
-    return strokeData.keys.toList();
+    final d = _predictorData[course.toLowerCase()]?[stroke.toLowerCase()];
+    return d?.keys.toList() ?? ['50'];
   }
 
-  /// ✅ Get valid split sizes for course + stroke + distance
-  List<String> getSplitSizes({
-    required String course,
-    required String distance,
-    required String stroke,  // ✅ NEW: stroke is required for accurate splits
-  }) {
-    course = course.toLowerCase();
-    stroke = stroke.toLowerCase();
-
-    final courseData = _predictorData[course];
-    if (courseData == null) return ['50'];
-
-    final strokeData = courseData[stroke];
-    if (strokeData == null) return ['50'];
-
-    final splitSizes = strokeData[distance];
-    return splitSizes ?? ['50'];
+  List<String> getSplitSizes({required String course, required String distance, required String stroke}) {
+    return _predictorData[course.toLowerCase()]?[stroke.toLowerCase()]?[distance] ?? ['50'];
   }
 
-  /// ✅ Get all valid distances for a course (for course dropdown reset)
-  List<String> getDistancesByCourse(String course) {
-    course = course.toLowerCase();
-    final courseData = _predictorData[course];
-    if (courseData == null) return ['50'];
+  // ── PDF Export (unchanged) ────────────────────────────────────
+  Future<void> exportOutputAsPdf(BuildContext context, WidgetRef ref)  async => _exportPdf(ref.read(stopwatchProvider2).logConverter,  'swim_converter_output.pdf',  context);
+  Future<void> exportOutputAsPdf3(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logPredictor,  'swim_predictor_output.pdf',  context);
+  Future<void> exportOutputAsPdf1(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logStopwatch,  'swim_stopwatch_output.pdf',  context);
 
-    // Collect all unique distances across all strokes for this course
-    final distances = <String>{};
-    for (final strokeData in courseData.values) {
-      distances.addAll(strokeData.keys);
-    }
-    return distances.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
-  }
-
-  Future<void> exportOutputAsPdf(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logConverter, 'swim_converter_output.pdf', context);
-  Future<void> exportOutputAsPdf3(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logPredictor, 'swim_predictor_output.pdf', context);
-  Future<void> exportOutputAsPdf1(BuildContext context, WidgetRef ref) async => _exportPdf(ref.read(stopwatchProvider2).logStopwatch, 'swim_stopwatch_output.pdf', context);
-
-
-  Future<void> _exportPdf(
-      String log,
-      String fileName,
-      BuildContext context,
-      ) async {
+  Future<void> _exportPdf(String log, String fileName, BuildContext context) async {
     if (log.isEmpty) return;
 
-    final pdf = pw.Document();
+    final pdf      = pw.Document();
     final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
-    final ttf = pw.Font.ttf(fontData);
+    final ttf      = pw.Font.ttf(fontData);
 
-    final List<String> allLines = log
+    final allLines = log
         .split('\n')
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
         .toList();
 
-    final int mid = (allLines.length / 2).ceil();
-    final List<String> leftHalf = allLines.sublist(0, mid);
-    final List<String> rightHalf = allLines.sublist(mid);
+    // ── Page & column geometry ────────────────────────────────
+    const double pageMargin    = 32;
+    const double headerHeight  = 60;  // SwimMetrics + divider + spacing
+    const double colGap        = 30;
+    const double lineHeight    = 13.0;
+    const double headerLineH   = 15.0;
 
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(32),
-        header: (context) => pw.Column(
-          children: [
-            pw.Center(
-              child: pw.Text(
-                'SwimMetrics',
-                style: pw.TextStyle(font: ttf, fontSize: 20, fontWeight: pw.FontWeight.bold),
-              ),
-            ),
-            pw.SizedBox(height: 10),
-            pw.Divider(thickness: 0.5),
-            pw.SizedBox(height: 10),
-          ],
+    final double pageH   = PdfPageFormat.a4.height;
+    final double usableH = pageH - (pageMargin * 2) - headerHeight;
+
+    // ── Measure how tall a single line will be ───────────────
+    double _lineH(String text) {
+      final isHeader = text.contains('Projection') ||
+          text.contains('→') ||
+          text.startsWith('===') ||
+          text.contains('Breakdown');
+      return (isHeader ? headerLineH : lineHeight) + (isHeader ? 12 : 0);
+    }
+
+    // ── Bin lines into columns, then pages ───────────────────
+    // Structure: pages → columns(2) → lines
+    final List<List<List<String>>> pages = [];
+
+    List<String> currentCol = [];
+    double colUsed = 0;
+    bool fillingLeft = true;
+
+    List<String> leftCol  = [];
+    List<String> rightCol = [];
+    double leftUsed  = 0;
+    double rightUsed = 0;
+
+    void flushPage() {
+      pages.add([List.from(leftCol), List.from(rightCol)]);
+      leftCol   = [];
+      rightCol  = [];
+      leftUsed  = 0;
+      rightUsed = 0;
+      fillingLeft = true;
+    }
+
+    for (final line in allLines) {
+      final h = _lineH(line);
+
+      if (fillingLeft) {
+        if (leftUsed + h > usableH && leftCol.isNotEmpty) {
+          // Left column full → switch to right
+          fillingLeft = false;
+        } else {
+          leftCol.add(line);
+          leftUsed += h;
+          continue;
+        }
+      }
+
+      // Filling right column
+      if (rightUsed + h > usableH && rightCol.isNotEmpty) {
+        // Right column full → flush page
+        flushPage();
+        leftCol.add(line);
+        leftUsed += h;
+        fillingLeft = true;
+      } else {
+        rightCol.add(line);
+        rightUsed += h;
+      }
+    }
+
+    // Flush remaining lines
+    if (leftCol.isNotEmpty || rightCol.isNotEmpty) {
+      flushPage();
+    }
+
+    // ── Build one pw.Page per logical page ───────────────────
+    for (final page in pages) {
+      final left  = page[0];
+      final right = page[1];
+
+      final double pageW   = PdfPageFormat.a4.width;
+      final double usableW = pageW - (pageMargin * 2);
+      final double colW    = (usableW - colGap) / 2;
+
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(pageMargin),
+          build: (pw.Context ctx) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
+
+                // ── Header ──────────────────────────────────────
+                pw.Center(
+                  child: pw.Text(
+                    'SwimMetrics',
+                    style: pw.TextStyle(
+                      font: ttf,
+                      fontSize: 20,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Divider(thickness: 0.5),
+                pw.SizedBox(height: 10),
+
+                // ── Two Columns ──────────────────────────────────
+                pw.Expanded(
+                  child: pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+
+                      // LEFT — filled first
+                      pw.SizedBox(
+                        width: colW,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: left.map((l) => _renderLine(l, ttf)).toList(),
+                        ),
+                      ),
+
+                      pw.SizedBox(width: colGap),
+
+                      // RIGHT — filled after left is full
+                      pw.SizedBox(
+                        width: colW,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: right.map((l) => _renderLine(l, ttf)).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
-        build: (pw.Context context) {
-          return [
-            // ✅ Center the entire Row content
-            pw.Center(
-              child: pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                mainAxisSize: pw.MainAxisSize.min, // ✅ Shrink-wrap the row to its content
-                children: [
-                  pw.Expanded(
-                    child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: leftHalf.map((line) => _renderLine(line, ttf)).toList(),
-                    ),
-                  ),
-                  pw.SizedBox(width: 30), // ✅ Slightly wider gap for better center visual
-                  pw.Expanded(
-                    child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: rightHalf.map((line) => _renderLine(line, ttf)).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ];
-        },
-      ),
-    );
+      );
+    }
 
+    // ── Save & Open ───────────────────────────────────────────
     try {
-      final dir = await getTemporaryDirectory();
+      final dir  = await getTemporaryDirectory();
       final file = File('${dir.path}/$fileName');
       await file.writeAsBytes(await pdf.save());
       if (context.mounted) await OpenFile.open(file.path);
@@ -957,27 +946,29 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
   }
 
   pw.Widget _renderLine(String text, pw.Font font) {
-    bool isMainHeader = text.contains('Projection') || text.contains('→');
-    bool isSubHeader = text.startsWith('===') || text.contains('Breakdown');
-
+    final isMainHeader = text.contains('Projection') || text.contains('→');
+    final isSubHeader  = text.startsWith('===') || text.contains('Breakdown');
     return pw.Container(
       alignment: pw.Alignment.centerLeft,
       padding: pw.EdgeInsets.only(
-        top: isMainHeader ? 12 : (isSubHeader ? 6 : 0),
+        top:    isMainHeader ? 12 : (isSubHeader ? 6 : 0),
+        bottom: 1,
       ),
       child: pw.Text(
         text.replaceAll('=', '').trim(),
         style: pw.TextStyle(
-          font: font,
-          fontSize: 9,
+          font:       font,
+          fontSize:   9,
           lineSpacing: 1.2,
-          fontWeight: (isMainHeader || isSubHeader) ? pw.FontWeight.bold : pw.FontWeight.normal,
+          fontWeight: (isMainHeader || isSubHeader)
+              ? pw.FontWeight.bold
+              : pw.FontWeight.normal,
         ),
       ),
     );
   }
 
   static String _formatElapsed(double s) => '${_twoDigits((s ~/ 60))}:${_secondsPart(s)}';
-  static String _secondsPart(double s) { final secs = s % 60; return secs.toStringAsFixed(2).padLeft(5, '0'); }
-  static String _twoDigits(int n) => n.toString().padLeft(2, '0');
+  static String _secondsPart(double s)   { final secs = s % 60; return secs.toStringAsFixed(2).padLeft(5, '0'); }
+  static String _twoDigits(int n)        => n.toString().padLeft(2, '0');
 }

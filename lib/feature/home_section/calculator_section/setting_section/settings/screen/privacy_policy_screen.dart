@@ -82,7 +82,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               ),
               SizedBox(height: 10.h),
               CustomText(
-                text: "Operated by PMcC Solutions LLC, a Texas limited liability company (“PMcC Solutions,” “we,” “us,” or “our”)",
+                text: "Operated by PMcC Solutions LLC, a Texas limited liability company (PMcC Solutions)",
                 fontSize: 14.sp,
                 color: textColor,
               ),

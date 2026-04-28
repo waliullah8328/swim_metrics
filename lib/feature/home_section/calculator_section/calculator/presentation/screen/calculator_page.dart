@@ -606,21 +606,25 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                               keyboardType: TextInputType.text,
                               hintText: "mm:ss.hh",
                               controller: timeController,
-
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return AppLocalizations.of(context)!.enterYourTime;
                                 }
-
-
-
                                 return null;
                               },
-
+                              suffixIcon: timeController.text.isNotEmpty
+                                  ? GestureDetector(
+                                onTap: () {
+                                  timeController.clear();
+                                  ref.read(splitCalcProvider.notifier).setGoalTime('');
+                                  setState(() {}); // refresh to hide icon after clear
+                                },
+                                child: const Icon(Icons.close, size: 18),
+                              )
+                                  : null,
                               onChanged: (value) {
-                                ref
-                                    .read(splitCalcProvider.notifier)
-                                    .setGoalTime(value);
+                                setState(() {}); // refresh to show/hide cross icon as user types
+                                ref.read(splitCalcProvider.notifier).setGoalTime(value);
                               },
                             ),
 
@@ -850,75 +854,172 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
       return;
     }
 
-    final pdf = pw.Document();
-
-    final fontData =
-    await rootBundle.load('assets/font/Merriweather-font.ttf');
-    final ttf = pw.Font.ttf(fontData);
+    final pdf      = pw.Document();
+    final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
+    final ttf      = pw.Font.ttf(fontData);
 
     final List historyList = history.reversed.take(200).toList();
 
-    try {
+    // ── Page & column geometry ────────────────────────────────
+    const double pageMarginH   = 40;
+    const double pageMarginV   = 30;
+    const double headerHeight  = 55;  // SwimMetrics + divider + spacing
+    const double colGap        = 10;
+    const double itemPadding   = 6;
+    const double lineHeight    = 9 * 1.3; // fontSize * lineSpacing
+
+    final double pageH   = PdfPageFormat.a4.height;
+    final double pageW   = PdfPageFormat.a4.width;
+    final double usableH = pageH - (pageMarginV * 2) - headerHeight;
+    final double usableW = pageW - (pageMarginH * 2);
+    final double colW    = (usableW - colGap) / 2;
+
+    // ── Measure how tall one history item will be ─────────────
+    double _measureItem(dynamic item) {
+      final lines = (item.output ?? '')
+          .toString()
+          .split('\n')
+          .where((e) =>
+      e.trim().isNotEmpty &&
+          e.trim() != '=' &&
+          e.trim() != '===')
+          .toList();
+      return (lines.length * lineHeight) + (itemPadding * 2) + 6; // +6 bottom gap
+    }
+
+    // ── Bin items: left col first → right col → new page ─────
+    // Structure: pages → 2 columns → items per column
+    final List<List<List<dynamic>>> pages = [];
+
+    List<dynamic> leftCol  = [];
+    List<dynamic> rightCol = [];
+    double leftUsed  = 0;
+    double rightUsed = 0;
+    bool fillingLeft = true;
+
+    void flushPage() {
+      pages.add([List.from(leftCol), List.from(rightCol)]);
+      leftCol      = [];
+      rightCol     = [];
+      leftUsed     = 0;
+      rightUsed    = 0;
+      fillingLeft  = true;
+    }
+
+    for (final item in historyList) {
+      final itemH = _measureItem(item);
+
+      if (fillingLeft) {
+        if (leftUsed + itemH > usableH && leftCol.isNotEmpty) {
+          // Left full → switch to right
+          fillingLeft = false;
+        } else {
+          leftCol.add(item);
+          leftUsed += itemH;
+          continue;
+        }
+      }
+
+      // Filling right column
+      if (rightUsed + itemH > usableH && rightCol.isNotEmpty) {
+        // Right full → flush page, start new left
+        flushPage();
+        leftCol.add(item);
+        leftUsed    += itemH;
+        fillingLeft  = true;
+      } else {
+        rightCol.add(item);
+        rightUsed += itemH;
+      }
+    }
+
+    // Flush any remaining items
+    if (leftCol.isNotEmpty || rightCol.isNotEmpty) {
+      flushPage();
+    }
+
+    // ── Build one pw.Page per logical page ───────────────────
+    for (final page in pages) {
+      final left  = page[0];
+      final right = page[1];
+
       pdf.addPage(
-        pw.MultiPage(
+        pw.Page(
           pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.symmetric(
-            horizontal: 40,
-            vertical: 30,
+          margin: pw.EdgeInsets.symmetric(
+            horizontal: pageMarginH,
+            vertical: pageMarginV,
           ),
-          maxPages: 100,
+          build: (pw.Context ctx) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
 
-          /// Header for each page
-          header: (context) => pw.Column(
-            children: [
-              pw.Center(
-                child: pw.Text(
-                  'SwimMetrics',
-                  style: pw.TextStyle(font: ttf, fontSize: 20, fontWeight: pw.FontWeight.bold),
+                // ── Header ──────────────────────────────────
+                pw.Center(
+                  child: pw.Text(
+                    'SwimMetrics',
+                    style: pw.TextStyle(
+                      font: ttf,
+                      fontSize: 20,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-              pw.SizedBox(height: 10),
-              pw.Divider(thickness: 0.5),
-              pw.SizedBox(height: 10),
-            ],
-          ),
+                pw.SizedBox(height: 10),
+                pw.Divider(thickness: 0.5),
+                pw.SizedBox(height: 10),
 
-          build: (context) => [
-            /// Auto height 2-column layout
-            pw.Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: historyList.map((item) {
-                return pw.Container(
-                  width:
-                  (PdfPageFormat.a4.availableWidth - 20) / 2,
-                  child: _buildPdfEntry(item, ttf),
-                );
-              }).toList(),
-            ),
-          ],
+                // ── Two Columns ──────────────────────────────
+                pw.Expanded(
+                  child: pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+
+                      // LEFT — fills first
+                      pw.SizedBox(
+                        width: colW,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: left
+                              .map((item) => _buildPdfEntry(item, ttf))
+                              .toList(),
+                        ),
+                      ),
+
+                      pw.SizedBox(width: colGap),
+
+                      // RIGHT — fills after left is full
+                      pw.SizedBox(
+                        width: colW,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: right
+                              .map((item) => _buildPdfEntry(item, ttf))
+                              .toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       );
+    }
 
-      final dir = await getTemporaryDirectory();
-
-      final file = File(
-        '${dir.path}/swim_metrics_split_calculator.pdf',
-      );
-
+    // ── Save & Open ───────────────────────────────────────────
+    try {
+      final dir  = await getTemporaryDirectory();
+      final file = File('${dir.path}/swim_metrics_split_calculator.pdf');
       await file.writeAsBytes(await pdf.save());
-
-      if (context.mounted) {
-        await OpenFile.open(file.path);
-      }
+      if (context.mounted) await OpenFile.open(file.path);
     } catch (e) {
       debugPrint("PDF Export Error: $e");
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to export PDF'),
-          ),
+          const SnackBar(content: Text('Failed to export PDF')),
         );
       }
     }
@@ -929,22 +1030,23 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
     final lines = (item.output ?? '')
         .toString()
         .split('\n')
-        .where(
-          (e) =>
-      e.trim().isNotEmpty &&
-          e.trim() != '=' &&
-          e.trim() != '===',
-    )
+        .where((e) =>
+    e.trim().isNotEmpty &&
+        e.trim() != '=' &&
+        e.trim() != '===')
         .toList();
 
-    return pw.Container(
-      padding: const pw.EdgeInsets.all(6),
-      child: pw.Text(
-        lines.join('\n'),
-        style: pw.TextStyle(
-          font: ttf,
-          fontSize: 9,
-          lineSpacing: 1.3,
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(bottom: 6), // gap between items
+      child: pw.Container(
+        padding: const pw.EdgeInsets.all(6),
+        child: pw.Text(
+          lines.join('\n'),
+          style: pw.TextStyle(
+            font: ttf,
+            fontSize: 9,
+            lineSpacing: 1.3,
+          ),
         ),
       ),
     );

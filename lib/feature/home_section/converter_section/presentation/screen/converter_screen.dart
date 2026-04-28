@@ -40,6 +40,9 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
   final TextEditingController timeController = TextEditingController();
   final FocusNode timeFocusNode = FocusNode();
 
+  // ✅ ValueNotifier — only rebuilds the suffix icon, not the whole screen
+  final ValueNotifier<bool> _hasText = ValueNotifier<bool>(false);
+
   @override
   void initState() {
     super.initState();
@@ -47,20 +50,26 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
     final state1 = ref.read(converterProvider1);
     timeController.text = state1.timeText;
+    // ✅ Sync initial value
+    _hasText.value = state1.timeText.isNotEmpty;
+  }
+
+  @override
+  void dispose() {
+    _hasText.dispose();
+    timeController.dispose();
+    timeFocusNode.dispose();
+    super.dispose();
   }
 
   Future<void> checkPlanExpiry(BuildContext context) async {
     final planEndDate = await TokenStorage.getPlanEndDate();
 
-
     if (planEndDate == null) return;
 
     if (DateTime.now().isAfter(planEndDate)) {
-      // ❌ Plan expired → logout
       await TokenStorage.clearAll();
       await TokenStorage.deleteLoginFlag();
-
-      // Navigate to login
       context.go(RouteNames.loginScreen);
     }
   }
@@ -82,18 +91,13 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
     final controller1 = ref.read(converterProvider1.notifier);
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-    final isDark = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final showCourse = ref.watch(showCourseSectionConverter);
-    final fontOption = ref
-        .watch(settingsProvider)
-        .fontSize;
+    final fontOption = ref.watch(settingsProvider).fontSize;
     final isHaptic = ref.watch(settingsProvider.select((s) => s.haptic));
 
     return Scaffold(
       key: scaffoldKey,
-
       drawer: CustomDrawer(),
       appBar: AppBar(
         title: CustomText(
@@ -105,10 +109,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
         leading: GestureDetector(
           onTap: () {
             scaffoldKey.currentState?.openDrawer();
-            if (isHaptic == true) {
-              HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-            }
+            if (isHaptic == true) HapticFeedback.lightImpact();
           },
           child: Padding(
             padding: EdgeInsets.only(left: 18.w),
@@ -120,30 +121,21 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
             ),
           ),
         ),
-
-        /// Divider below AppBar
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
         ),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-
         child: Column(
           children: [
             if (!showCourse)
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    ref
-                        .read(showCourseSectionConverter.notifier)
-                        .state = true;
-                    if (isHaptic == true) {
-                      HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                    }
+                    ref.read(showCourseSectionConverter.notifier).state = true;
+                    if (isHaptic == true) HapticFeedback.lightImpact();
                   },
                   child: Column(
                     children: [
@@ -153,9 +145,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         children: [
                           SvgPicture.asset(IconPath.pullIcon),
                           CustomText(
-                            text: AppLocalizations.of(
-                              context,
-                            )!.pullDownToSeeOptions,
+                            text: AppLocalizations.of(context)!.pullDownToSeeOptions,
                             fontSize: getAdjustedFontSize(14, fontOption).sp,
                             color: Color(0xffC7C7C7),
                           ),
@@ -169,15 +159,11 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
             Container(
               padding: const EdgeInsets.all(16),
-
               decoration: BoxDecoration(
-                color: isDark ? Color(0xff0C3156) : Colors.white,
+                color: isDark ? AppColors.darkThemeContainerColor : Color(0xffFFFFFF),
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(blurRadius: 6, color: Colors.black12),
-                ],
+                boxShadow: const [BoxShadow(blurRadius: 6, color: Colors.black12)],
               ),
-
               child: Column(
                 children: [
                   if (showCourse)
@@ -190,96 +176,55 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                 children: [
                                   CustomText(
                                     text: AppLocalizations.of(context)!.gender,
-
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: getAdjustedFontSize(
-                                      16,
-                                      fontOption,
-                                    ).sp,
+                                    fontSize: getAdjustedFontSize(16, fontOption).sp,
                                   ),
                                   SizedBox(height: 8.h),
                                   Consumer(
                                     builder: (context, ref, child) {
                                       final state1 = ref.watch(
-                                        converterProvider1.select(
-                                              (s) => s.gender,
-                                        ),
+                                        converterProvider1.select((s) => s.gender),
                                       );
-
-                                      // convert to match UI
                                       final selectedValue = state1.isNotEmpty
-                                          ? state1[0].toUpperCase() +
-                                          state1.substring(1)
+                                          ? state1[0].toUpperCase() + state1.substring(1)
                                           : "";
-                                      final controller1 = ref.read(
-                                        converterProvider1.notifier,
-                                      );
-                                      debugPrint(state1.toString());
-
+                                      final controller1 = ref.read(converterProvider1.notifier);
                                       return SplitCalculatorSelectorOne(
                                         items: const ["Men", "Women"],
-                                        selectedValue:
-                                        selectedValue,
-                                        // ✅ keep selected after refresh
-                                        onChanged: (v) =>
-                                            controller1.setGender(v),
+                                        selectedValue: selectedValue,
+                                        onChanged: (v) => controller1.setGender(v),
                                       );
                                     },
                                   ),
                                 ],
                               ),
                             ),
-
                             Expanded(
                               child: Column(
                                 children: [
                                   CustomText(
                                     text: AppLocalizations.of(context)!.stroke,
-
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: getAdjustedFontSize(
-                                      16,
-                                      fontOption,
-                                    ).sp,
+                                    fontSize: getAdjustedFontSize(16, fontOption).sp,
                                   ),
                                   SizedBox(height: 8.h),
                                   Consumer(
                                     builder: (context, ref, child) {
-                                      final items = const [
-                                        "Fly",
-                                        "Back",
-                                        "Breast",
-                                        "Free",
-                                        "IM",
-                                      ];
-
+                                      final items = const ["Fly", "Back", "Breast", "Free", "IM"];
                                       final state1 = ref.watch(
-                                        converterProvider1.select(
-                                              (s) => s.stroke,
-                                        ),
+                                        converterProvider1.select((s) => s.stroke),
                                       );
-
-                                      // match lowercase state with UI list
                                       final selectedValue = items.firstWhere(
-                                            (item) =>
-                                        item.toLowerCase() == state1,
+                                            (item) => item.toLowerCase() == state1,
                                         orElse: () => "",
                                       );
-
-                                      final controller1 = ref.read(
-                                        converterProvider1.notifier,
-                                      );
-
+                                      final controller1 = ref.read(converterProvider1.notifier);
                                       return SplitCalculatorSelectorOne(
                                         items: items,
                                         selectedValue: selectedValue,
-                                        onChanged: (selected) {
-                                          controller1.setStroke(
-                                            selected,
-                                          ); // store lowercase inside
-                                        },
+                                        onChanged: (selected) => controller1.setStroke(selected),
                                       );
                                     },
                                   ),
@@ -292,8 +237,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                         Row(
                           children: [
-
-                            /// ================= FROM COURSE =================
                             Expanded(
                               child: Column(
                                 children: [
@@ -301,96 +244,53 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                     text: AppLocalizations.of(context)!.from,
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: getAdjustedFontSize(
-                                      16,
-                                      fontOption,
-                                    ).sp,
+                                    fontSize: getAdjustedFontSize(16, fontOption).sp,
                                   ),
                                   SizedBox(height: 8.h),
-
                                   Consumer(
                                     builder: (context, ref, child) {
                                       const items = ["SCY", "SCM", "LCM"];
-
-                                      final state = ref.watch(
-                                          converterProvider1);
+                                      final state = ref.watch(converterProvider1);
                                       final course = state.course;
-                                      final stroke = state.stroke;
-
-                                      final controller = ref.read(
-                                          converterProvider1.notifier);
-
+                                      final controller = ref.read(converterProvider1.notifier);
                                       final selectedValue = items.firstWhere(
-                                            (item) =>
-                                        item.toLowerCase() == course,
+                                            (item) => item.toLowerCase() == course,
                                         orElse: () => items.first,
                                       );
-
                                       return SplitCalculatorSelectorOne(
                                         items: items,
                                         selectedValue: selectedValue,
                                         onChanged: (selected) {
-                                          final newCourse = selected
-                                              .toLowerCase();
-
-                                          // ✅ use BOTH course + stroke
-                                          // final distances = getDistances(newCourse, stroke);
-
-                                          controller.setCourse(newCourse);
-
-                                          // reset distance safely
-                                          // controller.setDistance(distances.first);
+                                          controller.setCourse(selected.toLowerCase());
                                         },
                                       );
                                     },
-                                  )
+                                  ),
                                 ],
                               ),
                             ),
-
-
-                            /// ================= DISTANCE =================
                             Expanded(
                               child: Column(
                                 children: [
                                   CustomText(
-                                    text: AppLocalizations.of(
-                                      context,
-                                    )!.distance,
+                                    text: AppLocalizations.of(context)!.distance,
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: getAdjustedFontSize(
-                                      16,
-                                      fontOption,
-                                    ).sp,
+                                    fontSize: getAdjustedFontSize(16, fontOption).sp,
                                   ),
                                   SizedBox(height: 8.h),
-
                                   Consumer(
                                     builder: (context, ref, child) {
-                                      final state = ref.watch(
-                                          converterProvider1);
-                                      final controller = ref.read(
-                                          converterProvider1.notifier);
-
-                                      // ✅ use BOTH course + stroke
-                                      final distances = getDistances(
-                                        state.course,
-                                        state.stroke,
-                                      );
-
-                                      // ✅ ensure valid selection
-                                      final selectedDistance = distances
-                                          .contains(state.distance)
+                                      final state = ref.watch(converterProvider1);
+                                      final controller = ref.read(converterProvider1.notifier);
+                                      final distances = getDistances(state.course, state.stroke);
+                                      final selectedDistance = distances.contains(state.distance)
                                           ? state.distance
                                           : distances.first;
-
                                       return SplitCalculatorSelectorOne(
                                         items: distances,
                                         selectedValue: selectedDistance,
-                                        onChanged: (value) {
-                                          controller.setDistance(value);
-                                        },
+                                        onChanged: (value) => controller.setDistance(value),
                                       );
                                     },
                                   ),
@@ -413,77 +313,52 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             Consumer(
                               builder: (context, ref, child) {
                                 final state = ref.watch(converterProvider1);
-                                final controller1 = ref.read(
-                                  converterProvider1.notifier,
-                                );
+                                final controller1 = ref.read(converterProvider1.notifier);
                                 return Row(
                                   children: [
-                                    // SCY
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Checkbox(
                                           value: state.targets.contains('scy'),
-                                          onChanged:
-                                          state.course.isNotEmpty &&
-                                              state.course == 'scy'
+                                          onChanged: state.course.isNotEmpty && state.course == 'scy'
                                               ? null
                                               : (val) {
-                                            controller1.toggleTarget(
-                                              'scy',
-                                              val ?? false,
-                                            );
+                                            controller1.toggleTarget('scy', val ?? false);
                                             if (isHaptic) HapticFeedback.heavyImpact();
-                                          }
-
+                                          },
                                         ),
                                         const Text('SCY'),
                                       ],
                                     ),
                                     const SizedBox(width: 12),
-
-                                    // SCM
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Checkbox(
                                           value: state.targets.contains('scm'),
-                                          onChanged:
-                                          state.course.isNotEmpty &&
-                                              state.course == 'scm'
+                                          onChanged: state.course.isNotEmpty && state.course == 'scm'
                                               ? null
                                               : (val) {
-                                            controller1.toggleTarget(
-                                              'scm',
-                                              val ?? false,
-                                            );
+                                            controller1.toggleTarget('scm', val ?? false);
                                             if (isHaptic) HapticFeedback.heavyImpact();
-                                          }
-
+                                          },
                                         ),
                                         const Text('SCM'),
                                       ],
                                     ),
                                     const SizedBox(width: 12),
-
-                                    // LCM
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Checkbox(
                                           value: state.targets.contains('lcm'),
-                                          onChanged:
-                                          state.course.isNotEmpty &&
-                                              state.course == 'lcm'
+                                          onChanged: state.course.isNotEmpty && state.course == 'lcm'
                                               ? null
                                               : (val) {
-                                            controller1.toggleTarget(
-                                              'lcm',
-                                              val ?? false,
-                                            );
+                                            controller1.toggleTarget('lcm', val ?? false);
                                             if (isHaptic) HapticFeedback.heavyImpact();
-                                          }
-
+                                          },
                                         ),
                                         Text('LCM'),
                                       ],
@@ -499,7 +374,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     ),
 
                   /// TIME INPUT
-                  /// TIME INPUT
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -513,7 +387,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                       TextFormField(
                         controller: timeController,
-                        // ✅ use controller
                         focusNode: timeFocusNode,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
@@ -522,11 +395,26 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             borderRadius: BorderRadius.circular(6),
                             borderSide: const BorderSide(color: Colors.grey),
                           ),
+                          // ✅ ValueListenableBuilder — only this icon widget rebuilds
+                          suffixIcon: ValueListenableBuilder<bool>(
+                            valueListenable: _hasText,
+                            builder: (context, hasText, _) {
+                              return hasText
+                                  ? GestureDetector(
+                                onTap: () {
+                                  timeController.clear();
+                                  _hasText.value = false; // ✅ no setState
+                                  ref.read(converterProvider1.notifier).setTimeText('');
+                                },
+                                child: const Icon(Icons.close, size: 18),
+                              )
+                                  : const SizedBox.shrink();
+                            },
+                          ),
                         ),
                         onChanged: (value) {
-                          ref
-                              .read(converterProvider1.notifier)
-                              .setTimeText(value);
+                          _hasText.value = value.isNotEmpty; // ✅ no setState — only icon rebuilds
+                          ref.read(converterProvider1.notifier).setTimeText(value);
                         },
                       ),
                     ],
@@ -540,7 +428,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                         text: AppLocalizations.of(context)!.showSplits,
                         fontSize: 14.sp,
                       ),
-
                       Consumer(
                         builder: (context, ref, child) {
                           final isRemember = ref.watch(
@@ -551,8 +438,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             onChanged: (v) {
                               controller1.setShowSplits(v ?? false);
                               if (isHaptic) HapticFeedback.heavyImpact();
-                            }
-
+                            },
                           );
                         },
                       ),
@@ -562,45 +448,21 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                   /// CONVERT BUTTON
                   GestureDetector(
                     onTap: () {
-                      // Check if the time field is empty
-                      if (timeController.text
-                          .trim()
-                          .isEmpty) {
-                        // Show a Snackbar if the time field is empty
+                      if (timeController.text.trim().isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
                               AppLocalizations.of(context)!.enterYourTime,
-                              // You can customize this message
-                              style: TextStyle(fontSize: 14.sp,
-                                  color: AppColors.backgroundDark),
+                              style: TextStyle(fontSize: 14.sp, color: AppColors.backgroundDark),
                             ),
                             backgroundColor: Colors.grey,
-                            duration: Duration(
-                                seconds: 2), // Duration of Snackbar
+                            duration: Duration(seconds: 2),
                           ),
                         );
                       } else {
-                        // Proceed with conversion if time field is not empty
                         controller1.convert(context: context);
-                        ref
-                            .read(showCourseSectionConverter.notifier)
-                            .state = false;
-
-                        // Trigger haptic feedback if enabled
-                        if (isHaptic == true) {
-                          HapticFeedback
-                              .lightImpact(); // 👈 HAPTIC FEEDBACK HERE
-                        }
-
-                        final history = ref.watch(converterProvider1.select((s) => s.output));
-
-
-
-                        // Reverse the history to show the latest first
-                        final reversedHistory = history;
-                        print(history.toString());
-
+                        ref.read(showCourseSectionConverter.notifier).state = false;
+                        if (isHaptic == true) HapticFeedback.lightImpact();
                       }
                     },
                     child: Container(
@@ -636,28 +498,20 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                 final output = ref.watch(
                   converterProvider1.select((s) => s.output),
                 );
-
                 return output.isEmpty
                     ? SizedBox()
                     : Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
-
                   decoration: BoxDecoration(
                     color: isDark ? Color(0xff0C3156) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      width: 1,
-                      color: Color(0xff2DA8F0),
-                    ),
-                    boxShadow: const [
-                      BoxShadow(blurRadius: 12, color: Colors.black12),
-                    ],
+                    border: Border.all(width: 1, color: Color(0xff2DA8F0)),
+                    boxShadow: const [BoxShadow(blurRadius: 12, color: Colors.black12)],
                   ),
-
                   child: SingleChildScrollView(
-                    child: CustomText(text:
-                      output,
+                    child: CustomText(
+                      text: output,
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
                     ),
@@ -671,7 +525,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                 final output = ref.watch(
                   converterProvider1.select((s) => s.output),
                 );
-
                 return output.isEmpty
                     ? SizedBox()
                     : Column(
@@ -687,26 +540,17 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             ),
                             onPressed: () {
                               controller1.reset();
-                              if (isHaptic == true) {
-                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                              }
+                              if (isHaptic == true) HapticFeedback.lightImpact();
                             },
                             child: Center(
                               child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset(IconPath.clearIcon),
                                   SizedBox(width: 6.w),
                                   CustomText(
-                                    text: AppLocalizations.of(
-                                      context,
-                                    )!.clear,
-                                    fontSize: getAdjustedFontSize(
-                                      16,
-                                      fontOption,
-                                    ).sp,
+                                    text: AppLocalizations.of(context)!.clear,
+                                    fontSize: getAdjustedFontSize(16, fontOption).sp,
                                     color: AppColors.textWhite,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -722,34 +566,21 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                               backgroundColor: AppColors.primary,
                             ),
                             onPressed: () {
-                              final output = ref
-                                  .read(converterProvider1)
-                                  .output;
+                              final output = ref.read(converterProvider1).output;
                               exportOutputAsPdf(context, output);
-                              if (isHaptic == true) {
-                                HapticFeedback.lightImpact(); // 👈 HAPTIC HERE
-
-                              }
+                              if (isHaptic == true) HapticFeedback.lightImpact();
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SvgPicture.asset(
                                   IconPath.exportIcon,
-                                  colorFilter: ColorFilter.mode(
-                                    Colors.black,
-                                    BlendMode.srcIn,
-                                  ),
+                                  colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
                                 ),
                                 SizedBox(width: 6.w),
                                 CustomText(
-                                  text: AppLocalizations.of(
-                                    context,
-                                  )!.export,
-                                  fontSize: getAdjustedFontSize(
-                                    16,
-                                    fontOption,
-                                  ).sp,
+                                  text: AppLocalizations.of(context)!.export,
+                                  fontSize: getAdjustedFontSize(16, fontOption).sp,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ],
@@ -797,81 +628,63 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     }
   }
 
-
   List<String> getDistancesByCourseAndStroke(String course, String stroke) {
     course = course.toLowerCase().trim();
     stroke = stroke.toLowerCase().trim();
-
-    // Common strokes (Fly, Back, Breast)
     const sprintStrokes = ["fly", "back", "breast"];
 
     if (course == 'lcm' || course == 'scm') {
-      if (sprintStrokes.contains(stroke)) {
-        return ["50", "100", "200"];
-      } else if (stroke == "free") {
-        return ["50", "100", "200", "400", "800", "1500"];
-      } else if (stroke == "im") {
-        return ["200", "400"];
-      }
+      if (sprintStrokes.contains(stroke)) return ["50", "100", "200"];
+      if (stroke == "free") return ["50", "100", "200", "400", "800", "1500"];
+      if (stroke == "im") return ["200", "400"];
     }
-
     if (course == 'scy') {
-      if (sprintStrokes.contains(stroke)) {
-        return ["50", "100", "200"];
-      } else if (stroke == "free") {
-        return ["50", "100", "200", "500", "1000", "1650"];
-      } else if (stroke == "im") {
-        return ["100", "200", "400"];
-      }
+      if (sprintStrokes.contains(stroke)) return ["50", "100", "200"];
+      if (stroke == "free") return ["50", "100", "200", "500", "1000", "1650"];
+      if (stroke == "im") return ["100", "200", "400"];
     }
-
-    // fallback
     return ["50"];
   }
 
+  // ═══════════════════════════════════════════════════════════
+  //  CONSTANTS — matched to second export's proven geometry
+  // ═══════════════════════════════════════════════════════════
+  static const double _kPageMarginH     = 40;   // horizontal margin
+  static const double _kPageMarginV     = 30;   // vertical margin
+  static const double _kHeaderHeight    = 55;   // SwimMetrics + divider + spacing
+  static const double _kColumnGap       = 10;
+  static const double _kBlockPaddingV   = 6;    // padding inside each block
+  static const double _kLineHeight      = 9 * 1.3; // fontSize(9) * lineSpacing(1.3)
+  static const double _kTitleLineHeight = 11 * 1.3; // title fontSize(11) * lineSpacing
+  static const double _kInterBlockGap   = 6;    // gap between blocks
 
   // ═══════════════════════════════════════════════════════════
-//  CONSTANTS
-// ═══════════════════════════════════════════════════════════
-  static const double _kPageMargin       = 28;
-  static const double _kColumnGap        = 16;
-  static const double _kHeaderHeight     = 60;   // SwimMetrics + divider
-  static const double _kFooterHeight     = 20;
-  static const double _kBlockPaddingV    = 12;   // top+bottom padding per block card
-  static const double _kLineHeight       = 14.5; // per text line at font 10
-  static const double _kTitleLineHeight  = 16.0; // bold header lines
-  static const double _kInterBlockGap    = 10;   // gap between blocks
-
-// ═══════════════════════════════════════════════════════════
-//  HELPERS — measure how tall a block will be
-// ═══════════════════════════════════════════════════════════
+  //  MEASURE — how tall a block will be
+  // ═══════════════════════════════════════════════════════════
   double _measureBlock(List<String> lines) {
-    double h = _kBlockPaddingV;
+    double h = _kBlockPaddingV * 2; // top + bottom padding
     for (final raw in lines) {
       final line = raw.trim();
       final isHeader = line.contains('===') ||
           line.contains('→') ||
           line.contains('Projection');
       h += isHeader ? _kTitleLineHeight : _kLineHeight;
-      h += 3; // bottom padding per text row
     }
+    h += _kInterBlockGap; // gap after block
     return h;
   }
 
-// ═══════════════════════════════════════════════════════════
-//  MAIN EXPORT
-// ═══════════════════════════════════════════════════════════
-  Future<void> exportOutputAsPdf(
-      BuildContext context,
-      String output,
-      ) async {
+  // ═══════════════════════════════════════════════════════════
+  //  MAIN EXPORT
+  // ═══════════════════════════════════════════════════════════
+  Future<void> exportOutputAsPdf(BuildContext context, String output) async {
     if (output.trim().isEmpty) return;
 
     final pdf      = pw.Document();
     final fontData = await rootBundle.load('assets/font/Merriweather-font.ttf');
     final ttf      = pw.Font.ttf(fontData);
 
-    // ── Parse: double-newline = section boundary ─────────────────────────
+    // ── Parse blocks ─────────────────────────────────────────
     final List<List<String>> allBlocks = output
         .split('\n\n')
         .map((s) => s
@@ -882,104 +695,94 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
         .where((b) => b.isNotEmpty)
         .toList();
 
-    // ── Page geometry ─────────────────────────────────────────────────────
-    final double pageW        = PdfPageFormat.a4.width;
-    final double pageH        = PdfPageFormat.a4.height;
-    final double usableW      = pageW  - _kPageMargin * 2;
-    final double usableH      = pageH  - _kPageMargin * 2
-        - _kHeaderHeight
-        - _kFooterHeight;
-    final double colW         = (usableW - _kColumnGap) / 2;
+    // ── Page geometry — same as second export ────────────────
+    final double pageW   = PdfPageFormat.a4.width;
+    final double pageH   = PdfPageFormat.a4.height;
+    final double usableW = pageW - (_kPageMarginH * 2);
+    final double usableH = pageH - (_kPageMarginV * 2) - _kHeaderHeight;
+    final double colW    = (usableW - _kColumnGap) / 2;
 
-    // ── Bin blocks into (page, column) slots ─────────────────────────────
-    //   Structure: pages → columns(2) → blocks
-    //   Fill col-0 → col-1 → new page col-0 → col-1 → …
+    // ── Bin blocks: LEFT fills first → RIGHT → new page ──────
+    //
+    //  Same 3-step logic as the working second export:
+    //    1. Fits in left  → add to left
+    //    2. Fits in right → add to right
+    //    3. Both full     → flush page, start fresh left
+    //
     final List<List<List<List<String>>>> pages = [];
 
-    List<List<String>> currentCol    = [];
-    int                currentColIdx = 0;          // 0 = left, 1 = right
-    double             colUsed       = 0;
+    List<List<String>> col0    = [];
+    List<List<String>> col1    = [];
+    double             col0Used = 0;
+    double             col1Used = 0;
 
-    void _nextColumn() {
-      // Save current column, advance
-      if (pages.isEmpty || pages.last.length == 2) {
-        // Start a new page with this column
-        pages.add([List.from(currentCol)]);
-      } else {
-        // Add as right column of current page
-        pages.last.add(List.from(currentCol));
-      }
-      currentCol    = [];
-      currentColIdx = pages.isEmpty ? 0 : (pages.last.length % 2);
-      colUsed       = 0;
+    void flushPage() {
+      pages.add([List.from(col0), List.from(col1)]);
+      col0 = []; col1 = []; col0Used = 0; col1Used = 0;
     }
 
     for (final block in allBlocks) {
-      final blockH = _measureBlock(block) + _kInterBlockGap;
+      final blockH = _measureBlock(block);
 
-      if (colUsed + blockH > usableH && currentCol.isNotEmpty) {
-        // Current column is full — move to next column / page
-        _nextColumn();
-      }
-
-      currentCol.add(block as dynamic); // ← fix below — store block itself
-      colUsed += blockH;
-    }
-
-    // ── Flush remaining ───────────────────────────────────────────────────
-    if (currentCol.isNotEmpty) {
-      if (pages.isEmpty) {
-        pages.add([List.from(currentCol)]);
-      } else if (pages.last.length < 2) {
-        pages.last.add(List.from(currentCol));
+      if (col0Used + blockH <= usableH) {
+        // ✅ Step 1: left column has room
+        col0.add(block);
+        col0Used += blockH;
+      } else if (col1Used + blockH <= usableH) {
+        // ✅ Step 2: left full, right has room
+        col1.add(block);
+        col1Used += blockH;
       } else {
-        pages.add([List.from(currentCol)]);
+        // ✅ Step 3: both full → flush, restart on left
+        flushPage();
+        col0.add(block);
+        col0Used += blockH;
       }
     }
 
-    // Ensure every page has exactly 2 column slots (right may be empty)
-    for (final page in pages) {
-      while (page.length < 2) page.add([]);
-    }
+    // Flush remaining
+    if (col0.isNotEmpty || col1.isNotEmpty) flushPage();
 
-    // ── Build PDF — one pw.Page per logical page ──────────────────────────
-    final int totalPages = pages.length;
-
-    for (int pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+    // ── Build PDF pages ───────────────────────────────────────
+    for (int pageIdx = 0; pageIdx < pages.length; pageIdx++) {
       final leftBlocks  = pages[pageIdx][0];
       final rightBlocks = pages[pageIdx][1];
 
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.all(_kPageMargin),
+          // ✅ Same margin style as second export
+          margin: pw.EdgeInsets.symmetric(
+            horizontal: _kPageMarginH,
+            vertical: _kPageMarginV,
+          ),
           build: (pw.Context ctx) {
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.stretch,
               children: [
 
-                // ── Header ───────────────────────────────────────────────
+                // ── Header ──────────────────────────────────
                 pw.Center(
                   child: pw.Text(
                     'SwimMetrics',
                     style: pw.TextStyle(
                       font: ttf,
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: pw.FontWeight.bold,
                     ),
                   ),
                 ),
-                pw.SizedBox(height: 6),
-                pw.Divider(thickness: 0.6),
+                pw.SizedBox(height: 10),
+                pw.Divider(thickness: 0.5),
                 pw.SizedBox(height: 10),
 
-                // ── Two columns ──────────────────────────────────────────
+                // ── Two columns ──────────────────────────────
                 pw.Expanded(
                   child: pw.Row(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
 
-                      // LEFT column
+                      // LEFT column — fills first
                       pw.SizedBox(
                         width: colW,
                         child: _buildColumn(leftBlocks, ttf),
@@ -987,7 +790,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
 
                       pw.SizedBox(width: _kColumnGap),
 
-                      // RIGHT column
+                      // RIGHT column — fills after left
                       pw.SizedBox(
                         width: colW,
                         child: _buildColumn(rightBlocks, ttf),
@@ -995,30 +798,6 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     ],
                   ),
                 ),
-
-                // ── Footer ───────────────────────────────────────────────
-                // pw.Divider(thickness: 0.4),
-                // pw.Row(
-                //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     pw.Text(
-                //       'SwimMetrics Report',
-                //       style: pw.TextStyle(
-                //         font: ttf,
-                //         fontSize: 8,
-                //         color: PdfColors.grey600,
-                //       ),
-                //     ),
-                //     pw.Text(
-                //       'Page ${pageIdx + 1} of $totalPages',
-                //       style: pw.TextStyle(
-                //         font: ttf,
-                //         fontSize: 8,
-                //         color: PdfColors.grey600,
-                //       ),
-                //     ),
-                //   ],
-                // ),
               ],
             );
           },
@@ -1026,6 +805,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       );
     }
 
+    // ── Save & Open ───────────────────────────────────────────
     try {
       final dir  = await getTemporaryDirectory();
       final file = File('${dir.path}/swim_metrics_output.pdf');
@@ -1036,12 +816,11 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     }
   }
 
-// ═══════════════════════════════════════════════════════════
-//  COLUMN BUILDER — stacks blocks top→bottom
-// ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════
+  //  COLUMN BUILDER
+  // ═══════════════════════════════════════════════════════════
   pw.Widget _buildColumn(List<List<String>> blocks, pw.Font ttf) {
     if (blocks.isEmpty) return pw.SizedBox();
-
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: blocks.map((block) {
@@ -1053,48 +832,34 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
     );
   }
 
-// ═══════════════════════════════════════════════════════════
-//  BLOCK RENDERER
-// ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════
+  //  BLOCK RENDERER — font size matched to second export (9pt)
+  // ═══════════════════════════════════════════════════════════
   pw.Widget _buildOutputBlock(List<String> lines, pw.Font font) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: lines.map((raw) {
-        final line = raw.trim();
-
-        // Clean === decorators
+        final line    = raw.trim();
         final display = line.replaceAll('=', '').replaceAll('-', '').trim();
-
-        final bool isTitle   = line.contains('===') || line.contains('---');
-        final bool isResult  = line.contains('→');
-        final bool isSplit   = RegExp(r'^\d+(m)?:').hasMatch(line);
+        final bool isTitle  = line.contains('===') || line.contains('---');
+        final bool isResult = line.contains('→');
 
         return pw.Padding(
-          padding: pw.EdgeInsets.only(
-            bottom: 3,
-            // Indent split lines
-            left: isSplit ? 0 : 0,
-          ),
+          padding: const pw.EdgeInsets.only(bottom: 1),
           child: pw.Text(
             display,
             style: pw.TextStyle(
               font: font,
-              fontSize: isTitle ? 11 : 10,
+              fontSize: isTitle ? 11 : 9,   // ✅ matched to second export's 9pt
               fontWeight: isTitle || isResult
                   ? pw.FontWeight.bold
-                  : pw.FontWeight.bold,
-              color: isTitle
-                  ? PdfColors.black
-                  : isSplit
-                  ? PdfColors.black
-                  : PdfColors.black,
-              lineSpacing: 1.4,
+                  : pw.FontWeight.normal,
+              color: PdfColors.black,
+              lineSpacing: 1.3,             // ✅ matched to second export
             ),
           ),
         );
       }).toList(),
     );
   }
-
-
 }

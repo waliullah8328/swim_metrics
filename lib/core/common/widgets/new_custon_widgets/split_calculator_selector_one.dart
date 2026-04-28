@@ -68,13 +68,14 @@ class _SplitCalculatorSelectorOneState
 
     return Card(
       elevation: 0,
-      color: Colors.transparent, // Adjusting based on your manual Card shape
+      color: isDark ? const Color(0xff092541) : const Color(0xffEAEDF1), // ✅ changed
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: isDark ? Colors.grey.shade800 : const Color(0xffEAEDF1),
-          width: 1,
-        ),
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: isDark ? Color(0xff092541) : const Color(0xffEAEDF1),
+            width: 1,
+          ),
+
       ),
       child: SizedBox(
         width: double.infinity,
@@ -118,7 +119,7 @@ class _SplitCalculatorSelectorOneState
                       child: CustomText(
                         text: widget.items[index],
                         fontSize: 19.sp,
-                        color: isSelected ? AppColors.primary : (isDark ? Colors.white70 : Colors.black54),
+                        color: isSelected ? (isDark ? Colors.amber : const Color(0xFFB38F2E)): (isDark ? Colors.white70 : Colors.black54),
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
@@ -134,11 +135,11 @@ class _SplitCalculatorSelectorOneState
                 decoration: const BoxDecoration(
                   border: Border(
                     top: BorderSide(
-                      color: AppColors.textGrey,
+                      color: AppColors.primary,
                       width: 0.5,
                     ),
                     bottom: BorderSide(
-                      color: AppColors.textGrey,
+                      color: AppColors.primary,
                       width: 0.5,
                     ),
                   ),

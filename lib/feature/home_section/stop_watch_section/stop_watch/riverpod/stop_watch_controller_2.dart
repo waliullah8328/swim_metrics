@@ -24,6 +24,9 @@ class TimerState {
   final List<double> splits = [];
 }
 
+// stop_watch_controller_2.dart
+// ── Only the changed parts shown ─────────────────────────────
+
 class StopwatchController2 extends ChangeNotifier {
   final Map<String, TimerState> _timers = {
     'Stopwatch': TimerState(),
@@ -39,20 +42,26 @@ class StopwatchController2 extends ChangeNotifier {
   String logPredictor = '';
   String logConverter = '';
 
-  String gender = 'men';
-  String stroke = 'free';
-  String distance = '100';
-  String course = 'SCM';
+  String gender    = 'men';
+  String stroke    = 'free';
+  String distance  = '100';
+  String course    = 'SCM';
   String splitSize = '50';
   String startType = 'From Start';
 
-  bool progressiveActive = false;
-  String _marker = '15';
+  bool   progressiveActive     = false;
+  String _marker               = '15';
+  String fromCourse            = 'SCM';
+  String toCourse              = 'SCM';
+  String lastPredictorConfig   = '';
 
-  String fromCourse = 'SCM';
-  String toCourse = 'SCM';
+  // ✅ NEW: stores all completed predictor sessions separately
+  // Each session = { 'header': String, 'laps': List<String> }
+  final List<Map<String, dynamic>> _predictorSessions = [];
 
-  String lastPredictorConfig = '';
+  // ✅ NEW: current active session laps
+  List<String> _currentSessionLaps = [];
+  String       _currentSessionHeader = '';
 
   StopwatchController2() {
     initializeRatios1();
@@ -106,10 +115,8 @@ class StopwatchController2 extends ChangeNotifier {
     if (t.running) return;
 
     final now = DateTime.now();
-
     t.startTime ??= now;
     t.running = true;
-
     _marker = '15';
 
     _startTicker();
@@ -150,54 +157,31 @@ class StopwatchController2 extends ChangeNotifier {
 
     if (t.splits.length >= maxLogs) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You have reached the maximum of 100 laps'),
-        ),
+        const SnackBar(content: Text('You have reached the maximum of 100 laps')),
       );
       return;
     }
 
-    final total = elapsed();
-
-    /// ✅ FIXED: Pure calculation (UNDO SAFE)
-    final previousTotal =
-    t.splits.isEmpty ? 0.0 : t.splits.last;
-
-    final lap = total - previousTotal;
+    final total        = elapsed();
+    final previousTotal = t.splits.isEmpty ? 0.0 : t.splits.last;
+    final lap          = total - previousTotal;
 
     t.splits.add(total);
     final lapNo = t.splits.length;
 
     // ================= STOPWATCH =================
     if (activeMode == 'Stopwatch') {
-      final lines = logStopwatch.isEmpty
-          ? <String>[]
-          : logStopwatch.trim().split('\n');
-
-      lines.insert(
-        0,
-        "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / ${TimeUtils1.formatTime(total)}",
-      );
-
+      final lines = logStopwatch.isEmpty ? <String>[] : logStopwatch.trim().split('\n');
+      lines.insert(0, "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / ${TimeUtils1.formatTime(total)}");
       logStopwatch = lines.join('\n');
     }
 
-
-
     // ================= CONVERTER =================
     else if (activeMode == 'Converter') {
-      final factor = _factor(fromCourse, toCourse);
+      final factor    = _factor(fromCourse, toCourse);
       final converted = total * factor;
-
-      final lines = logConverter.isEmpty
-          ? <String>[]
-          : logConverter.trim().split('\n');
-
-      lines.insert(
-        0,
-        "Lap $lapNo: ${TimeUtils1.formatTime(total)} ${fromCourse.toUpperCase()} → ${TimeUtils1.formatTime(converted)} ${toCourse.toUpperCase()}",
-      );
-
+      final lines     = logConverter.isEmpty ? <String>[] : logConverter.trim().split('\n');
+      lines.insert(0, "Lap $lapNo: ${TimeUtils1.formatTime(total)} ${fromCourse.toUpperCase()} → ${TimeUtils1.formatTime(converted)} ${toCourse.toUpperCase()}");
       logConverter = lines.join('\n');
     }
 
@@ -210,44 +194,90 @@ class StopwatchController2 extends ChangeNotifier {
       final currentConfig =
           "$gender|$stroke|$distance|$course|$splitSize|$startType|$progressiveActive";
 
-      if (lastPredictorConfig != currentConfig ||
-          logPredictor.trim().isEmpty) {
-        lastPredictorConfig = currentConfig;
+      // ✅ Config changed OR first lap ever → start a NEW session
+      if (lastPredictorConfig != currentConfig) {
+        // ✅ Save current active session to history (if it has laps)
+        if (_currentSessionLaps.isNotEmpty) {
+          _predictorSessions.add({
+            'header': _currentSessionHeader,
+            'laps':   List<String>.from(_currentSessionLaps),
+          });
+        }
 
-        logPredictor =
-        "${gender[0].toUpperCase()}${gender.substring(1)}'s $distance $formattedStroke ${course.toUpperCase()} Projection\n"
+        // ✅ Reset current session for new config
+        lastPredictorConfig    = currentConfig;
+        _currentSessionLaps    = [];
+        _currentSessionHeader  =
+        "${gender[0].toUpperCase()}${gender.substring(1)}'s "
+            "$distance $formattedStroke ${course.toUpperCase()} Projection\n"
             "Start Type: $startType | Split Size: $splitSize\n"
-            "===============\n"
-            "Split Breakdown:";
-
+            "===============";
         _marker = '15';
+
+        // ✅ Also reset splits so lap numbers restart from 1
+        t.splits.clear();
+        t.splits.add(total); // re-add current split as lap 1
+        final newLap = total; // first lap of new session = total elapsed
+        final projected = _predict(1) ?? 0.0;
+        final isProgressive = _shouldEnableProgressive() && progressiveActive;
+        final label = isProgressive ? _marker : "Lap 1";
+        final newEntry = isProgressive
+            ? "$label ${TimeUtils1.formatTime(newLap)} / Projected Finish ${TimeUtils1.formatTime(projected)}"
+            : "$label ${TimeUtils1.formatTime(newLap)} / ${TimeUtils1.formatTime(total)} / Projected Finish ${TimeUtils1.formatTime(projected)}";
+        _currentSessionLaps.insert(0, newEntry);
+        if (isProgressive) _marker = _nextMarker(_marker);
+
+        _rebuildPredictorLog();
+        notifyListeners();
+        return;
       }
 
-      final projected = _predict(lapNo) ?? 0.0;
-      final isProgressive =
-          _shouldEnableProgressive() && progressiveActive;
-
-      final label = isProgressive ? _marker : "Lap $lapNo";
-
-      final newEntry = isProgressive
+      // ✅ Same config → append lap to current session
+      final projected     = _predict(lapNo) ?? 0.0;
+      final isProgressive = _shouldEnableProgressive() && progressiveActive;
+      final label         = isProgressive ? _marker : "Lap $lapNo";
+      final newEntry      = isProgressive
           ? "$label ${TimeUtils1.formatTime(lap)} / Projected Finish ${TimeUtils1.formatTime(projected)}"
           : "$label ${TimeUtils1.formatTime(lap)} / ${TimeUtils1.formatTime(total)} / Projected Finish ${TimeUtils1.formatTime(projected)}";
 
-      final parts = logPredictor.split("Split Breakdown:");
-      final header = parts[0];
-      final body = parts.length > 1 ? parts[1].trim() : "";
+      // ✅ Insert at top of current session (newest first)
+      _currentSessionLaps.insert(0, newEntry);
+      if (isProgressive) _marker = _nextMarker(_marker);
 
-      logPredictor = body.isEmpty
-          ? "${header}Split Breakdown:\n$newEntry"
-          : "${header}Split Breakdown:\n$newEntry\n$body";
-
-      if (isProgressive) {
-        _marker = _nextMarker(_marker);
-      }
+      _rebuildPredictorLog();
     }
 
     notifyListeners();
   }
+
+  // ✅ NEW: Rebuild logPredictor from sessions + current session
+  void _rebuildPredictorLog() {
+    final buffer = StringBuffer();
+
+    // ── Current active session at TOP ──────────────────────
+    if (_currentSessionHeader.isNotEmpty) {
+      buffer.writeln(_currentSessionHeader);
+      buffer.writeln("Split Breakdown:");
+      for (final lap in _currentSessionLaps) {
+        buffer.writeln(lap);
+      }
+    }
+
+    // ── Past sessions below, separated by blank line ───────
+    for (final session in _predictorSessions.reversed) {
+      buffer.writeln(); // blank line separator
+      buffer.writeln(session['header'] as String);
+      buffer.writeln("Split Breakdown:");
+      final laps = session['laps'] as List<String>;
+      for (final lap in laps) {
+        buffer.writeln(lap);
+      }
+    }
+
+    logPredictor = buffer.toString().trimRight();
+  }
+
+  // ================= RESET =================
   void reset() {
     final t = current;
 
@@ -261,6 +291,11 @@ class StopwatchController2 extends ChangeNotifier {
     logPredictor = '';
     logConverter = '';
 
+    // ✅ Clear predictor sessions too
+    _predictorSessions.clear();
+    _currentSessionLaps   = [];
+    _currentSessionHeader = '';
+    lastPredictorConfig   = '';
     _marker = '15';
 
     _ticker?.cancel();
@@ -276,15 +311,68 @@ class StopwatchController2 extends ChangeNotifier {
 
     if (activeMode == 'Stopwatch') {
       logStopwatch = _removeFirst(logStopwatch);
+
     } else if (activeMode == 'Predictor') {
-      logPredictor = _removeFirstPredictorLap(logPredictor);
+      // ✅ Remove from current session laps
+      if (_currentSessionLaps.isNotEmpty) {
+        _currentSessionLaps.removeAt(0); // newest is at index 0
+      }
 
       if (_shouldEnableProgressive() && progressiveActive) {
         _marker = _getMarkerFromCount(t.splits.length);
       }
+
+      // ✅ If current session is now empty, restore previous session
+      if (_currentSessionLaps.isEmpty && _predictorSessions.isNotEmpty) {
+        final prev         = _predictorSessions.removeLast();
+        _currentSessionHeader = prev['header'] as String;
+        _currentSessionLaps   = prev['laps']   as List<String>;
+
+        // Restore config from header so future splits match
+        lastPredictorConfig = '';  // force re-detect on next split
+      }
+
+      _rebuildPredictorLog();
+
     } else {
       logConverter = _removeFirst(logConverter);
     }
+
+    notifyListeners();
+  }
+
+  // ================= CLEAR LOG =================
+  void clearLog() {
+    if (activeMode == 'Stopwatch') {
+      logStopwatch = '';
+    }
+    if (activeMode == 'Predictor') {
+      logPredictor          = '';
+      _predictorSessions.clear();
+      _currentSessionLaps   = [];
+      _currentSessionHeader = '';
+      lastPredictorConfig   = '';
+      _marker               = '15';
+      // ✅ Also clear splits so next start is fresh
+      _timers['Predictor']!.splits.clear();
+    }
+    if (activeMode == 'Converter') {
+      logConverter = '';
+    }
+    notifyListeners();
+  }
+
+  // ================= CLEAR TIME =================
+  void clearTime() {
+    final t = current;
+
+    t.running = false;
+    t.startTime = null;
+    t.accumulated = 0;
+    t.lastSplitWall = null;
+
+    _ticker?.cancel();
+    _ticker = null;
 
     notifyListeners();
   }
@@ -302,80 +390,45 @@ class StopwatchController2 extends ChangeNotifier {
     return lines.join("\n");
   }
 
-    /// only clear time
-  void clearTime() {
-    final t = current;
-
-    t.running = false;
-    t.startTime = null;
-    t.accumulated = 0;
-    t.lastSplitWall = null;
-
-    /// keep splits if needed
-    /// or use t.splits.clear();
-
-    _ticker?.cancel();
-    _ticker = null;
-
-    notifyListeners();
-  }
-
-  void clearLog() {
-    if (activeMode == 'Stopwatch') logStopwatch = '';
-    if (activeMode == 'Predictor') logPredictor = '';
-    if (activeMode == 'Converter') logConverter = '';
-    notifyListeners();
-  }
-
   String _removeFirstPredictorLap(String log) {
     final lines = log.split("\n");
     final index = lines.indexOf("Split Breakdown:");
     if (index == -1) return log;
 
     int i = index + 1;
-    while (i < lines.length && lines[i].trim().isEmpty) {
-      i++;
-    }
-
-    if (i < lines.length) {
-      lines.removeAt(i);
-    }
+    while (i < lines.length && lines[i].trim().isEmpty) i++;
+    if (i < lines.length) lines.removeAt(i);
 
     return lines.join("\n");
   }
 
   double? _predict(int lapNo) {
     final total = elapsed();
-
     if (total <= 0) return null;
 
-    /// normalize values
-    final g = gender.toLowerCase().trim();
-    final s = stroke.toLowerCase().trim();
-    final c = course.toLowerCase().trim();
-
+    final g     = gender.toLowerCase().trim();
+    final s     = stroke.toLowerCase().trim();
+    final c     = course.toLowerCase().trim();
     final split = int.tryParse(splitSize) ?? 50;
 
-    /// Progressive mode
     if (_shouldEnableProgressive() && progressiveActive) {
       return SplitsCore4.predictorLCM50(
         elapsedSeconds: total,
-        gender: g,
-        marker: _marker,
-        pushStart: startType.toLowerCase() == 'from push',
+        gender:         g,
+        marker:         _marker,
+        pushStart:      startType.toLowerCase() == 'from push',
       );
     }
 
-    /// Standard mode
     return SplitsCore4.predictorStandard(
       elapsedSeconds: total,
-      splitCount: lapNo,
-      gender: g,
-      stroke: s,
-      distance: distance,
-      course: c,
-      splitSize: split,
-      pushStart: startType.toLowerCase() == 'from push',
+      splitCount:     lapNo,
+      gender:         g,
+      stroke:         s,
+      distance:       distance,
+      course:         c,
+      splitSize:      split,
+      pushStart:      startType.toLowerCase() == 'from push',
     );
   }
 
@@ -392,12 +445,9 @@ class StopwatchController2 extends ChangeNotifier {
 
   String _nextMarker(String current) {
     switch (current) {
-      case '15':
-        return '25';
-      case '25':
-        return '35';
-      default:
-        return '15';
+      case '15': return '25';
+      case '25': return '35';
+      default:   return '15';
     }
   }
 
@@ -405,24 +455,10 @@ class StopwatchController2 extends ChangeNotifier {
     _ticker?.cancel();
     _ticker = Timer.periodic(
       const Duration(milliseconds: 100),
-          (_) {
-        if (current.running) notifyListeners();
-      },
+          (_) { if (current.running) notifyListeners(); },
     );
   }
 }
-
-// final stopwatchProvider2 =
-// ChangeNotifierProvider<StopwatchController2>((ref) => StopwatchController2());
-//
-// class TimerState {
-//   bool running = false;
-//   DateTime? startTime;
-//   double accumulated = 0.0;
-//   DateTime? lastSplitWall;
-//   final List<double> splits = [];
-// }
-//
 // class StopwatchController2 extends ChangeNotifier {
 //   final Map<String, TimerState> _timers = {
 //     'Stopwatch': TimerState(),
@@ -432,14 +468,12 @@ class StopwatchController2 extends ChangeNotifier {
 //
 //   Timer? _ticker;
 //
-//   // ================= MODE =================
 //   String activeMode = 'Stopwatch';
 //
 //   String logStopwatch = '';
 //   String logPredictor = '';
 //   String logConverter = '';
 //
-//   // ================= PREDICTOR =================
 //   String gender = 'men';
 //   String stroke = 'free';
 //   String distance = '100';
@@ -450,9 +484,10 @@ class StopwatchController2 extends ChangeNotifier {
 //   bool progressiveActive = false;
 //   String _marker = '15';
 //
-//   // ================= CONVERTER =================
 //   String fromCourse = 'SCM';
 //   String toCourse = 'SCM';
+//
+//   String lastPredictorConfig = '';
 //
 //   StopwatchController2() {
 //     initializeRatios1();
@@ -475,8 +510,8 @@ class StopwatchController2 extends ChangeNotifier {
 //     String? split,
 //     String? start,
 //   }) {
-//     if (g != null) gender = g;
-//     if (s != null) stroke = s;
+//     if (g != null) gender = g.toLowerCase();
+//     if (s != null) stroke = s.toLowerCase();
 //     if (d != null) distance = d;
 //     if (c != null) course = c.toLowerCase();
 //     if (split != null) splitSize = split;
@@ -484,6 +519,7 @@ class StopwatchController2 extends ChangeNotifier {
 //
 //     progressiveActive = _shouldEnableProgressive();
 //     _marker = '15';
+//
 //     notifyListeners();
 //   }
 //
@@ -508,7 +544,6 @@ class StopwatchController2 extends ChangeNotifier {
 //
 //     t.startTime ??= now;
 //     t.running = true;
-//     t.lastSplitWall ??= now;
 //
 //     _marker = '15';
 //
@@ -524,7 +559,6 @@ class StopwatchController2 extends ChangeNotifier {
 //     t.accumulated = elapsed();
 //     t.running = false;
 //     t.startTime = null;
-//     t.lastSplitWall = null;
 //
 //     _ticker?.cancel();
 //     notifyListeners();
@@ -541,42 +575,33 @@ class StopwatchController2 extends ChangeNotifier {
 //     }
 //     return t.accumulated;
 //   }
-//   String lastPredictorConfig = '';
 //
 //   // ================= SPLIT =================
-//   // Pass context to the function to show the Snackbar
 //   void split(BuildContext context) {
 //     final t = current;
 //     if (!t.running) return;
 //
 //     const int maxLogs = 100;
 //
-//     // 1. CHECK LIMIT FIRST
-//     // Check against the current number of splits already recorded
 //     if (t.splits.length >= maxLogs) {
 //       ScaffoldMessenger.of(context).showSnackBar(
 //         const SnackBar(
-//           content: Text('You have reached the maximum of $maxLogs laps'),
-//           duration: Duration(seconds: 2),
+//           content: Text('You have reached the maximum of 100 laps'),
 //         ),
 //       );
-//       return; // Exit function so no more laps are added
+//       return;
 //     }
 //
-//     final now = DateTime.now();
 //     final total = elapsed();
 //
-//     final lap = t.lastSplitWall == null
-//         ? total
-//         : now.difference(t.lastSplitWall!).inMilliseconds / 1000;
+//     /// ✅ FIXED: Pure calculation (UNDO SAFE)
+//     final previousTotal =
+//     t.splits.isEmpty ? 0.0 : t.splits.last;
 //
-//     t.lastSplitWall = now;
+//     final lap = total - previousTotal;
+//
 //     t.splits.add(total);
-//
 //     final lapNo = t.splits.length;
-//
-//     // You can remove the trimLog helper now, as the logic above
-//     // prevents the list from ever exceeding the limit.
 //
 //     // ================= STOPWATCH =================
 //     if (activeMode == 'Stopwatch') {
@@ -586,12 +611,13 @@ class StopwatchController2 extends ChangeNotifier {
 //
 //       lines.insert(
 //         0,
-//         "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / "
-//             "${TimeUtils1.formatTime(total)}",
+//         "Lap $lapNo: ${TimeUtils1.formatTime(lap)} / ${TimeUtils1.formatTime(total)}",
 //       );
 //
 //       logStopwatch = lines.join('\n');
 //     }
+//
+//
 //
 //     // ================= CONVERTER =================
 //     else if (activeMode == 'Converter') {
@@ -604,8 +630,7 @@ class StopwatchController2 extends ChangeNotifier {
 //
 //       lines.insert(
 //         0,
-//         "Lap $lapNo: ${TimeUtils1.formatTime(total)} ${fromCourse.toUpperCase()}  → "
-//             "${TimeUtils1.formatTime(converted)}  ${toCourse.toUpperCase()}",
+//         "Lap $lapNo: ${TimeUtils1.formatTime(total)} ${fromCourse.toUpperCase()} → ${TimeUtils1.formatTime(converted)} ${toCourse.toUpperCase()}",
 //       );
 //
 //       logConverter = lines.join('\n');
@@ -613,50 +638,43 @@ class StopwatchController2 extends ChangeNotifier {
 //
 //     // ================= PREDICTOR =================
 //     else {
-//       final formattedStroke = stroke.toLowerCase() == "im" ? "IM" : "${stroke[0].toUpperCase()}${stroke.substring(1).toLowerCase()}";
-//       final currentConfig = "$gender|$stroke|$distance|$course|$splitSize|$startType|$progressiveActive";
+//       final formattedStroke = stroke.toLowerCase() == "im"
+//           ? "IM"
+//           : "${stroke[0].toUpperCase()}${stroke.substring(1).toLowerCase()}";
 //
-//       // 1. Reset/Initialize Header if config changes or log is empty
-//       if (lastPredictorConfig != currentConfig || logPredictor.trim().isEmpty) {
+//       final currentConfig =
+//           "$gender|$stroke|$distance|$course|$splitSize|$startType|$progressiveActive";
+//
+//       if (lastPredictorConfig != currentConfig ||
+//           logPredictor.trim().isEmpty) {
 //         lastPredictorConfig = currentConfig;
-//         logPredictor = "${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}'s $distance $formattedStroke ${course.toUpperCase()} Projection\n"
+//
+//         logPredictor =
+//         "${gender[0].toUpperCase()}${gender.substring(1)}'s $distance $formattedStroke ${course.toUpperCase()} Projection\n"
 //             "Start Type: $startType | Split Size: $splitSize\n"
 //             "===============\n"
 //             "Split Breakdown:";
 //
 //         _marker = '15';
-//         t.lastSplitWall = now;
 //       }
-//       debugPrint(logPredictor);
 //
-//       // 2. Prepare the data
 //       final projected = _predict(lapNo) ?? 0.0;
-//       final isProgressive = _shouldEnableProgressive() && progressiveActive;
+//       final isProgressive =
+//           _shouldEnableProgressive() && progressiveActive;
+//
 //       final label = isProgressive ? _marker : "Lap $lapNo";
 //
-//       final String fLap = TimeUtils1.formatTime(lap);
-//       final String fTotal = TimeUtils1.formatTime(total);
-//       final String fProj = TimeUtils1.formatTime(projected);
-//
 //       final newEntry = isProgressive
-//           ? "$label $fLap / Projected Finish $fProj"
-//           : "$label $fLap / $fTotal / Projected Finish $fProj";
+//           ? "$label ${TimeUtils1.formatTime(lap)} / Projected Finish ${TimeUtils1.formatTime(projected)}"
+//           : "$label ${TimeUtils1.formatTime(lap)} / ${TimeUtils1.formatTime(total)} / Projected Finish ${TimeUtils1.formatTime(projected)}";
 //
-//       // 3. Split the log into Header and Body
 //       final parts = logPredictor.split("Split Breakdown:");
+//       final header = parts[0];
+//       final body = parts.length > 1 ? parts[1].trim() : "";
 //
-//       // Use ${header} with braces to avoid the "Undefined name" error
-//       final String header = parts[0];
-//       final String currentBody = parts.length > 1 ? parts[1].trim() : "";
-//
-//       // 4. Reconstruct: Header + Label + New Entry + Full History
-//       if (currentBody.isEmpty) {
-//         // Fixed interpolation here:
-//         logPredictor = "${header}Split Breakdown:\n$newEntry";
-//       } else {
-//         // Fixed interpolation here:
-//         logPredictor = "${header}Split Breakdown:\n$newEntry\n$currentBody";
-//       }
+//       logPredictor = body.isEmpty
+//           ? "${header}Split Breakdown:\n$newEntry"
+//           : "${header}Split Breakdown:\n$newEntry\n$body";
 //
 //       if (isProgressive) {
 //         _marker = _nextMarker(_marker);
@@ -665,74 +683,6 @@ class StopwatchController2 extends ChangeNotifier {
 //
 //     notifyListeners();
 //   }
-//
-//   void initializePredictorLog() {
-//     logPredictor = "${gender.toUpperCase()}'$distance e ${stroke.toUpperCase()} ${course.toUpperCase()}Projection\n"
-//         "Start Type: $startType | Split Size: $splitSize\n"
-//         "===============\n"
-//         "Split Breakdown:\n";
-//     notifyListeners();
-//   }
-//
-//   // ================= PREDICT (FIXED) =================
-//   double? _predict(int lapNo) {
-//     final total = elapsed();
-//     if (total <= 0) return null;
-//
-//     // Use normalized lowercase values for lookup
-//     final normalizedGender = gender.toLowerCase();
-//     final normalizedStroke = stroke.toLowerCase();
-//     final normalizedCourse = course.toLowerCase();
-//
-//     if (_shouldEnableProgressive() && progressiveActive) {
-//       return SplitsCore4.predictorLCM50(
-//         elapsedSeconds: total,
-//         gender: normalizedGender,
-//         marker: _marker,
-//         pushStart: startType.toLowerCase() == 'from push',
-//       );
-//     }
-//
-//     final split = int.tryParse(splitSize) ?? 50;
-//
-//     return SplitsCore4.predictorStandard(
-//       elapsedSeconds: total,
-//       splitCount: lapNo,
-//       gender: normalizedGender,
-//       stroke: normalizedStroke,
-//       distance: distance,
-//       course: normalizedCourse, // "scm", "scy", or "lcm"
-//       splitSize: split,
-//       pushStart: startType.toLowerCase() == 'from push',
-//     );
-//   }
-//
-//   // ================= MARKER =================
-//   String _nextMarker(String current) {
-//     switch (current) {
-//       case '15':
-//         return '25';
-//       case '25':
-//         return '35';
-//       default:
-//         return '15';
-//     }
-//   }
-//
-//   // ================= CHECK =================
-//   bool _shouldEnableProgressive() {
-//     return course.toLowerCase() == 'lcm' &&
-//         distance == '50' &&
-//         ['15', '25', '35'].contains(splitSize);
-//   }
-//
-//   // ================= CONVERTER =================
-//   double _factor(String from, String to) {
-//     if (from == to) return 1.0;
-//     return Ratios1.conversionFactors['${from}_$to'] ?? 1.0;
-//   }
-//
-//   // ================= RESET =================
 //   void reset() {
 //     final t = current;
 //
@@ -752,7 +702,42 @@ class StopwatchController2 extends ChangeNotifier {
 //     notifyListeners();
 //   }
 //
-//   /// only clear time
+//   // ================= UNDO =================
+//   void undoLastSplit() {
+//     final t = current;
+//     if (t.splits.isEmpty) return;
+//
+//     t.splits.removeLast();
+//
+//     if (activeMode == 'Stopwatch') {
+//       logStopwatch = _removeFirst(logStopwatch);
+//     } else if (activeMode == 'Predictor') {
+//       logPredictor = _removeFirstPredictorLap(logPredictor);
+//
+//       if (_shouldEnableProgressive() && progressiveActive) {
+//         _marker = _getMarkerFromCount(t.splits.length);
+//       }
+//     } else {
+//       logConverter = _removeFirst(logConverter);
+//     }
+//
+//     notifyListeners();
+//   }
+//
+//   // ================= HELPERS =================
+//   String _getMarkerFromCount(int count) {
+//     const markers = ['15', '25', '35'];
+//     return markers[count % 3];
+//   }
+//
+//   String _removeFirst(String log) {
+//     if (log.isEmpty) return "";
+//     final lines = log.trim().split("\n");
+//     lines.removeAt(0);
+//     return lines.join("\n");
+//   }
+//
+//     /// only clear time
 //   void clearTime() {
 //     final t = current;
 //
@@ -777,87 +762,78 @@ class StopwatchController2 extends ChangeNotifier {
 //     notifyListeners();
 //   }
 //
-//   void undoLastSplit() {
-//     final t = current;
-//     if (t.splits.isEmpty) return;
-//
-//     /// remove last split time
-//     t.splits.removeLast();
-//
-//     // ================= STOPWATCH =================
-//     if (activeMode == 'Stopwatch') {
-//       logStopwatch = _removeFirst(logStopwatch);
-//     }
-//
-//     // ================= PREDICTOR =================
-//     else if (activeMode == 'Predictor') {
-//       logPredictor = _removeFirstPredictorLap(logPredictor);
-//
-//       /// ✅ FIX PROGRESSIVE MODE MARKER
-//       if (_shouldEnableProgressive() && progressiveActive) {
-//         _marker = _getMarkerFromCount(t.splits.length);
-//       }
-//     }
-//
-//     // ================= CONVERTER =================
-//     else {
-//       logConverter = _removeFirst(logConverter);
-//     }
-//
-//     notifyListeners();
-//   }
-//
-//   /// ======================================================
-//   /// FIX MARKER AFTER UNDO
-//   /// ======================================================
-//   String _getMarkerFromCount(int count) {
-//     final markers = ['15', '25', '35'];
-//
-//     /// count = remaining splits
-//     /// 0 => 15
-//     /// 1 => 25
-//     /// 2 => 35
-//     /// 3 => 15 again
-//     return markers[count % 3];
-//   }
-//
-//   String _removeFirst(String log) {
-//     if (log.isEmpty) return "";
-//
-//     List<String> lines = log.trim().split("\n");
-//
-//     if (lines.isNotEmpty) {
-//       lines.removeAt(0);
-//     }
-//
-//     return lines.join("\n");
-//   }
-//
-// // Predictor: preserve header, remove first lap after "Split Breakdown:"
 //   String _removeFirstPredictorLap(String log) {
-//     if (log.isEmpty) return "";
+//     final lines = log.split("\n");
+//     final index = lines.indexOf("Split Breakdown:");
+//     if (index == -1) return log;
 //
-//     List<String> lines = log.split("\n");
-//
-//     int headerIndex = lines.indexOf("Split Breakdown:");
-//
-//     if (headerIndex == -1) {
-//       return log; // header not found
+//     int i = index + 1;
+//     while (i < lines.length && lines[i].trim().isEmpty) {
+//       i++;
 //     }
 //
-//     int lapIndex = headerIndex + 1;
-//
-//     // Skip empty line(s)
-//     while (lapIndex < lines.length && lines[lapIndex].trim().isEmpty) {
-//       lapIndex++;
-//     }
-//
-//     // Remove first lap only
-//     if (lapIndex < lines.length) {
-//       lines.removeAt(lapIndex);
+//     if (i < lines.length) {
+//       lines.removeAt(i);
 //     }
 //
 //     return lines.join("\n");
+//   }
+//
+//   double? _predict(int lapNo) {
+//     final total = elapsed();
+//
+//     if (total <= 0) return null;
+//
+//     /// normalize values
+//     final g = gender.toLowerCase().trim();
+//     final s = stroke.toLowerCase().trim();
+//     final c = course.toLowerCase().trim();
+//
+//     final split = int.tryParse(splitSize) ?? 50;
+//
+//     /// Progressive mode
+//     if (_shouldEnableProgressive() && progressiveActive) {
+//       return SplitsCore4.predictorLCM50(
+//         elapsedSeconds: total,
+//         gender: g,
+//         marker: _marker,
+//         pushStart: startType.toLowerCase() == 'from push',
+//       );
+//     }
+//
+//     /// Standard mode
+//     return SplitsCore4.predictorStandard(
+//       elapsedSeconds: total,
+//       splitCount: lapNo,
+//       gender: g,
+//       stroke: s,
+//       distance: distance,
+//       course: c,
+//       splitSize: split,
+//       pushStart: startType.toLowerCase() == 'from push',
+//     );
+//   }
+//
+//   bool _shouldEnableProgressive() {
+//     return course == 'lcm' &&
+//         distance == '50' &&
+//         ['15', '25', '35'].contains(splitSize);
+//   }
+//
+//   double _factor(String from, String to) {
+//     if (from == to) return 1.0;
+//     return Ratios1.conversionFactors['${from}_$to'] ?? 1.0;
+//   }
+//
+//   String _nextMarker(String current) {
+//     switch (current) {
+//       case '15':
+//         return '25';
+//       case '25':
+//         return '35';
+//       default:
+//         return '15';
+//     }
 //   }
 //
 //   void _startTicker() {
@@ -869,4 +845,5 @@ class StopwatchController2 extends ChangeNotifier {
 //       },
 //     );
 //   }
-//}
+// }
+

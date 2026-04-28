@@ -6,6 +6,7 @@ import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
 import 'package:swim_metrics/l10n/app_localizations.dart';
 
+import '../../../../../../../config/route/routes_name.dart';
 import '../../../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../../../core/utils/constants/icon_path.dart';
 
@@ -86,13 +87,17 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 8.h),
-
-              CustomText(
-                text: "SwimMetrics provides three unique core tools: ",
-
-                fontSize: 13.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'SwimMetrics provides three unique core tools: ',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
+
               SizedBox(height: 10.h),
               CustomDottedText(
                 isDark: isDark,
@@ -118,13 +123,16 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 8.h),
-              CustomText(
-                text:
-                    "Predictions use highly detailed ratio tables derived from elite competition data (the Olympics, World Championships, and NCAA Championships). While the projections are mathematically consistent and based on real patterns, they are still estimates — an athlete’s real split distribution may differ due to pacing strategy, fatigue, stroke efficiency, or race conditions.",
-
-                fontSize: 12.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'Predictions use highly detailed ratio tables derived from elite competition data (the Olympics, World Championships, and NCAA Championships). While the projections are mathematically consistent and based on real patterns, they are still estimates — an athlete’s real split distribution may differ due to pacing strategy, fatigue, stroke efficiency, or race conditions.',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
 
               SizedBox(height: 16.h),
 
@@ -137,13 +145,17 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 8.h),
-
-              CustomText(
-                text: "Yes — all three.",
-
-                fontSize: 14.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'Yes — all three.',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
+
               SizedBox(height: 10.h),
               CustomDottedText(
                 isDark: isDark,
@@ -174,22 +186,29 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 8.h),
-
-              CustomText(
-                text:
-                    "Yes. All SwimMetrics tools include Export to PDF functionality. Exports use clean formatting with column balancing so events print neatly. You’ll receive both an HTML file and a fully formatted PDF.",
-
-                fontSize: 13.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'Yes. All SwimMetrics tools include Export to PDF functionality. Exports use clean formatting with column balancing so events print neatly. You’ll receive both an HTML file and a fully formatted PDF.',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
+
               SizedBox(height: 10.h),
-              CustomText(
-                text:
-                    "Use them as pace charts for clear goals to be reached! BB cut, Age Group State Championships, Summer Juniors finalists, Olympic Trials qualifier, World Record, or whatever goal you are trying to reach, this is the tool for you!",
 
-                fontSize: 13.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'Use them as pace charts for clear goals to be reached! BB cut, Age Group State Championships, Summer Juniors finalists, Olympic Trials qualifier, World Record, or whatever goal you are trying to reach, this is the tool for you!',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
 
               SizedBox(height: 16.h),
 
@@ -202,13 +221,17 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 8.h),
-
-              CustomText(
-                text: "The Stopwatch mode has 3 features:",
-
-                fontSize: 14.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'The Stopwatch mode has 3 features:',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
+
               SizedBox(height: 10.h),
               CustomDottedText(
                 isDark: isDark,
@@ -248,14 +271,17 @@ class FAQScreen extends StatelessWidget {
                     "“From Push” assumes the swimmer begins in the water (like mid-set in training).",
               ),
               SizedBox(height: 10.h),
-
-              CustomText(
-                text:
-                    "The app adjusts the opening split to account for the faster first split when pushing off instead of diving.",
-
-                fontSize: 13.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'The app adjusts the opening split to account for the faster first split when pushing off instead of diving.',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
+
 
               SizedBox(height: 10.h),
 
@@ -268,12 +294,16 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 6.h),
-              CustomText(
-                text: "Each pool type has its own natural increments:",
-
-                fontSize: 13.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'Each pool type has its own natural increments:',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
               SizedBox(height: 10.h),
 
               CustomDottedText(
@@ -285,14 +315,17 @@ class FAQScreen extends StatelessWidget {
                 title: "LCM → splits are naturally in 50s",
               ),
               SizedBox(height: 10.h),
-
-              CustomText(
-                text:
-                    "Longer events follow 50-meter increments, while shorter races (50/100) have special handling to match real splitting conventions and predictions.",
-
-                fontSize: 12.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'Longer events follow 50-meter increments, while shorter races (50/100) have special handling to match real splitting conventions and predictions.',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
+
 
 
               SizedBox(height: 16.h),
@@ -306,12 +339,16 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 6.h),
-              CustomText(
-                text: "The Converter uses either:",
-
-                fontSize: 13.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'The Converter uses either:',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
               SizedBox(height: 10.h),
 
               CustomDottedText(
@@ -323,14 +360,16 @@ class FAQScreen extends StatelessWidget {
                 title: "Fallback universal conversion factors for simple course-to-course changes",
               ),
               SizedBox(height: 10.h),
-
-              CustomText(
-                text:
-                "Each conversion is consistent, reproducible, and grounded in stroke-specific and gender-specific reference times",
-
-                fontSize: 12.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'Each conversion is consistent, reproducible, and grounded in stroke-specific and gender-specific reference times',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
 
 
 
@@ -345,12 +384,16 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 6.h),
-              CustomText(
-                text: "Some events don’t exist in every course type. For example:",
-
-                fontSize: 13.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'Some events don’t exist in every course type. For example:',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
               SizedBox(height: 10.h),
 
               CustomDottedText(
@@ -366,14 +409,17 @@ class FAQScreen extends StatelessWidget {
                 title: "1650 SCY → converts to 1500 SCM/LCM",
               ),
               SizedBox(height: 10.h),
-
-              CustomText(
-                text:
-                "This is intentional and uses baseline elite reference times to calculate accurate conversion factors.",
-
-                fontSize: 12.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'This is intentional and uses baseline elite reference times to calculate accurate conversion factors.',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
+
 
 
               SizedBox(height: 16.h),
@@ -387,12 +433,16 @@ class FAQScreen extends StatelessWidget {
                 color: isDark ? AppColors.textWhite : Color(0xff1D2130),
               ),
               SizedBox(height: 6.h),
-              CustomText(
-                text: "If a stroke-distance-course combination doesn’t exist in major competitions (i.e. 100 IM LCM) or lacks standardized ratios, SwimMetrics uses safe fallback logic or disables unsupported combinations to avoid misleading projections.",
-
-                fontSize: 13.sp,
-                color: isDark ? Color(0xffC7C7C7) : Colors.black54,
+              Text(
+                'If a stroke-distance-course combination doesn’t exist in major competitions (i.e. 100 IM LCM) or lacks standardized ratios, SwimMetrics uses safe fallback logic or disables unsupported combinations to avoid misleading projections.',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? const Color(0xffC7C7C7) : Colors.black54,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
+
 
               SizedBox(height: 24.h),
 
@@ -429,7 +479,9 @@ class FAQScreen extends StatelessWidget {
                       width: 120.w,
                       child: CustomPrimaryButton(
                         title: "Get in touch",
-                        onPressed: () {},
+                        onPressed: () {
+                          context.push(RouteNames.helpSupportScreen);
+                        },
                       ),
                     ),
                   ],
