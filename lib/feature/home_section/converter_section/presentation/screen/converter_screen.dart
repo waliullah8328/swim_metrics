@@ -20,6 +20,7 @@ import '../../../../../core/common/widgets/new_custon_widgets/split_calculator_s
 import '../../../../../core/services/token_storage.dart';
 import '../../../../../core/utils/constants/icon_path.dart';
 
+import '../../../calculator_section/calculator/presentation/screen/calculator_page.dart';
 import '../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 
 import '../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
@@ -249,16 +250,37 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                   SizedBox(height: 8.h),
                                   Consumer(
                                     builder: (context, ref, child) {
-                                      const items = ["SCY", "SCM", "LCM"];
-                                      final state = ref.watch(converterProvider1);
-                                      final course = state.course;
-                                      final controller = ref.read(converterProvider1.notifier);
-                                      final selectedValue = items.firstWhere(
-                                            (item) => item.toLowerCase() == course,
-                                        orElse: () => items.first,
+                                      final courseOrderAsync = ref.watch(courseOrderProvider);
+
+                                      final orderedItems = courseOrderAsync.maybeWhen(
+                                        data: (courses) => courses,
+                                        orElse: () => ["SCY", "SCM", "LCM"],
                                       );
+
+                                      final middleItem = orderedItems[orderedItems.length ~/ 2];
+
+                                      final state      = ref.watch(converterProvider1);
+                                      final controller = ref.read(converterProvider1.notifier);
+
+                                      final courseLower = state.course.toLowerCase().trim();
+
+                                      // ✅ All comparisons in same case (lowercase)
+                                      final validLowerItems = orderedItems.map((e) => e.toLowerCase()).toList();
+
+                                      final selectedValue = orderedItems.firstWhere(
+                                            (item) => item.toLowerCase() == courseLower,
+                                        orElse: () => middleItem,
+                                      );
+
+                                      // ✅ Only sync when course is genuinely missing — consistent case comparison
+                                      if (state.course.isEmpty || !validLowerItems.contains(courseLower)) {
+                                        Future.microtask(
+                                              () => controller.setCourse(middleItem.toLowerCase()),
+                                        );
+                                      }
+
                                       return SplitCalculatorSelectorOne(
-                                        items: items,
+                                        items: orderedItems,
                                         selectedValue: selectedValue,
                                         onChanged: (selected) {
                                           controller.setCourse(selected.toLowerCase());
@@ -312,8 +334,12 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                             ),
                             Consumer(
                               builder: (context, ref, child) {
-                                final state = ref.watch(converterProvider1);
+                                final state      = ref.watch(converterProvider1);
                                 final controller1 = ref.read(converterProvider1.notifier);
+
+                                // ✅ Normalize once — state.course is stored lowercase
+                                final courseLower = state.course.toLowerCase().trim();
+
                                 return Row(
                                   children: [
                                     Row(
@@ -321,7 +347,8 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                       children: [
                                         Checkbox(
                                           value: state.targets.contains('scy'),
-                                          onChanged: state.course.isNotEmpty && state.course == 'scy'
+                                          // ✅ Disable if this IS the selected from-course
+                                          onChanged: courseLower == 'scy'
                                               ? null
                                               : (val) {
                                             controller1.toggleTarget('scy', val ?? false);
@@ -337,7 +364,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                       children: [
                                         Checkbox(
                                           value: state.targets.contains('scm'),
-                                          onChanged: state.course.isNotEmpty && state.course == 'scm'
+                                          onChanged: courseLower == 'scm'
                                               ? null
                                               : (val) {
                                             controller1.toggleTarget('scm', val ?? false);
@@ -353,14 +380,14 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                                       children: [
                                         Checkbox(
                                           value: state.targets.contains('lcm'),
-                                          onChanged: state.course.isNotEmpty && state.course == 'lcm'
+                                          onChanged: courseLower == 'lcm'
                                               ? null
                                               : (val) {
                                             controller1.toggleTarget('lcm', val ?? false);
                                             if (isHaptic) HapticFeedback.heavyImpact();
                                           },
                                         ),
-                                        Text('LCM'),
+                                        const Text('LCM'),
                                       ],
                                     ),
                                   ],
@@ -378,7 +405,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomText(
-                        text: "Time (mm:ss.hh)",
+                        text: "${AppLocalizations.of(context)!.time}(mm:ss.hh)",
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
                         fontSize: getAdjustedFontSize(16, fontOption).sp,
@@ -647,16 +674,17 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  CONSTANTS — matched to second export's proven geometry
+  //  CONSTANTS — tuned for full page utilization
   // ═══════════════════════════════════════════════════════════
-  static const double _kPageMarginH     = 40;   // horizontal margin
-  static const double _kPageMarginV     = 30;   // vertical margin
-  static const double _kHeaderHeight    = 55;   // SwimMetrics + divider + spacing
+  static const double _kPageMarginH     = 20;    // ✅ reduced: more horizontal space
+  static const double _kPageMarginV     = 20;    // ✅ reduced: more vertical space
+  static const double _kHeaderHeight    = 45;    // ✅ reduced: header takes less space
   static const double _kColumnGap       = 10;
-  static const double _kBlockPaddingV   = 6;    // padding inside each block
-  static const double _kLineHeight      = 9 * 1.3; // fontSize(9) * lineSpacing(1.3)
-  static const double _kTitleLineHeight = 11 * 1.3; // title fontSize(11) * lineSpacing
-  static const double _kInterBlockGap   = 6;    // gap between blocks
+  static const double _kBlockPaddingV   = 4;     // ✅ reduced: tighter block padding
+  static const double _kLineHeight      = 9 * 1.2;  // ✅ tighter line spacing
+  static const double _kTitleLineHeight = 11 * 1.2; // ✅ tighter title spacing
+  static const double _kInterBlockGap   = 4;     // ✅ reduced: tighter gap between blocks
+  static const double _kBottomReserve   = 20;    // ✅ exactly 20px empty at bottom
 
   // ═══════════════════════════════════════════════════════════
   //  MEASURE — how tall a block will be
@@ -695,24 +723,22 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
         .where((b) => b.isNotEmpty)
         .toList();
 
-    // ── Page geometry — same as second export ────────────────
+    // ── Page geometry ─────────────────────────────────────────
     final double pageW   = PdfPageFormat.a4.width;
     final double pageH   = PdfPageFormat.a4.height;
     final double usableW = pageW - (_kPageMarginH * 2);
-    final double usableH = pageH - (_kPageMarginV * 2) - _kHeaderHeight;
+    // ✅ subtract bottom reserve so last block stops 20px from bottom
+    final double usableH = pageH
+        - (_kPageMarginV * 2)
+        - _kHeaderHeight
+        - _kBottomReserve;
     final double colW    = (usableW - _kColumnGap) / 2;
 
     // ── Bin blocks: LEFT fills first → RIGHT → new page ──────
-    //
-    //  Same 3-step logic as the working second export:
-    //    1. Fits in left  → add to left
-    //    2. Fits in right → add to right
-    //    3. Both full     → flush page, start fresh left
-    //
     final List<List<List<List<String>>>> pages = [];
 
-    List<List<String>> col0    = [];
-    List<List<String>> col1    = [];
+    List<List<String>> col0     = [];
+    List<List<String>> col1     = [];
     double             col0Used = 0;
     double             col1Used = 0;
 
@@ -751,10 +777,11 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
-          // ✅ Same margin style as second export
-          margin: pw.EdgeInsets.symmetric(
-            horizontal: _kPageMarginH,
-            vertical: _kPageMarginV,
+          margin: pw.EdgeInsets.only(
+            left:   _kPageMarginH,
+            right:  _kPageMarginH,
+            top:    _kPageMarginV,
+            bottom: _kBottomReserve, // ✅ exactly 20px bottom gap
           ),
           build: (pw.Context ctx) {
             return pw.Column(
@@ -767,14 +794,14 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
                     'SwimMetrics',
                     style: pw.TextStyle(
                       font: ttf,
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: pw.FontWeight.bold,
                     ),
                   ),
                 ),
-                pw.SizedBox(height: 10),
+                pw.SizedBox(height: 6),
                 pw.Divider(thickness: 0.5),
-                pw.SizedBox(height: 10),
+                pw.SizedBox(height: 6),
 
                 // ── Two columns ──────────────────────────────
                 pw.Expanded(
@@ -817,7 +844,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  COLUMN BUILDER
+  //  COLUMN BUILDER — same logic, no changes
   // ═══════════════════════════════════════════════════════════
   pw.Widget _buildColumn(List<List<String>> blocks, pw.Font ttf) {
     if (blocks.isEmpty) return pw.SizedBox();
@@ -833,7 +860,7 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  BLOCK RENDERER — font size matched to second export (9pt)
+  //  BLOCK RENDERER — same logic, no changes
   // ═══════════════════════════════════════════════════════════
   pw.Widget _buildOutputBlock(List<String> lines, pw.Font font) {
     return pw.Column(
@@ -850,12 +877,12 @@ class _ConverterScreenState extends ConsumerState<ConverterScreen> {
             display,
             style: pw.TextStyle(
               font: font,
-              fontSize: isTitle ? 11 : 9,   // ✅ matched to second export's 9pt
+              fontSize: isTitle ? 11 : 9,
               fontWeight: isTitle || isResult
                   ? pw.FontWeight.bold
                   : pw.FontWeight.normal,
               color: PdfColors.black,
-              lineSpacing: 1.3,             // ✅ matched to second export
+              lineSpacing: 1.2,
             ),
           ),
         );

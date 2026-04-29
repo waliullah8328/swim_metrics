@@ -569,4 +569,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get pleaseSelectAProfileImage =>
       'Por favor, selecciona una imagen de perfil';
+
+  @override
+  String get calculate => 'Calculate';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get noDataFound => 'No data found';
+
+  @override
+  String get pleaseWait => 'Please wait';
 }

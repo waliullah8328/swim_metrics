@@ -25,6 +25,7 @@ import 'package:pdf/widgets.dart' as pw;
 import '../../../../../../config/route/routes_name.dart';
 import '../../../../../../core/services/token_storage.dart';
 
+import '../../../../../on_boarding/presentation/screens/widget/course_page_widget.dart';
 import '../../../setting_section/settings/riverpod/setting_controller.dart';
 import '../../riverpod/calculations.dart';
 import '../../riverpod/calculator_split_state.dart';
@@ -32,6 +33,13 @@ import '../../riverpod/split_calculator.dart';
 
 final currencyProvider = StateProvider<String>((ref) => "SCY");
 final showCourseSectionProvider = StateProvider<bool>((ref) => true);
+
+final courseOrderProvider = FutureProvider<List<String>>((ref) async {
+
+  return CourseOrderStorage.loadCourseOrder();
+
+});
+
 
 class SplitCalculatorPage extends ConsumerStatefulWidget {
   const SplitCalculatorPage({super.key});
@@ -204,118 +212,190 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                   color: AppColors.primary,
                                 ),
 
+
                                 Consumer(
+
                                   builder: (context, ref, child) {
+
                                     final state = ref.watch(splitCalcProvider);
 
-                                    final course = state.course
-                                        .trim()
-                                        .toUpperCase();
-                                    const validCourses = ["SCY", "SCM", "LCM"];
-                                    final selected =
-                                    validCourses.contains(course)
-                                        ? course
-                                        : "SCY";
+                                    final courseOrderAsync = ref.watch(courseOrderProvider);
+
+
+                                    // ✅ Load saved order — fallback to default while loading
+
+                                    final orderedCourses = courseOrderAsync.maybeWhen(
+
+                                    data: (courses) => courses,
+
+                                    orElse: () => ["SCY", "SCM", "LCM"],
+
+                                    );
+
+
+                                    final course = state.course.trim().toUpperCase();
+
+                                    final selected = orderedCourses.contains(course)
+
+                                    ? course
+
+                                        : orderedCourses.first; // ✅ fallback to first in saved order
+
 
                                     final displayItems = {
-                                      "SCY":
-                                      AppLocalizations.of(context)?.scy ??
-                                          "SCY",
-                                      "SCM":
-                                      AppLocalizations.of(context)?.scm ??
-                                          "SCM",
-                                      "LCM":
-                                      AppLocalizations.of(context)?.lcm ??
-                                          "LCM",
+
+                                    "SCY": AppLocalizations.of(context)?.scy ?? "SCY",
+
+                                    "SCM": AppLocalizations.of(context)?.scm ?? "SCM",
+
+                                    "LCM": AppLocalizations.of(context)?.lcm ?? "LCM",
+
                                     };
 
+
                                     final bgColor = isDark
-                                        ? const Color(0xff033A5E)
+
+                                    ? const Color(0xff033A5E)
+
                                         : const Color(0xFFD9D9D9);
 
-                                    final normalTextColor = const Color(
-                                      0xFFB8892D,
-                                    );
+
+                                    final normalTextColor = const Color(0xFFB8892D);
+
 
                                     return Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 16.w,
-                                        vertical: 8.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: bgColor,
-                                        borderRadius: BorderRadius.circular(40),
-                                      ),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton<String>(
-                                          value: selected,
-                                          isDense: true,
-                                          icon: Icon(
-                                            Icons.keyboard_arrow_down,
-                                            color: isDark?Colors.amber:normalTextColor,
-                                          ),
 
-                                          // ✅ IMPORTANT: match dropdown popup color
-                                          dropdownColor: bgColor,
+                                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
 
-                                          // ✅ Dropdown list item style
-                                          style: TextStyle(
-                                            color: isDark?Colors.amber:normalTextColor,
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                    decoration: BoxDecoration(
 
-                                          // ✅ Selected item style (matches your gender selector)
-                                          selectedItemBuilder: (context) {
-                                            return validCourses.map((c) {
-                                              return Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Text(
-                                                  displayItems[c]!,
-                                                  style: TextStyle(
-                                                    color: isDark?Colors.amber:normalTextColor,// 🔥 consistent primary
-                                                    fontSize: 14.sp,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList();
-                                          },
+                                    color: bgColor,
 
-                                          items: validCourses.map((c) {
-                                            final isSelected = c == selected;
+                                    borderRadius: BorderRadius.circular(40),
 
-                                            return DropdownMenuItem<String>(
-                                              value: c,
-                                              child: Text(
-                                                displayItems[c]!,
-                                                style: TextStyle(
-                                                  color: isSelected
-                                                      ? isDark?Colors.yellow:normalTextColor // ✅ highlight inside dropdown too
-                                                      : normalTextColor,
-                                                  fontWeight: isSelected
-                                                      ? FontWeight.w600
-                                                      : FontWeight.w500,
-                                                ),
-                                              ),
-                                            );
-                                          }).toList(),
+                                    ),
 
-                                          onChanged: (value) {
-                                            if (value == null) return;
+                                    child: DropdownButtonHideUnderline(
 
-                                            ref
-                                                .read(
-                                              splitCalcProvider.notifier,
-                                            )
-                                                .setCourse(value.toLowerCase());
-                                            if (isHaptic) HapticFeedback.heavyImpact();
-                                          },
-                                        ),
-                                      ),
+                                    child: DropdownButton<String>(
+
+                                    value: selected,
+
+                                    isDense: true,
+
+                                    icon: Icon(
+
+                                    Icons.keyboard_arrow_down,
+
+                                    color: isDark ? Colors.amber : normalTextColor,
+
+                                    ),
+
+                                    dropdownColor: bgColor,
+
+                                    style: TextStyle(
+
+                                    color: isDark ? Colors.amber : normalTextColor,
+
+                                    fontSize: 14.sp,
+
+                                    fontWeight: FontWeight.w700,
+
+                                    ),
+
+
+                                    // ✅ Selected item shows in saved order
+
+                                    selectedItemBuilder: (context) {
+
+                                    return orderedCourses.map((c) {
+
+                                    return Align(
+
+                                    alignment: Alignment.centerLeft,
+
+                                    child: Text(
+
+                                    displayItems[c] ?? c,
+
+                                    style: TextStyle(
+
+                                    color: isDark ? Colors.amber : normalTextColor,
+
+                                    fontSize: 14.sp,
+
+                                    fontWeight: FontWeight.w700,
+
+                                    ),
+
+                                    ),
+
                                     );
+
+                                    }).toList();
+
+                                    },
+
+
+                                    // ✅ Dropdown list in saved order
+
+                                    items: orderedCourses.map((c) {
+
+                                    final isSelected = c == selected;
+
+                                    return DropdownMenuItem<String>(
+
+                                    value: c,
+
+                                    child: Text(
+
+                                    displayItems[c] ?? c,
+
+                                    style: TextStyle(
+
+                                    color: isSelected
+
+                                    ? (isDark ? Colors.yellow : normalTextColor)
+
+                                        : normalTextColor,
+
+                                    fontWeight:
+
+                                    isSelected ? FontWeight.w600 : FontWeight.w500,
+
+                                    ),
+
+                                    ),
+
+                                    );
+
+                                    }).toList(),
+
+
+                                    onChanged: (value) {
+
+                                    if (value == null) return;
+
+                                    ref
+
+                                        .read(splitCalcProvider.notifier)
+
+                                        .setCourse(value.toLowerCase());
+
+                                    if (isHaptic) HapticFeedback.heavyImpact();
+
+                                    },
+
+                                    ),
+
+                                    ),
+
+                                    );
+
                                   },
+
                                 ),
+
                               ],
                             ),
                             SizedBox(height: 20.h),
@@ -606,12 +686,12 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                               keyboardType: TextInputType.text,
                               hintText: "mm:ss.hh",
                               controller: timeController,
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return AppLocalizations.of(context)!.enterYourTime;
-                                }
-                                return null;
-                              },
+                              // validator: (value) {
+                              //   if (value == null || value.trim().isEmpty) {
+                              //     return AppLocalizations.of(context)!.enterYourTime;
+                              //   }
+                              //   return null;
+                              // },
                               suffixIcon: timeController.text.isNotEmpty
                                   ? GestureDetector(
                                 onTap: () {
@@ -636,9 +716,23 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                 fixedSize: Size(double.infinity, 52.h),
                               ),
                               onPressed: () {
-                                final isValid = _formKey.currentState!
-                                    .validate();
+                                // ✅ Check empty first — show toast, skip validation
+                                if (timeController.text.trim().isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        AppLocalizations.of(context)!.enterYourTime,
+                                        style: TextStyle(fontSize: 14.sp),
+                                      ),
+                                      backgroundColor: Colors.grey,
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                  if (isHaptic) HapticFeedback.heavyImpact();
+                                  return;
+                                }
 
+                                final isValid = _formKey.currentState!.validate();
                                 if (!isValid) {
                                   if (isHaptic) HapticFeedback.heavyImpact();
                                   return;
@@ -646,25 +740,11 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
 
                                 if (isHaptic) HapticFeedback.lightImpact();
 
-                                ref
-                                    .read(splitCalcProvider.notifier)
-                                    .calculate();
-                                ref
-                                    .read(
-                                  showCourseSectionProvider.notifier,
-                                )
-                                    .state =
-                                false;
+                                ref.read(splitCalcProvider.notifier).calculate();
+                                ref.read(showCourseSectionProvider.notifier).state = false;
 
-
-                                // deleteable
                                 final history = ref.watch(splitCalcProvider).history;
-
-
-
-                                // Reverse the history to show the latest first
                                 final reversedHistory = history.reversed.toList();
-
                                 for (var item in reversedHistory) {
                                   debugPrint(item.toString());
                                   debugPrint(item.output.toString());
@@ -683,11 +763,8 @@ class _SplitCalculatorPageState extends ConsumerState<SplitCalculatorPage> {
                                     ),
                                     SizedBox(width: 6.w),
                                     CustomText(
-                                      text: "Calculate",
-                                      fontSize: getAdjustedFontSize(
-                                        14,
-                                        fontOption,
-                                      ).sp,
+                                      text: AppLocalizations.of(context)!.calculate,
+                                      fontSize: getAdjustedFontSize(14, fontOption).sp,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ],

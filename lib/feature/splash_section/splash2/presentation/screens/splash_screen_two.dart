@@ -6,6 +6,7 @@ import 'package:swim_metrics/core/utils/constants/app_colors.dart';
 
 
 import 'package:swim_metrics/core/utils/constants/app_sizer.dart';
+import 'package:swim_metrics/l10n/app_localizations.dart';
 
 
 import '../../../../../config/route/routes_name.dart';
@@ -101,7 +102,7 @@ class _SplashScreenState extends ConsumerState<SplashScreenTwo> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
            // Image.asset(ImagePath.swimmingGifLogo,width: 150.w,height: 150.h,fit: BoxFit.fitHeight,),
-            CustomText(text: "Please wait...",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.textWhite,)
+            CustomText(text: "${AppLocalizations.of(context)!.pleaseWait}...",fontSize: 16.sp,fontWeight: FontWeight.w600,color: AppColors.textWhite,)
 
 
           ],

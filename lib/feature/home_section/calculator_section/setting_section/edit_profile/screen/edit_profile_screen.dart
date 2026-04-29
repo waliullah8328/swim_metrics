@@ -144,7 +144,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                     );
                   },
-                      error: (error,stack)=> Text("No data found"),
+                      error: (error,stack)=> Text(AppLocalizations.of(context)!.noDataFound),
                       loading: ()=>CircularProgressIndicator(),
                   ),
 

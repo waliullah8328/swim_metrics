@@ -206,7 +206,12 @@
 "viewYourPlan": "View your plan",
 "yearlyPay": "Yearly Pay",
 "pleaseEnterYourPhoneNumber": "Please enter your phone number",
-"pleaseSelectAProfileImage": "Please select a profile image"
+"pleaseSelectAProfileImage": "Please select a profile image",
+
+"calculate":"Calculate",
+"time":"Time",
+"noDataFound":"No data found",
+"pleaseWait":"Please wait"
 
 
 

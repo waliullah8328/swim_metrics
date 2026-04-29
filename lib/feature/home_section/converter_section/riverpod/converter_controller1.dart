@@ -259,6 +259,7 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../on_boarding/presentation/screens/widget/course_page_widget.dart';
 
 final converterProvider1 =
 NotifierProvider<ConverterController, ConverterState>(
@@ -1041,6 +1042,8 @@ List<String> _calculateSplits(
 class ConverterController extends Notifier<ConverterState> {
   @override
   ConverterState build() {
+    // ✅ Call on provider creation — no need to call it manually anywhere
+    initFromCourseOrder();
     return const ConverterState();
   }
 
@@ -1071,104 +1074,122 @@ class ConverterController extends Notifier<ConverterState> {
     return ['scy', 'scm', 'lcm'].where((e) => e != state.course).toList();
   }
 
-  void convert({required context}) {
-    final s = state;
+  Future<void> initFromCourseOrder() async {
+    final savedOrder = await CourseOrderStorage.loadCourseOrder();
+    final middleItem = savedOrder[savedOrder.length ~/ 2]; // ✅ middle of saved order
+    state = state.copyWith(course: middleItem);
+  }
 
-    if ([s.course, s.gender, s.stroke, s.distance, s.timeText]
-        .any((e) => e.trim().isEmpty)) {
-      state = s.copyWith(
-        output:
-        '${AppLocalizations.of(context)!.pleaseFillAllFields}\n\n${s.output}',
+  void convert({required context}) {
+    // ✅ Normalize everything to lowercase BEFORE any computation
+    final course   = state.course.toLowerCase().trim();
+    final gender   = state.gender.toLowerCase().trim();
+    final stroke   = state.stroke.toLowerCase().trim();
+    final distance = state.distance.trim();
+    final timeText = state.timeText.trim();
+
+    // ✅ Guard: validate course is a known value before any map lookup
+    const validCourses = ['scy', 'scm', 'lcm'];
+    if (!validCourses.contains(course)) {
+      state = state.copyWith(
+        output: '${AppLocalizations.of(context)!.pleaseFillAllFields}\n\n${state.output}',
+      );
+      return;
+    }
+
+    if ([course, gender, stroke, distance, timeText].any((e) => e.isEmpty)) {
+      state = state.copyWith(
+        output: '${AppLocalizations.of(context)!.pleaseFillAllFields}\n\n${state.output}',
       );
       return;
     }
 
     double totalSeconds;
     try {
-      totalSeconds = _mmssToSeconds(s.timeText.trim());
+      totalSeconds = _mmssToSeconds(timeText);
     } catch (_) {
-      state = s.copyWith(
-        output:
-        '${AppLocalizations.of(context)!.invalidTimeFormat}\n\n${s.output}',
+      state = state.copyWith(
+        output: '${AppLocalizations.of(context)!.invalidTimeFormat}\n\n${state.output}',
       );
       return;
     }
 
-    final results = <String>[];
+    final results      = <String>[];
     final splitResults = <String>[];
 
     results.add('=== Conversion Results ===');
 
-    final targets = s.targets.isEmpty
+    final targets = state.targets.isEmpty
         ? allowedTargets()
-        : allowedTargets().where((e) => s.targets.contains(e)).toList();
+        : allowedTargets().where((e) => state.targets.contains(e)).toList();
 
     for (final to in targets) {
-      if (s.course.toLowerCase() == 'lcm' &&
-          s.stroke.toLowerCase() == 'im' &&
-          s.distance == '100' &&
-          to.toLowerCase() == 'lcm') continue;
+      // ✅ Normalize target course
+      final toNorm = to.toLowerCase().trim();
 
-      final displayDistance =
-      _getDisplayDistance(s.stroke, s.distance, s.course, to);
+      // ✅ Skip unknown target courses
+      if (!validCourses.contains(toNorm)) continue;
 
+      if (course == 'lcm' && stroke == 'im' && distance == '100' && toNorm == 'lcm') continue;
+
+      final displayDistance = _getDisplayDistance(stroke, distance, course, toNorm);
       if (displayDistance.isEmpty) continue;
 
-      final multiplier = s.preferWR
-          ? _computeMultiplier(s.gender, s.stroke, s.distance, s.course, to)
-          : _poolRatio(s.course, to);
+      // ✅ All values are now guaranteed lowercase — no null crash
+      final multiplier = state.preferWR
+          ? _computeMultiplier(gender, stroke, distance, course, toNorm)
+          : _poolRatio(course, toNorm);
 
-      final converted = totalSeconds * multiplier;
+      final converted     = totalSeconds * multiplier;
       final convertedText = _secondsToMmss(converted);
 
-      final strokeLabel = s.stroke.toUpperCase() == 'IM'
+      final strokeLabel = stroke.toUpperCase() == 'IM'
           ? 'IM'
-          : '${s.stroke[0].toUpperCase()}${s.stroke.substring(1).toLowerCase()}';
+          : '${stroke[0].toUpperCase()}${stroke.substring(1).toLowerCase()}';
 
       final genderLabel =
-          '${s.gender[0].toUpperCase()}${s.gender.substring(1).toLowerCase()}';
+          '${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}';
 
-      final bool is100ImLcm = s.stroke.toUpperCase() == 'IM' &&
-          s.distance == '100' &&
-          to.toUpperCase() == 'LCM';
+      final bool is100ImLcm =
+          stroke == 'im' && distance == '100' && toNorm == 'lcm';
 
       if (!is100ImLcm) {
         results.add(
-          '$genderLabel ${s.distance} $strokeLabel ${s.timeText} ${s.course.toUpperCase()} '
-              '→ $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText',
+          '$genderLabel $distance $strokeLabel $timeText ${course.toUpperCase()} '
+              '→ $displayDistance $strokeLabel ${toNorm.toUpperCase()}: $convertedText',
         );
       }
 
-      if (s.showSplits && !is100ImLcm) {
+      if (state.showSplits && !is100ImLcm) {
         splitResults.add(
-          '$genderLabel ${s.distance} $strokeLabel ${s.timeText} ${s.course.toUpperCase()} '
-              '→ $displayDistance $strokeLabel ${to.toUpperCase()}: $convertedText',
+          '$genderLabel $distance $strokeLabel $timeText ${course.toUpperCase()} '
+              '→ $displayDistance $strokeLabel ${toNorm.toUpperCase()}: $convertedText',
         );
 
         String splitsText;
 
-        if (to == 'lcm' && displayDistance == '50') {
-          splitsText = _calculate50LcmSplits(converted, s.gender);
+        if (toNorm == 'lcm' && displayDistance == '50') {
+          splitsText = _calculate50LcmSplits(converted, gender);
         } else {
-          final ratioSource = to == 'scy'
+          final ratioSource = toNorm == 'scy'
               ? _ratiosScy
-              : to == 'scm'
+              : toNorm == 'scm'
               ? _ratiosScm
               : _ratiosLcm;
 
           final ratios = _getOrGenerateRatios(
-            s.gender,
-            s.stroke,
+            gender,
+            stroke,
             displayDistance,
             ratioSource,
-            to == 'lcm',
+            toNorm == 'lcm',
           );
 
           final splitLines = _calculateSplits(
             converted,
             ratios,
             int.parse(displayDistance),
-            to,
+            toNorm,
           );
 
           splitsText = splitLines.join('\n');
@@ -1179,22 +1200,11 @@ class ConverterController extends Notifier<ConverterState> {
     }
 
     final List<String> sections = [];
+    if (results.length > 1)        sections.add(results.join('\n'));
+    if (splitResults.isNotEmpty)   sections.add(splitResults.join('\n\n'));
+    if (state.output.isNotEmpty)   sections.add(state.output);
 
-    if (results.length > 1) {
-      sections.add(results.join('\n'));
-    }
-
-    if (splitResults.isNotEmpty) {
-      sections.add(splitResults.join('\n\n'));
-    }
-
-    if (s.output.isNotEmpty) {
-      sections.add(s.output);
-    }
-
-    final finalOutput = sections.join('\n\n').trim();
-
-    state = s.copyWith(output: finalOutput);
+    state = state.copyWith(output: sections.join('\n\n').trim());
   }
 
   String _calculate50LcmSplits(double total, String gender) {

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../../core/utils/utils/ratios_1.dart';
 import '../../../../../core/utils/utils/time_utils_1.dart' hide TimeUtils1;
+import '../../../../on_boarding/presentation/screens/widget/course_page_widget.dart';
 
 
 
@@ -33,6 +34,9 @@ class StopwatchController2 extends ChangeNotifier {
     'Predictor': TimerState(),
     'Converter': TimerState(),
   };
+  StopwatchController2() {
+    initFromCourseOrder();
+  }
 
   Timer? _ticker;
 
@@ -55,6 +59,16 @@ class StopwatchController2 extends ChangeNotifier {
   String toCourse              = 'SCM';
   String lastPredictorConfig   = '';
 
+
+  Future<void> initFromCourseOrder() async {
+    final savedOrder = await CourseOrderStorage.loadCourseOrder();
+    final middleItem = savedOrder[savedOrder.length ~/ 2];
+    fromCourse = middleItem; // ✅ direct field assignment
+    toCourse  = middleItem; // ✅ direct field assignment
+    course  = middleItem; // ✅ direct field assignment
+    notifyListeners();       // ✅ notify UI to rebuild
+  }
+
   // ✅ NEW: stores all completed predictor sessions separately
   // Each session = { 'header': String, 'laps': List<String> }
   final List<Map<String, dynamic>> _predictorSessions = [];
@@ -63,9 +77,7 @@ class StopwatchController2 extends ChangeNotifier {
   List<String> _currentSessionLaps = [];
   String       _currentSessionHeader = '';
 
-  StopwatchController2() {
-    initializeRatios1();
-  }
+
 
   TimerState get current => _timers[activeMode]!;
 

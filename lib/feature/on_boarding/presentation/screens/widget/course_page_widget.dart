@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/common/widgets/custom_text.dart';
 import '../../../../../core/utils/constants/app_colors.dart';
@@ -9,7 +10,27 @@ import '../../../../../core/utils/constants/app_sizer.dart';
 import '../../../../../core/utils/constants/icon_path.dart';
 import '../../../../../l10n/app_localizations.dart';
 
+/// ═══════════════════════════════════════════════════════════
+/// SHARED PREFERENCE HELPER
+/// ═══════════════════════════════════════════════════════════
+class CourseOrderStorage {
+  static const String _key = 'course_order';
 
+  static Future<void> saveCourseOrder(List<String> courses) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_key, courses);
+  }
+
+  static Future<List<String>> loadCourseOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getStringList(_key);
+    return saved ?? ["SCY", "SCM", "LCM"];
+  }
+}
+
+/// ═══════════════════════════════════════════════════════════
+/// STATE
+/// ═══════════════════════════════════════════════════════════
 class OnboardingState {
   final List<String> availableCourses;
   final String selectedCourse;
@@ -19,7 +40,10 @@ class OnboardingState {
     required this.selectedCourse,
   });
 
-  OnboardingState copyWith({List<String>? availableCourses, String? selectedCourse}) {
+  OnboardingState copyWith({
+    List<String>? availableCourses,
+    String? selectedCourse,
+  }) {
     return OnboardingState(
       availableCourses: availableCourses ?? this.availableCourses,
       selectedCourse: selectedCourse ?? this.selectedCourse,
@@ -27,33 +51,74 @@ class OnboardingState {
   }
 }
 
+/// ═══════════════════════════════════════════════════════════
+/// VIEW MODEL
+/// ═══════════════════════════════════════════════════════════
 class OnboardingViewModel extends StateNotifier<OnboardingState> {
   OnboardingViewModel()
-      : super(OnboardingState(
-    availableCourses: ["SCY", "SCM", "LCM"],
-    selectedCourse: "SCY",
-  ));
+      : super(
+    OnboardingState(
+      availableCourses: ["SCY", "SCM", "LCM"],
+      selectedCourse: "SCY",
+    ),
+  ) {
+    _loadSavedOrder();
+  }
 
-  // Logic to handle dragging from one index to another
-  void reorderCourses(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
+  Future<void> _loadSavedOrder() async {
+    final saved = await CourseOrderStorage.loadCourseOrder();
+
+    // Only update if there is actually saved data
+    if (saved.isNotEmpty) {
+      state = state.copyWith(
+        availableCourses: saved,
+        selectedCourse: saved.first,
+      );
+    }
+  }
+
+  // Helper method to persist the data
+  Future<void> _saveToDatabase(List<String> list) async {
+    await CourseOrderStorage.saveCourseOrder(list);
+  }
+
+  Future<void> reorderCourses(int oldIndex, int newIndex) async {
+    // --- CRITICAL FIX FOR DOWNWARD DRAG ---
+    if (newIndex > oldIndex) {
       newIndex -= 1;
     }
 
-    final List<String> items = List.from(state.availableCourses);
-    final String movedItem = items.removeAt(oldIndex);
-    items.insert(newIndex, movedItem);
+    // 1. Create a completely new list copy (ensures Riverpod detects change)
+    final List<String> updatedList = List.from(state.availableCourses);
 
+    // 2. Perform the swap
+    final String movedItem = updatedList.removeAt(oldIndex);
+    updatedList.insert(newIndex, movedItem);
+
+    // 3. Update the state
+    // This triggers the build method to refresh the 1. 2. 3. numbers
     state = state.copyWith(
-      availableCourses: items,
-      selectedCourse: items.first, // The new #1 item
+      availableCourses: updatedList,
+      // Optional: Update selectedCourse if the top item changed
+      selectedCourse: updatedList.first,
     );
+
+    // 4. PERSISTENCE
+    await _saveToDatabase(updatedList);
   }
 }
 
-final onboardingProvider1 = StateNotifierProvider<OnboardingViewModel, OnboardingState>((ref) {
+/// ═══════════════════════════════════════════════════════════
+/// PROVIDER
+/// ═══════════════════════════════════════════════════════════
+final onboardingProvider1 =
+StateNotifierProvider<OnboardingViewModel, OnboardingState>((ref) {
   return OnboardingViewModel();
 });
+
+/// ═══════════════════════════════════════════════════════════
+/// COURSE PAGE
+/// ═══════════════════════════════════════════════════════════
 class CoursePage extends ConsumerWidget {
   const CoursePage({super.key});
 
@@ -64,9 +129,12 @@ class CoursePage extends ConsumerWidget {
 
     return Column(
       children: [
-        // Header Section
         Padding(
-          padding: EdgeInsets.only(left: 32.w, right: 32.w, top: 120.h),
+          padding: EdgeInsets.only(
+            left: 32.w,
+            right: 32.w,
+            top: 120.h,
+          ),
           child: Column(
             children: [
               Row(
@@ -79,7 +147,7 @@ class CoursePage extends ConsumerWidget {
                     fontSize: 24.sp,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textWhite,
-                  )
+                  ),
                 ],
               ),
               SizedBox(height: 8.h),
@@ -88,23 +156,20 @@ class CoursePage extends ConsumerWidget {
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 color: AppColors.textGrey,
-                textAlign: TextAlign.center,
-              )
+              ),
             ],
           ),
         ),
 
         SizedBox(height: 32.h),
 
-        // Reorderable List Section
         Container(
           margin: EdgeInsets.symmetric(horizontal: 30.w),
           decoration: BoxDecoration(
-            color: Color(0xFF0B2E4A), // Deep dark blue background from image
+            color: const Color(0xFF0B2E4A),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.blueAccent.withValues(alpha: 0.8),
-              width: 1,
+              color: Colors.blueAccent.withOpacity(0.8),
             ),
           ),
           child: ClipRRect(
@@ -112,108 +177,96 @@ class CoursePage extends ConsumerWidget {
             child: ReorderableListView.builder(
               shrinkWrap: true,
               itemCount: courseList.length,
-              // 🔥 FIX: proxyDecorator ensures the item stays dark when picked up
-              proxyDecorator: (child, index, animation) {
-                return AnimatedBuilder(
-                  animation: animation,
-                  builder: (BuildContext context, Widget? child) {
-                    // The animation.value helps us add a slight effect (like a shadow or scale)
-                    // when the item is picked up
-                    final double animValue = Curves.easeInOut.transform(animation.value);
-                    //final double elevation = lerpDouble(0, 6, animValue)!;
 
-                    return Material(
-                      // Transparent so the ClipRRect below handles the background
-                      color: Colors.transparent,
-                      //elevation: elevation, // Adds a subtle shadow while dragging
-                      shadowColor: Colors.black.withOpacity(0.5),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12), // 🔥 This keeps the corners rounded
-                        child: Container(
-                          color: const Color(0xFF0B2E4A), // Match your list background
-                          child: child,
-                        ),
-                      ),
-                    );
-                  },
-                  child: child,
+              onReorder: (oldIndex, newIndex) async {
+                await ref
+                    .read(onboardingProvider1.notifier)
+                    .reorderCourses(oldIndex, newIndex);
+              },
+
+              proxyDecorator: (child, index, animation) {
+                return Material(
+                  color: Colors.transparent,
+                  child: ScaleTransition(
+                    scale: Tween<double>(
+                      begin: 1,
+                      end: 1.03,
+                    ).animate(animation),
+                    child: child,
+                  ),
                 );
               },
-              onReorder: (oldIndex, newIndex) {
-                ref.read(onboardingProvider1.notifier).reorderCourses(oldIndex, newIndex);
-              },
+
               itemBuilder: (context, index) {
                 final course = courseList[index];
                 final isFirst = index == 0;
 
                 return Column(
-                  key: ValueKey(course), // Required for Reorderable
-                  mainAxisSize: MainAxisSize.min,
+                  key: ValueKey(course),
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 20.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 28.w,
+                        vertical: 20.h,
+                      ),
                       child: Row(
                         children: [
-                          // 1. Rank Number (e.g., 1.)
                           SizedBox(
                             width: 40.w,
                             child: Text(
                               "${index + 1}.",
                               style: TextStyle(
-                                color: isFirst ? Colors.amber : Colors.white60,
+                                color: isFirst
+                                    ? Colors.amber
+                                    : Colors.white60,
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
 
-                          SizedBox(width: 70.w,),
+                          SizedBox(width: 60.w),
 
-                          // 2. Course Title (Centered)
-                          Text(
-                            course,
-                            style: TextStyle(
-                              color: isFirst ? Colors.amber : Colors.white60,
-                              fontSize: 16.sp,
-                              fontWeight: isFirst ? FontWeight.bold : FontWeight.w500,
-                              letterSpacing: 1.2,
+                          Expanded(
+                            child: Text(
+                              course,
+                              style: TextStyle(
+                                color: isFirst
+                                    ? Colors.amber
+                                    : Colors.white60,
+                                fontSize: 16.sp,
+                                fontWeight: isFirst
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                              ),
                             ),
                           ),
 
-                          const Spacer(),
-
-                          // 3. Drag Handle (SVG from your project)
                           ReorderableDragStartListener(
                             index: index,
                             child: Icon(
-                              Icons.drag_indicator, // Or your SvgPicture.asset(IconPath.courseIcon)
-                              color: isFirst ? Colors.amber.withOpacity(0.5) : Colors.white24,
-                              size: 24.sp,
+                              Icons.drag_indicator,
+                              color: isFirst
+                                  ? Colors.amber.withOpacity(0.6)
+                                  : Colors.white24,
                             ),
                           ),
                         ],
                       ),
                     ),
 
-                    // 4. Divider: Only show between items, not after the last one
                     if (index < courseList.length - 1)
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 0.5.w),
-                        child: Divider(
-                          height: 0.5,
-                          thickness: 0.5,
-                          color: AppColors.primary,
-                        ),
+                      Divider(
+                        height: 1,
+                        color: AppColors.primary,
                       ),
                   ],
                 );
               },
             ),
           ),
-        )
+        ),
       ],
     );
   }
 }
-
-

@@ -15,6 +15,7 @@ import '../../../../../../core/common/widgets/new_custon_widgets/split_calculato
 import '../../../../../../core/services/token_storage.dart';
 import '../../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../../core/utils/constants/icon_path.dart';
+import '../../../../calculator_section/calculator/presentation/screen/calculator_page.dart';
 import '../../../../calculator_section/calculator/presentation/screen/widget/custom_drawer_widget.dart';
 import '../../../../calculator_section/calculator/riverpod/audio_controller.dart';
 import '../../../../calculator_section/setting_section/settings/riverpod/setting_controller.dart';
@@ -575,44 +576,90 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
   }
 
   Widget _converterSelector(BuildContext context, FontSizeOption fontOption, bool isHaptic) {
-    return Row(children: [
-      Expanded(child: Column(children: [
-        CustomText(text: AppLocalizations.of(context)!.from, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
-        SizedBox(height: 8.h),
-        Consumer(builder: (context, ref, child) {
-          const items = ["SCY", "SCM", "LCM"];
-          final course = ref.watch(stopwatchProvider2.select((s) => s.fromCourse));
-          final selected = items.contains(course) ? course : items.first;
-          return SplitCalculatorSelectorOne(
-            items: items,
-            selectedValue: selected,
-            onChanged: (s) {
-              FocusManager.instance.primaryFocus?.unfocus();
-              ref.read(stopwatchProvider2.notifier).setConverterCourses(from: s);
-              if (isHaptic) HapticFeedback.lightImpact();
-            },
-          );
-        }),
-      ])),
-      Expanded(child: Column(children: [
-        CustomText(text: AppLocalizations.of(context)!.to, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
-        SizedBox(height: 8.h),
-        Consumer(builder: (context, ref, child) {
-          const items = ["SCY", "SCM", "LCM"];
-          final course = ref.watch(stopwatchProvider2.select((s) => s.toCourse));
-          final selected = items.contains(course) ? course : items.first;
-          return SplitCalculatorSelectorOne(
-            items: items,
-            selectedValue: selected,
-            onChanged: (s) {
-              FocusManager.instance.primaryFocus?.unfocus();
-              ref.read(stopwatchProvider2.notifier).setConverterCourses(to: s);
-              if (isHaptic) HapticFeedback.lightImpact();
-            },
-          );
-        }),
-      ])),
-    ]);
+    return Row(
+      children: [
+        // ── FROM ─────────────────────────────────────────────
+        Expanded(
+          child: Column(
+            children: [
+              CustomText(
+                text: AppLocalizations.of(context)!.from,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: getAdjustedFontSize(16, fontOption).sp,
+              ),
+              SizedBox(height: 8.h),
+              Consumer(
+                builder: (context, ref, child) {
+                  // ✅ Load saved course order
+                  final courseOrderAsync = ref.watch(courseOrderProvider);
+                  final orderedItems = courseOrderAsync.maybeWhen(
+                    data: (courses) => courses,
+                    orElse: () => ["SCY", "SCM", "LCM"],
+                  );
+
+                  // ✅ Middle item as initial default
+                  final middleItem = orderedItems[orderedItems.length ~/ 2];
+
+                  final course   = ref.watch(stopwatchProvider2.select((s) => s.fromCourse));
+
+                  // ✅ Use middle as fallback if course not found in list
+                  final selected = orderedItems.contains(course) ? course : middleItem;
+
+                  return SplitCalculatorSelectorOne(
+                    items: orderedItems,
+                    selectedValue: selected,
+                    onChanged: (s) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      ref.read(stopwatchProvider2.notifier).setConverterCourses(from: s);
+                      if (isHaptic) HapticFeedback.lightImpact();
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+
+        // ── TO ───────────────────────────────────────────────
+        Expanded(
+          child: Column(
+            children: [
+              CustomText(
+                text: AppLocalizations.of(context)!.to,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: getAdjustedFontSize(16, fontOption).sp,
+              ),
+              SizedBox(height: 8.h),
+              Consumer(
+                builder: (context, ref, child) {
+                  // ✅ Load saved course order
+                  final courseOrderAsync = ref.watch(courseOrderProvider);
+                  final orderedItems = courseOrderAsync.maybeWhen(
+                    data: (courses) => courses,
+                    orElse: () => ["SCY", "SCM", "LCM"],
+                  );
+
+                  final course   = ref.watch(stopwatchProvider2.select((s) => s.toCourse));
+                  final selected = orderedItems.contains(course) ? course : orderedItems.first;
+
+                  return SplitCalculatorSelectorOne(
+                    items: orderedItems,        // ✅ saved order
+                    selectedValue: selected,
+                    onChanged: (s) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      ref.read(stopwatchProvider2.notifier).setConverterCourses(to: s);
+                      if (isHaptic) HapticFeedback.lightImpact();
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _predictorSelector(BuildContext context, FontSizeOption fontOption) {
@@ -655,29 +702,62 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
       ]),
       SizedBox(height: 10.h),
       Row(children: [
-        Expanded(child: Column(children: [
-          SizedBox(height: 8.h),
-          CustomText(text: AppLocalizations.of(context)!.course, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
-          SizedBox(height: 16.h),
-          Consumer(builder: (context, ref, child) {
-            const items    = ["SCY", "SCM", "LCM"];
-            final rawCourse = ref.watch(stopwatchProvider2.select((s) => s.course));
-            final currentCourse = rawCourse.toUpperCase();
-            return SplitCalculatorSelectorOne(
-              items: items,
-              selectedValue: currentCourse,
-              onChanged: (s) {
-                final notifier      = ref.read(stopwatchProvider2.notifier);
-                final state         = ref.read(stopwatchProvider2);
-                final newCourse     = s.toLowerCase();
-                final validDistances = getDistances(newCourse, state.stroke);
-                final newDistance   = validDistances.contains(state.distance) ? state.distance : validDistances.first;
-                final validSplits   = getSplitSizes(course: newCourse, distance: newDistance, stroke: state.stroke);
-                notifier.setPredictorParams(c: newCourse, d: newDistance, split: validSplits.isNotEmpty ? validSplits.first : "50");
-              },
-            );
-          }),
-        ])),
+        Expanded(
+          child: Column(
+            children: [
+              SizedBox(height: 8.h),
+              CustomText(
+                text: AppLocalizations.of(context)!.course,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: getAdjustedFontSize(16, fontOption).sp,
+              ),
+              SizedBox(height: 16.h),
+              Consumer(
+                builder: (context, ref, child) {
+                  // ✅ Load saved course order from SharedPreferences
+                  final courseOrderAsync = ref.watch(courseOrderProvider);
+                  final orderedItems = courseOrderAsync.maybeWhen(
+                    data: (courses) => courses,
+                    orElse: () => ["SCY", "SCM", "LCM"],
+                  );
+
+                  final rawCourse    = ref.watch(stopwatchProvider2.select((s) => s.course));
+                  final currentCourse = rawCourse.toUpperCase();
+
+                  // ✅ fallback to first in saved order if current not found
+                  final selectedValue = orderedItems.contains(currentCourse)
+                      ? currentCourse
+                      : orderedItems.first;
+
+                  return SplitCalculatorSelectorOne(
+                    items: orderedItems,         // ✅ saved order
+                    selectedValue: selectedValue,
+                    onChanged: (s) {
+                      final notifier       = ref.read(stopwatchProvider2.notifier);
+                      final state          = ref.read(stopwatchProvider2);
+                      final newCourse      = s.toLowerCase();
+                      final validDistances = getDistances(newCourse, state.stroke);
+                      final newDistance    = validDistances.contains(state.distance)
+                          ? state.distance
+                          : validDistances.first;
+                      final validSplits    = getSplitSizes(
+                        course: newCourse,
+                        distance: newDistance,
+                        stroke: state.stroke,
+                      );
+                      notifier.setPredictorParams(
+                        c: newCourse,
+                        d: newDistance,
+                        split: validSplits.isNotEmpty ? validSplits.first : "50",
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
         Expanded(child: Column(children: [
           SizedBox(height: 8.h),
           CustomText(text: AppLocalizations.of(context)!.distance, color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: getAdjustedFontSize(16, fontOption).sp),
