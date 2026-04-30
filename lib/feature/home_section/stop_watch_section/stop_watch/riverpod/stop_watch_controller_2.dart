@@ -63,7 +63,8 @@ class StopwatchController2 extends ChangeNotifier {
   Future<void> initFromCourseOrder() async {
     final savedOrder = await CourseOrderStorage.loadCourseOrder();
     final middleItem = savedOrder[savedOrder.length ~/ 2];
-    fromCourse = middleItem; // ✅ direct field assignment
+    final firstItem = savedOrder[0];
+    fromCourse = firstItem; // ✅ direct field assignment
     toCourse  = middleItem; // ✅ direct field assignment
     course  = middleItem; // ✅ direct field assignment
     notifyListeners();       // ✅ notify UI to rebuild
@@ -136,19 +137,24 @@ class StopwatchController2 extends ChangeNotifier {
   }
 
   // ================= STOP =================
-  void pause() {
-    final t = current;
-    if (!t.running) return;
+  // In StopwatchController2 — add this method:
+  void pauseMode(String mode) {
+    final t = _timers[mode];
+    if (t == null || !t.running) return;
 
-    t.accumulated = elapsed();
+    t.accumulated = t.accumulated +
+        DateTime.now().difference(t.startTime!).inMilliseconds / 1000;
     t.running = false;
     t.startTime = null;
 
-    _ticker?.cancel();
+    // Only cancel ticker if NO timer is running
+    final anyRunning = _timers.values.any((t) => t.running);
+    if (!anyRunning) _ticker?.cancel();
+
     notifyListeners();
   }
 
-  void stop() => pause();
+  //void stop() => pause();
 
   // ================= ELAPSED =================
   double elapsed() {

@@ -421,7 +421,7 @@ class _StopwatchScreenState extends ConsumerState<StopwatchScreen> {
                 onTap: () {
                   FocusManager.instance.primaryFocus?.unfocus();
                   ref.read(stopwatchProvider2.notifier).setMode(mode);
-                  ref.read(stopwatchProvider2.notifier).pause();
+                  ref.read(stopwatchProvider2.notifier).pauseMode(mode);
                   ref.read(statusProvider.notifier).state = StopwatchStatus.stopped;
                   if (isHaptic)    HapticFeedback.lightImpact();
                   if (isStopWatch) ref.read(audioProvider.notifier).play();
